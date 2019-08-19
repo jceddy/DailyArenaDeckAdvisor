@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+	<?define VersionNumber="!(bind.FileVersion.DailyArenaDeckAdvisorExe)" ?>
+	<?define UpgradeCode="db23b1b4-1446-4001-a525-0264e1abc4eb" ?>
+	<?define InfoURL="https://clans.dailyarena.com/" ?>
+
+	<?if $(var.Platform) = x64 ?>
+		<?define Win64 = "yes" ?>
+		<?define PlatformProgramFilesFolder = "ProgramFiles64Folder" ?>
+		<?define DailyArenaDeckAdvisorExeSourcePath = "$(var.ProjectDir)..\DailyArenaDeckAdvisor\x64\Release\DailyArenaDeckAdvisor.exe" ?>
+		<?define NewtonsoftJsonDllSourcePath = "$(var.ProjectDir)..\DailyArenaDeckAdvisor\x64\Release\Newtonsoft.Json.dll" ?>
+		<?define NewtonsoftJsonXmlSourcePath = "$(var.ProjectDir)..\DailyArenaDeckAdvisor\x64\Release\Newtonsoft.Json.xml" ?>
+		<?define DailyArenaDeckAdvisorLauncherExeSourcePath = "$(var.ProjectDir)..\DailyArenaDeckAdvisorLauncher\x64\Release\DailyArenaDeckAdvisorLauncher.exe" ?>
+		<?define DailyArenaDeckAdvisorUpdaterExeSourcePath = "$(var.ProjectDir)..\DailyArenaDeckAdvisorUpdater\x64\Release\DailyArenaDeckAdvisorUpdater.exe" ?>
+	<?else ?>
+		<?define Win64 = "no" ?>
+		<?define PlatformProgramFilesFolder = "ProgramFilesFolder" ?>
+		<?define DailyArenaDeckAdvisorExeSourcePath = "$(var.ProjectDir)..\DailyArenaDeckAdvisor\x86\Release\DailyArenaDeckAdvisor.exe" ?>
+		<?define NewtonsoftJsonDllSourcePath = "$(var.ProjectDir)..\DailyArenaDeckAdvisor\x86\Release\Newtonsoft.Json.dll" ?>
+		<?define NewtonsoftJsonXmlSourcePath = "$(var.ProjectDir)..\DailyArenaDeckAdvisor\x86\Release\Newtonsoft.Json.xml" ?>
+		<?define DailyArenaDeckAdvisorLauncherExeSourcePath = "$(var.ProjectDir)..\DailyArenaDeckAdvisorLauncher\x86\Release\DailyArenaDeckAdvisorLauncher.exe" ?>
+		<?define DailyArenaDeckAdvisorUpdaterExeSourcePath = "$(var.ProjectDir)..\DailyArenaDeckAdvisorUpdater\x86\Release\DailyArenaDeckAdvisorUpdater.exe" ?>
+	<?endif ?>
+
+	<Product Id="*" Name="!(loc.ApplicationName)" Language="!(loc.Language)" Version="$(var.VersionNumber)" Manufacturer="!(loc.ManufacturerFullName)" UpgradeCode="$(var.UpgradeCode)">
+		<Package Id="*" InstallerVersion="400" Compressed="yes" InstallScope="perMachine"  Description="!(loc.ProductDescription)" Comments="!(loc.Comments) $(var.VersionNumber)" />
+
+		<WixVariable Id="WixUILicenseRtf" Value="dummy" />
+		
+		<WixVariable Id="WixUIBannerBmp" Value="images\BannerTop.bmp" />
+		<WixVariable Id="WixUIDialogBmp" Value="images\Dialog.bmp" />
+		
+		<Icon Id="Icon.exe" SourceFile="images\app.ico" />
+		
+		<Property Id="ARPPRODUCTICON" Value="Icon.exe" />
+		<Property Id="ARPHELPLINK" Value="$(var.InfoURL)" />
+		<Property Id="ARPNOREPAIR" Value="yes" Secure="yes" />
+		<Property Id="ARPNOMODIFY" Value="yes" Secure="yes" />
+		
+		<MajorUpgrade DowngradeErrorMessage="!(loc.NewerInstalled)" AllowSameVersionUpgrades="yes" />
+		
+		<InstallExecuteSequence>
+			<!-- Determine the install location after the install path has been validated by the installer -->
+			<Custom Action="SetARPINSTALLLOCATION" After="InstallValidate"></Custom>
+		</InstallExecuteSequence>
+		
+		<CustomAction Id="SetARPINSTALLLOCATION" Property="ARPINSTALLLOCATION" Value="[INSTALLDIR]" />
+		
+		<Condition Message="!(loc.OS2Old)">
+			<![CDATA[Installed OR (VersionNT >= 600)]]>
+		</Condition>
+		
+		<?if $(var.Platform) = x64 ?>
+			<Condition Message="!(loc.x86VersionRequired)">
+				<![CDATA[VersionNT64]]>
+			</Condition>
+		<?endif?>
+		<?if $(var.Platform) = x86 ?>
+			<Condition Message="!(loc.x64VersionRequired)">
+				<![CDATA[NOT VersionNT64]]>
+			</Condition>
+		<?endif?>
+		
+		<CustomAction Id='SaveCmdLineValueINSTALLDIR' Property='CMDLINE_INSTALLDIR' Value='[INSTALLDIR]' Execute='firstSequence' />
+		<CustomAction Id='SetFromCmdLineValueINSTALLDIR' Property='INSTALLDIR' Value='[CMDLINE_INSTALLDIR]' Execute='firstSequence' />
+		<InstallUISequence>
+			<Custom Action='SaveCmdLineValueINSTALLDIR' Before='AppSearch' />
+			<Custom Action='SetFromCmdLineValueINSTALLDIR' After='AppSearch'>
+				CMDLINE_INSTALLDIR
+			</Custom>
+		</InstallUISequence>
+		<InstallExecuteSequence>
+			<Custom Action='SaveCmdLineValueINSTALLDIR' Before='AppSearch' />
+			<Custom Action='SetFromCmdLineValueINSTALLDIR' After='AppSearch'>
+				CMDLINE_INSTALLDIR
+			</Custom>
+		</InstallExecuteSequence>
+	
+		<Property Id="INSTALLDIR">
+			<RegistrySearch Id="DetermineInstallLocation" Type="raw" Root="HKLM" Key="Software\!(loc.ManufacturerName)\InstalledProducts\!(loc.ApplicationName)" Name="InstallLocation" />
+		</Property>
+
+		<Media Id="1" Cabinet="media1.cab" EmbedCab="yes" />
+		
+		<Directory Id="TARGETDIR" Name="SourceDir">
+			<Directory Id="$(var.PlatformProgramFilesFolder)">
+				<Directory Id="ProgramFilesHK" Name="!(loc.ManufacturerName)">
+					<Directory Id="INSTALLDIR" Name="!(loc.ApplicationName)">
+						<!-- Installation directory as a component so it can be emptied during uninstall (by default files added by someone other than Windows Installer are not removed) -->
+						<Component Id="INSTALLDIR_comp" Guid="e057f927-93d3-4ef4-97ef-5e334b26094c">
+							<CreateFolder />
+							<RemoveFile Id="RemoveFilesFromAppDirectory" Name="*.*" On="uninstall" />
+						</Component>
+
+						<!-- Main program file -->
+						<Component Id="DailyArenaDeckAdvisor.exe_comp" Guid="*" Win64="$(var.Win64)">
+							<File Source="$(var.DailyArenaDeckAdvisorExeSourcePath)" Id="DailyArenaDeckAdvisorExe" KeyPath="yes" />
+						</Component>
+						
+						<!-- Other Files -->
+						<Component Id="DailyArenaDeckAdvisorLauncher.exe_comp" Guid="4ba3c231-a45f-451d-896b-526ac73811c9" Win64="$(var.Win64)">
+							<File Source="$(var.DailyArenaDeckAdvisorLauncherExeSourcePath)" Id="DailyArenaDeckAdvisorLauncherExe" KeyPath="yes" />
+						</Component>
+						<Component Id="DailyArenaDeckAdvisorUpdater.exe_comp" Guid="314d15de-e70a-496b-8623-ea03bc6ec145" Win64="$(var.Win64)">
+							<File Source="$(var.DailyArenaDeckAdvisorUpdaterExeSourcePath)" Id="DailyArenaDeckAdvisorUpdaterExe" KeyPath="yes" />
+						</Component>
+						<Component Id="Newtonsoft.Json.dll_comp" Guid="47a23765-4657-4a16-a04f-8f4705a7271f" Win64="$(var.Win64)">
+							<File Source="$(var.NewtonsoftJsonDllSourcePath)" Id="NewtonsoftJsonDll" KeyPath="yes" />
+						</Component>
+						<Component Id="Newtonsoft.Json.xml_comp" Guid="f2636b43-a795-439c-b66f-76c9c5b506eb" Win64="$(var.Win64)">
+							<File Source="$(var.NewtonsoftJsonXmlSourcePath)" Id="NewtonsoftJsonXml" KeyPath="yes" />
+						</Component>
+					</Directory>
+				</Directory>
+			</Directory>
+			
+			<Directory Id="ProgramMenuFolder">
+				<Directory Id="ApplicationProgramsFolder" Name="DailyArenaDeckAdvisor" />
+				<Directory Id="DesktopFolder" Name="Desktop" />
+			</Directory>
+
+			<!-- Registry entries -->
+			<Component Id="RegValInstallLocation_comp" Guid="4aeb589c-3ed1-400b-8104-477ad53957aa">
+				<RegistryKey Root="HKLM" Key="Software\!(loc.ManufacturerName)\InstalledProducts\!(loc.ApplicationName)">
+					<RegistryValue Name="InstallLocation" Value="[INSTALLDIR]" Type="string" KeyPath="yes" />
+				</RegistryKey>
+			</Component>
+		</Directory>
+	
+		<Feature Id="Complete" Title="!(loc.ApplicationName)" Description="!(loc.FeatureCompleteDescription)" Display="expand" Level="1" ConfigurableDirectory="INSTALLDIR">
+			<!-- A feature block for the main (GUI) program and all its dependencies -->
+			<Feature Id="MainProgram" Title="!(loc.FeatureMainProgramTitle)" Description="!(loc.FeatureMainProgramDescription)" Level="1">
+				<ComponentRef Id="INSTALLDIR_comp" />
+				<ComponentRef Id="DailyArenaDeckAdvisor.exe_comp" />
+				<ComponentRef Id="Newtonsoft.Json.dll_comp" />
+				<ComponentRef Id="Newtonsoft.Json.xml_comp" />
+				<ComponentRef Id="DailyArenaDeckAdvisorLauncher.exe_comp" />
+				<ComponentRef Id="DailyArenaDeckAdvisorUpdater.exe_comp" />
+
+				<!-- Registry entries -->
+				<ComponentRef Id="RegValInstallLocation_comp" />
+			
+				<!-- Shortcuts -->
+				<ComponentRef Id="ApplicationShortcut" />
+				<ComponentRef Id="ApplicationShortcutDesktop" />
+			</Feature>
+		</Feature>
+	
+		<UI>
+			<!-- Define the installer UI -->
+			<UIRef Id="WixUI_HK" />
+		</UI>
+
+		<Property Id="WIXUI_INSTALLDIR" Value="INSTALLDIR" />
+	</Product>
+
+	<Fragment>
+		<DirectoryRef Id="ApplicationProgramsFolder">
+			<Component Id="ApplicationShortcut" Guid="55d52bf5-b6f6-4c59-8bd6-6f27cf4fcf99">
+				<Shortcut Id="ApplicationStartMenuShortcut" Name="DailyArenaDeckAdvisor" Description="Daily Arena Deck Advisor" Target="[INSTALLDIR]DailyArenaDeckAdvisorLauncher.exe" WorkingDirectory="INSTALLFOLDER" />
+				<RemoveFolder Id="RemoveApplicationProgramsFolder" Directory="ApplicationProgramsFolder" On="uninstall" />
+				<RegistryValue Root="HKCU" Key="Software\!(loc.ManufacturerName)\InstalledProducts\!(loc.ApplicationName)" Name="installed" Type="integer" Value="1" KeyPath="yes" />
+			</Component>
+		</DirectoryRef>
+		<DirectoryRef Id="DesktopFolder">
+			<Component Id="ApplicationShortcutDesktop" Guid="4e9c950c-4c36-488d-a43f-4a01b126d903">
+				<Shortcut Id="ApplicationDesktopShortcut" Name="DailyArenaDeckAdvisor" Description="Daily Arena Deck Advisor" Target="[INSTALLDIR]DailyArenaDeckAdvisorLauncher.exe" WorkingDirectory="INSTALLFOLDER" />
+				<RemoveFolder Id="RemoveDesktopFolder" Directory="DesktopFolder" On="uninstall" />
+				<RegistryValue Root="HKCU" Key="Software\!(loc.ManufacturerName)\InstalledProducts\!(loc.ApplicationName)" Name="installed" Type="integer" Value="1" KeyPath="yes" />
+			</Component>
+		</DirectoryRef>
+	</Fragment>
+</Wix>

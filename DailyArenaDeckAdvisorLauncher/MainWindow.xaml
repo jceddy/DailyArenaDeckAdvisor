@@ -1,0 +1,15 @@
+﻿<Window x:Class="DailyArenaDeckAdvisorLauncher.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d"
+        Title="Daily Arena Deck Advisor - Launcher" Height="225" Width="400"
+		WindowStyle="None" WindowStartupLocation="CenterScreen" ResizeMode="NoResize" BorderBrush="Black" BorderThickness="3"
+		Closed="Window_Closed" Loaded="Window_Loaded">
+	<StackPanel Orientation="Vertical" VerticalAlignment="Center">
+		<TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" TextAlignment="Center" FontWeight="Bold" FontSize="36">Daily Arena<LineBreak />Deck Advisor</TextBlock>
+		<TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="Bold" FontSize="28"></TextBlock>
+		<TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="Bold" FontSize="28">Checking for updates...</TextBlock>
+	</StackPanel>
+</Window>
