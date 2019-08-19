@@ -139,6 +139,7 @@ namespace DailyArenaDeckAdvisor
 
 			Archetype.WildcardsOwned = _wildcardsOwned;
 			Archetype.CardStats = _cardStats;
+			Archetype.AnyNumber = _anyNumber;
 
 			foreach (Card card in Card.AllCards)
 			{
@@ -508,11 +509,6 @@ namespace DailyArenaDeckAdvisor
 								playerInventory[printing.ArenaId] = 0;
 							}
 							if (neededCards == 0) { break; }
-						}
-						if (_anyNumber.Contains(neededCard.Name))
-						{
-							neededForMain = Math.Min(neededForMain, Math.Max(4 - haveCards[neededCard.Name], 0));
-							neededForSideboard = Math.Min(neededForSideboard, Math.Max(4 - haveCards[neededCard.Name], 0));
 						}
 						if (neededForMain > 0)
 						{

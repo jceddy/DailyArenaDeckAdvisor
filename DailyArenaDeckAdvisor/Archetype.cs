@@ -112,8 +112,8 @@ namespace DailyArenaDeckAdvisor
 			get
 			{
 				ReadOnlyDictionary<int, Card> cardsById = Card.CardsById;
-				return MainDeckToCollect.Select(x => new { cardsById[x.Key].Rarity, Count = x.Value }).
-					Concat(SideboardToCollect.Select(x => new { cardsById[x.Key].Rarity, Count = x.Value })).
+				return MainDeckToCollect.Select(x => new { cardsById[x.Key].Rarity, Count = AnyNumber.Contains(cardsById[x.Key].Name) ? Math.Min(x.Value, 4) - (SuggestedMainDeck.Where(y => y.Key == x.Key).Count() + SuggestedSideboard.Where(z => z.Key == x.Key).Count()) : x.Value }).
+					Concat(SideboardToCollect.Select(x => new { cardsById[x.Key].Rarity, Count = AnyNumber.Contains(cardsById[x.Key].Name) ? Math.Min(x.Value, 4) - (SuggestedMainDeck.Where(y => y.Key == x.Key).Count() + SuggestedSideboard.Where(z => z.Key == x.Key).Count()) : x.Value })).
 					GroupBy(x => x.Rarity).
 					Select(x => new Tuple<CardRarity, int, int>(x.Key, x.Sum(y => y.Count), WildcardsOwned[x.Key])).
 					OrderByDescending(x => x.Item1).ToList();
@@ -287,6 +287,8 @@ namespace DailyArenaDeckAdvisor
 		public static Dictionary<CardRarity, int> WildcardsOwned { get; set; }
 
 		public static Dictionary<Card, CardStats> CardStats { get; set; }
+
+		public static List<string> AnyNumber { get; set; }
 
 		private static int NextIndex { get; set; } = 0;
 	}
