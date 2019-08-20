@@ -41,7 +41,7 @@ namespace DailyArenaDeckAdvisor
 		{
 			App application = (App)Application.Current;
 			_logger = application.Logger;
-			_logger.Debug("Main Window Constructor Called");
+			_logger.Debug("Main Window Constructor Called - {0}", "Main Application");
 
 			InitializeComponent();
 			DataContext = this;
@@ -180,7 +180,7 @@ namespace DailyArenaDeckAdvisor
 			}
 			if (loadDecksFromServer)
 			{
-				var archetypesUrl = $"https://clans.dailyarena.net/deck_scraper.php?format={mappedFormat}&_c={Guid.NewGuid()}";
+				var archetypesUrl = $"https://clans.dailyarena.net/{mappedFormat}_decks.json?_c={Guid.NewGuid()}";
 				var archetypesRequest = WebRequest.Create(archetypesUrl);
 				archetypesRequest.Method = "GET";
 
@@ -716,7 +716,7 @@ namespace DailyArenaDeckAdvisor
 
 		private void Window_Loaded(object sender, RoutedEventArgs e)
 		{
-			_logger.Debug("Main Window Loaded");
+			_logger.Debug("Main Window Loaded - {0}", "Main Application");
 
 			AssemblyName assemblyName = Assembly.GetExecutingAssembly().GetName();
 			string assemblyVersion = assemblyName.Version.ToString();
@@ -746,7 +746,7 @@ namespace DailyArenaDeckAdvisor
 				{
 					if (t.Exception != null)
 					{
-						_logger.Error(t.Exception, "Exception in loadTask ({0})", "Window_Loaded");
+						_logger.Error(t.Exception, "Exception in {0} ({1} - {2})", "loadTask", "Window_Loaded", "Main Application");
 					}
 				},
 				TaskContinuationOptions.OnlyOnFaulted
@@ -775,7 +775,7 @@ namespace DailyArenaDeckAdvisor
 				{
 					if (t.Exception != null)
 					{
-						_logger.Error(t.Exception, "Exception in loadTask ({0})", "Format_PropertyChanged");
+						_logger.Error(t.Exception, "Exception in {0} ({1} - {2})", "loadTask", "Format_PropertyChanged", "Main Application");
 					}
 				},
 				TaskContinuationOptions.OnlyOnFaulted
@@ -832,7 +832,7 @@ namespace DailyArenaDeckAdvisor
 				{
 					if (t.Exception != null)
 					{
-						_logger.Error(t.Exception, "Exception in loadTask ({0})", "Refresh_Click");
+						_logger.Error(t.Exception, "Exception in {0} ({1} - {2})", "loadTask", "Refresh_Click", "Main Application");
 					}
 				},
 				TaskContinuationOptions.OnlyOnFaulted
@@ -864,7 +864,7 @@ namespace DailyArenaDeckAdvisor
 				{
 					if (t.Exception != null)
 					{
-						_logger.Error(t.Exception, "Exception in loadTask ({0})", "HardRefresh_Click");
+						_logger.Error(t.Exception, "Exception in {0} ({1} - {2})", "loadTask", "HardRefresh_Click", "Main Application");
 					}
 				},
 				TaskContinuationOptions.OnlyOnFaulted

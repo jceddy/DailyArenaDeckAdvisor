@@ -3,18 +3,55 @@ using System.Collections.Generic;
 
 namespace DailyArenaDeckAdvisor.Database
 {
+	/// <summary>
+	/// Class that represents a set of Magic colors.
+	/// </summary>
 	public class CardColors : IComparable<CardColors>, IComparable<int>, IComparable<string>
 	{
+		/// <summary>
+		/// Is White one of the colors?
+		/// </summary>
 		public bool IsWhite { get; private set; }
+
+		/// <summary>
+		/// Is Blue one of the colors?
+		/// </summary>
 		public bool IsBlue { get; private set; }
+
+		/// <summary>
+		/// Is Black one of the colors?
+		/// </summary>
 		public bool IsBlack { get; private set; }
+
+		/// <summary>
+		/// Is Red one of the colors?
+		/// </summary>
 		public bool IsRed { get; private set; }
+
+		/// <summary>
+		/// Is Green one of the colors?
+		/// </summary>
 		public bool IsGreen { get; private set; }
 
+		/// <summary>
+		/// An integer representing the "sort order" of the color set.
+		/// </summary>
 		public int SortOrder { get; private set; }
 
+		/// <summary>
+		/// A string representation of the color set.
+		/// </summary>
 		public string ColorString { get; private set; }
 
+		/// <summary>
+		/// Private constructor called by the static CardColorFromString method.
+		/// </summary>
+		/// <param name="isWhite">Is this a White color combo?</param>
+		/// <param name="isBlue">Is this a Blue color combo?</param>
+		/// <param name="isBlack">Is this a Black color combo?</param>
+		/// <param name="isRed">Is this a Red color combo?</param>
+		/// <param name="isGreen">Is this a Green color combo?</param>
+		/// <param name="sortOrder">An integer representing the "sort order" of the color set.</param>
 		private CardColors(bool isWhite, bool isBlue, bool isBlack, bool isRed, bool isGreen, int sortOrder)
 		{
 			IsWhite = isWhite;
@@ -31,6 +68,11 @@ namespace DailyArenaDeckAdvisor.Database
 				isGreen ? "G" : string.Empty);
 		}
 
+		/// <summary>
+		/// Check whether this color combo contains another one.
+		/// </summary>
+		/// <param name="other">The other color combo to check.</param>
+		/// <returns>True if this color is the same as the other, or completely contains it; false otherwise.</returns>
 		public bool Contains(CardColors other)
 		{
 			if (other.IsWhite && !IsWhite) return false;
@@ -41,11 +83,20 @@ namespace DailyArenaDeckAdvisor.Database
 			return true;
 		}
 
+		/// <summary>
+		/// Get a string representation of the color combo.
+		/// </summary>
+		/// <returns>A string representation of the color combo.</returns>
 		public override string ToString()
 		{
 			return ColorString;
 		}
 
+		/// <summary>
+		/// Check whether this color combo is equal to another object/value.
+		/// </summary>
+		/// <param name="obj">The other object/value to compare this color combo to.</param>
+		/// <returns>True if this color combo is equal to the specified object/value; false otherwise.</returns>
 		public override bool Equals(object obj)
 		{
 			if (obj == null)
@@ -68,13 +119,25 @@ namespace DailyArenaDeckAdvisor.Database
 			return false;
 		}
 
+		/// <summary>
+		/// Get this color combo's hash code.
+		/// </summary>
+		/// <returns>The color combo's sort order.</returns>
 		public override int GetHashCode()
 		{
 			return SortOrder;
 		}
 
+		/// <summary>
+		/// Static dictionary containing all CardColors objects that have been created.
+		/// </summary>
 		private static Dictionary<int, CardColors> _cachedColors = new Dictionary<int, CardColors>();
 
+		/// <summary>
+		/// Get a CardColors object from a string specification.
+		/// </summary>
+		/// <param name="colorString">The string specification for the color combo.</param>
+		/// <returns>The specified CardColors object.</returns>
 		public static CardColors CardColorFromString(string colorString)
 		{
 			bool isWhite = colorString.Contains("W");
@@ -98,16 +161,31 @@ namespace DailyArenaDeckAdvisor.Database
 			return _cachedColors[sortOrder];
 		}
 
+		/// <summary>
+		/// Compare this CardColors object to another one.
+		/// </summary>
+		/// <param name="other">The other CardColors object to compare this one to.</param>
+		/// <returns>0 if the objects are equal, otherwise a difference value based on the objects' sort orders.</returns>
 		public int CompareTo(CardColors other)
 		{
 			return SortOrder.CompareTo(other.SortOrder);
 		}
 
+		/// <summary>
+		/// Compare this CardColors object to an integer.
+		/// </summary>
+		/// <param name="other">The integer to compare this CardColors object to.</param>
+		/// <returns>A comparison of this object's sort order with the specified integer.</returns>
 		public int CompareTo(int other)
 		{
 			return SortOrder.CompareTo(other);
 		}
 
+		/// <summary>
+		/// Compare this CardColors object to an string.
+		/// </summary>
+		/// <param name="other">The string to compare this CardColors object to.</param>
+		/// <returns>A comparison result similar to comparing directly to the CardColors object reprsented by the specified string.</returns>
 		public int CompareTo(string other)
 		{
 			bool isWhite = other.Contains("W");

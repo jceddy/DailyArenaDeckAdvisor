@@ -41,7 +41,7 @@ namespace DailyArenaDeckAdvisor
 				File(new CompactJsonFormatter(), $"{dataFolder}\\logs\\log.txt",
 					rollingInterval: RollingInterval.Hour,
 					retainedFileCountLimit: 5,
-					fileSizeLimitBytes: 1048576,
+					fileSizeLimitBytes: 10485760,
 					rollOnFileSizeLimit: true).
 				CreateLogger();
 

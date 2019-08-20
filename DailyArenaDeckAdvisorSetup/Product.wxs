@@ -9,7 +9,9 @@
 		<?define PlatformProgramFilesFolder = "ProgramFiles64Folder" ?>
 		<?define DailyArenaDeckAdvisorExeSourcePath = "$(var.ProjectDir)..\DailyArenaDeckAdvisor\x64\Release\DailyArenaDeckAdvisor.exe" ?>
 		<?define NewtonsoftJsonDllSourcePath = "$(var.ProjectDir)..\DailyArenaDeckAdvisor\x64\Release\Newtonsoft.Json.dll" ?>
-		<?define NewtonsoftJsonXmlSourcePath = "$(var.ProjectDir)..\DailyArenaDeckAdvisor\x64\Release\Newtonsoft.Json.xml" ?>
+		<?define SerilogDllSourcePath = "$(var.ProjectDir)..\DailyArenaDeckAdvisor\x64\Release\Serilog.dll" ?>
+		<?define SerilogFormattingDllSourcePath = "$(var.ProjectDir)..\DailyArenaDeckAdvisor\x64\Release\Serilog.Formatting.Compact.dll" ?>
+		<?define SerilogFileDllSourcePath = "$(var.ProjectDir)..\DailyArenaDeckAdvisor\x64\Release\Serilog.Sinks.File.dll" ?>
 		<?define DailyArenaDeckAdvisorLauncherExeSourcePath = "$(var.ProjectDir)..\DailyArenaDeckAdvisorLauncher\x64\Release\DailyArenaDeckAdvisorLauncher.exe" ?>
 		<?define DailyArenaDeckAdvisorUpdaterExeSourcePath = "$(var.ProjectDir)..\DailyArenaDeckAdvisorUpdater\x64\Release\DailyArenaDeckAdvisorUpdater.exe" ?>
 	<?else ?>
@@ -17,7 +19,9 @@
 		<?define PlatformProgramFilesFolder = "ProgramFilesFolder" ?>
 		<?define DailyArenaDeckAdvisorExeSourcePath = "$(var.ProjectDir)..\DailyArenaDeckAdvisor\x86\Release\DailyArenaDeckAdvisor.exe" ?>
 		<?define NewtonsoftJsonDllSourcePath = "$(var.ProjectDir)..\DailyArenaDeckAdvisor\x86\Release\Newtonsoft.Json.dll" ?>
-		<?define NewtonsoftJsonXmlSourcePath = "$(var.ProjectDir)..\DailyArenaDeckAdvisor\x86\Release\Newtonsoft.Json.xml" ?>
+		<?define SerilogDllSourcePath = "$(var.ProjectDir)..\DailyArenaDeckAdvisor\x86\Release\Serilog.dll" ?>
+		<?define SerilogFormattingDllSourcePath = "$(var.ProjectDir)..\DailyArenaDeckAdvisor\x86\Release\Serilog.Formatting.Compact.dll" ?>
+		<?define SerilogFileDllSourcePath = "$(var.ProjectDir)..\DailyArenaDeckAdvisor\x86\Release\Serilog.Sinks.File.dll" ?>
 		<?define DailyArenaDeckAdvisorLauncherExeSourcePath = "$(var.ProjectDir)..\DailyArenaDeckAdvisorLauncher\x86\Release\DailyArenaDeckAdvisorLauncher.exe" ?>
 		<?define DailyArenaDeckAdvisorUpdaterExeSourcePath = "$(var.ProjectDir)..\DailyArenaDeckAdvisorUpdater\x86\Release\DailyArenaDeckAdvisorUpdater.exe" ?>
 	<?endif ?>
@@ -107,8 +111,14 @@
 						<Component Id="Newtonsoft.Json.dll_comp" Guid="47a23765-4657-4a16-a04f-8f4705a7271f" Win64="$(var.Win64)">
 							<File Source="$(var.NewtonsoftJsonDllSourcePath)" Id="NewtonsoftJsonDll" KeyPath="yes" />
 						</Component>
-						<Component Id="Newtonsoft.Json.xml_comp" Guid="f2636b43-a795-439c-b66f-76c9c5b506eb" Win64="$(var.Win64)">
-							<File Source="$(var.NewtonsoftJsonXmlSourcePath)" Id="NewtonsoftJsonXml" KeyPath="yes" />
+						<Component Id="Serilog.dll_comp" Guid="d1b1dbe2-9c21-4bba-9384-533c9f293169" Win64="$(var.Win64)">
+							<File Source="$(var.SerilogDllSourcePath)" Id="SerilogDll" KeyPath="yes" />
+						</Component>
+						<Component Id="Serilog.Formatting.Compact.dll_comp" Guid="27570ca2-866e-487d-87dc-9723e3e912e9" Win64="$(var.Win64)">
+							<File Source="$(var.SerilogFormattingDllSourcePath)" Id="SerilogFormattingDll" KeyPath="yes" />
+						</Component>
+						<Component Id="Serilog.Sinks.File.dll_comp" Guid="1e1fb3b3-b723-49ca-b5a4-d1958cd6874b" Win64="$(var.Win64)">
+							<File Source="$(var.SerilogFileDllSourcePath)" Id="SerilogFileDll" KeyPath="yes" />
 						</Component>
 					</Directory>
 				</Directory>
@@ -133,7 +143,9 @@
 				<ComponentRef Id="INSTALLDIR_comp" />
 				<ComponentRef Id="DailyArenaDeckAdvisor.exe_comp" />
 				<ComponentRef Id="Newtonsoft.Json.dll_comp" />
-				<ComponentRef Id="Newtonsoft.Json.xml_comp" />
+				<ComponentRef Id="Serilog.dll_comp" />
+				<ComponentRef Id="Serilog.Formatting.Compact.dll_comp" />
+				<ComponentRef Id="Serilog.Sinks.File.dll_comp" />
 				<ComponentRef Id="DailyArenaDeckAdvisorLauncher.exe_comp" />
 				<ComponentRef Id="DailyArenaDeckAdvisorUpdater.exe_comp" />
 
