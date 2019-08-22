@@ -7,6 +7,7 @@
         mc:Ignorable="d"
         Title="Daily Arena Deck Advisor" Height="660" Width="1040" Loaded="Window_Loaded">
 	<Window.Resources>
+		<local:NullImageConverter x:Key="NullImageConverter" />
 		<local:TabTemplateSelector x:Key="TabTemplateSelector" />
 		<local:ContentTemplateSelector x:Key="ContentTemplateSelector" />
 		<DataTemplate x:Key="ArchetypeTabTemplate" DataType="{x:Type local:Archetype}">
@@ -38,7 +39,21 @@
 									<StackPanel Orientation="Horizontal">
 										<TextBlock Text="{Binding Quantity}" Width="15" TextAlignment="Right" />
 										<TextBlock Text="x " />
-										<TextBlock x:Name="CardName" FontWeight="Bold" Text="{Binding Card.Name}" Foreground="Green" />
+										<TextBlock x:Name="CardName" FontWeight="Bold" Text="{Binding Card.Name}" Foreground="Green" ToolTipService.ShowDuration="600000">
+											<TextBlock.ToolTip>
+												<ToolTip Background="Transparent" BorderThickness="0">
+													<Grid MaxHeight="400">
+														<Border BorderBrush="Black" BorderThickness="1" Background="White"
+																HorizontalAlignment="Left" VerticalAlignment="Top">
+															<TextBlock Text="{Binding Card.FullName}" Margin="3" />
+														</Border>
+														<Image Source="{Binding Card.ImageUri, Converter={StaticResource NullImageConverter}}"
+															   Stretch="UniformToFill" StretchDirection="Both">
+														</Image>
+													</Grid>
+												</ToolTip>
+											</TextBlock.ToolTip>
+										</TextBlock>
 										<TextBlock Text=" " />
 										<TextBlock Text="{Binding Stats.MetaStatsView}" />
 									</StackPanel>
@@ -65,7 +80,21 @@
 									<StackPanel Orientation="Horizontal">
 										<TextBlock Text="{Binding Quantity}" Width="15" TextAlignment="Right" />
 										<TextBlock Text="x " />
-										<TextBlock x:Name="CardName" FontWeight="Bold" Text="{Binding Card.Name}" Foreground="Green" />
+										<TextBlock x:Name="CardName" FontWeight="Bold" Text="{Binding Card.Name}" Foreground="Green" ToolTipService.ShowDuration="600000">
+											<TextBlock.ToolTip>
+												<ToolTip Background="Transparent" BorderThickness="0">
+													<Grid MaxHeight="400">
+														<Border BorderBrush="Black" BorderThickness="1" Background="White"
+																HorizontalAlignment="Left" VerticalAlignment="Top">
+															<TextBlock Text="{Binding Card.FullName}" Margin="3" />
+														</Border>
+														<Image Source="{Binding Card.ImageUri, Converter={StaticResource NullImageConverter}}"
+															   Stretch="UniformToFill" StretchDirection="Both">
+														</Image>
+													</Grid>
+												</ToolTip>
+											</TextBlock.ToolTip>
+										</TextBlock>
 										<TextBlock Text=" " />
 										<TextBlock Text="{Binding Stats.MetaStatsView}" />
 									</StackPanel>
@@ -147,9 +176,37 @@
 									<StackPanel Orientation="Horizontal">
 										<TextBlock Text="{Binding Item3}" Width="15" TextAlignment="Right" />
 										<TextBlock Text="x " />
-										<TextBlock Text="{Binding Item1}" />
+										<TextBlock Text="{Binding Item1}" ToolTipService.ShowDuration="600000">
+											<TextBlock.ToolTip>
+												<ToolTip Background="Transparent" BorderThickness="0">
+													<Grid MaxHeight="400">
+														<Border BorderBrush="Black" BorderThickness="1" Background="White"
+																HorizontalAlignment="Left" VerticalAlignment="Top">
+															<TextBlock Text="{Binding Item4.FullName}" Margin="3" />
+														</Border>
+														<Image Source="{Binding Item4.ImageUri, Converter={StaticResource NullImageConverter}}"
+															   Stretch="UniformToFill" StretchDirection="Both">
+														</Image>
+													</Grid>
+												</ToolTip>
+											</TextBlock.ToolTip>
+										</TextBlock>
 										<TextBlock Text=" => " />
-										<TextBlock Text="{Binding Item2}" />
+										<TextBlock Text="{Binding Item2}" ToolTipService.ShowDuration="600000">
+											<TextBlock.ToolTip>
+												<ToolTip Background="Transparent" BorderThickness="0">
+													<Grid MaxHeight="400">
+														<Border BorderBrush="Black" BorderThickness="1" Background="White"
+																HorizontalAlignment="Left" VerticalAlignment="Top">
+															<TextBlock Text="{Binding Item5.FullName}" Margin="3" />
+														</Border>
+														<Image Source="{Binding Item5.ImageUri, Converter={StaticResource NullImageConverter}}"
+															   Stretch="UniformToFill" StretchDirection="Both">
+														</Image>
+													</Grid>
+												</ToolTip>
+											</TextBlock.ToolTip>
+										</TextBlock>
 									</StackPanel>
 								</DataTemplate>
 							</ItemsControl.ItemTemplate>
@@ -189,7 +246,21 @@
 								<StackPanel Orientation="Horizontal">
 									<TextBlock Text="{Binding TotalCopiesNeeded}" Width="15" TextAlignment="Right" />
 									<TextBlock Text="x " />
-									<TextBlock FontWeight="Bold" Text="{Binding Name}" />
+									<TextBlock FontWeight="Bold" Text="{Binding Name}" ToolTipService.ShowDuration="600000">
+										<TextBlock.ToolTip>
+											<ToolTip Background="Transparent" BorderThickness="0">
+												<Grid MaxHeight="400">
+													<Border BorderBrush="Black" BorderThickness="1" Background="White"
+																HorizontalAlignment="Left" VerticalAlignment="Top">
+														<TextBlock Text="{Binding Card.FullName}" Margin="3" />
+													</Border>
+													<Image Source="{Binding Card.ImageUri, Converter={StaticResource NullImageConverter}}"
+															   Stretch="UniformToFill" StretchDirection="Both">
+													</Image>
+												</Grid>
+											</ToolTip>
+										</TextBlock.ToolTip>
+									</TextBlock>
 									<TextBlock Text=" " />
 									<TextBlock Text="{Binding MetaStats}" />
 								</StackPanel>
@@ -239,7 +310,7 @@
 		<TextBlock x:Name="ComputingSuggestions" Grid.RowSpan="2" Visibility="Collapsed">Computing deck suggestions...</TextBlock>
 		<Border Grid.Row="0" x:Name="FilterPanel" Visibility="Collapsed" BorderThickness="0,0,0,1" BorderBrush="Gray">
 			<StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-				<Label Target="{Binding Path=SelectedFormat}" Margin="3" FontWeight="Bold" VerticalContentAlignment="Center">Format:</Label>
+				<Label Margin="3" FontWeight="Bold" VerticalContentAlignment="Center">Format:</Label>
 				<ComboBox x:Name="SelectedFormat" SelectedValue="{Binding Format.Value, Mode=TwoWay}" SelectedValuePath="Content"
 						  Margin="3" VerticalContentAlignment="Center">
 					<ComboBoxItem>Standard</ComboBoxItem>

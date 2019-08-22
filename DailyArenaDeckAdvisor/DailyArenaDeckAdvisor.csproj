@@ -88,6 +88,7 @@
     <Compile Include="Database\Set.cs" />
     <Compile Include="MetaReport.cs" />
     <Compile Include="ContentTemplateSelector.cs" />
+    <Compile Include="NullImageConverter.cs" />
     <Compile Include="TabTemplateSelector.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>

@@ -138,13 +138,15 @@ namespace DailyArenaDeckAdvisor
 
 		public List<Tuple<int, int, int>> SuggestedReplacements { get; set; }
 
-		public List<Tuple<string, string, int>> SuggestedReplacementsView
+		public List<Tuple<string, string, int, Card, Card>> SuggestedReplacementsView
 		{
 			get
 			{
 				ReadOnlyDictionary<int, Card> cardsById = Card.CardsById;
 				return SuggestedReplacements.
-					Select(x => new Tuple<string, string, int>(cardsById[x.Item1].Name, cardsById[x.Item2].Name, x.Item3)).ToList();
+					Select(x => new Tuple<string, string, int, Card, Card>(
+						cardsById[x.Item1].Name, cardsById[x.Item2].Name, x.Item3, cardsById[x.Item1], cardsById[x.Item2])
+					).ToList();
 			}
 		}
 

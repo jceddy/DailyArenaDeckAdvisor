@@ -1,14 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.IO;
 using System.Linq;
+using System.Net;
 
 namespace DailyArenaDeckAdvisor.Database
 {
 	/// <summary>
 	/// Class that reprsents a Magic Card.
 	/// </summary>
-	public class Card : IComparable<Card>, IComparable<int>, IComparable<string>
+	public class Card : IComparable<Card>, IComparable<int>, IComparable<string>, INotifyPropertyChanged
 	{
 		/// <summary>
 		/// The Unique Identifier of this card on Arena.
@@ -71,6 +74,86 @@ namespace DailyArenaDeckAdvisor.Database
 		public double BoosterCost { get; private set; }
 
 		/// <summary>
+		/// The card's unique identifier on Scryfall.
+		/// </summary>
+		public string ScryfallId { get; private set; }
+
+		/// <summary>
+		/// The Uri for the card's (cached) image.
+		/// </summary>
+		private Uri _imageUri = null;
+
+		/// <summary>
+		/// The Uri for the card's (normal size) image.
+		/// </summary>
+		public Uri ImageUri {
+			get
+			{
+				if(string.IsNullOrWhiteSpace(ScryfallId))
+				{
+					return null;
+				}
+				if(_imageUri == null)
+				{
+					string cachedImageLocation = $"{_cachedCardImageFolder}\\{ScryfallId}.jpg";
+					Uri cachedImageUri = new Uri(cachedImageLocation);
+					if (File.Exists(cachedImageLocation))
+					{
+						File.SetLastAccessTime(cachedImageLocation, DateTime.Now);
+						_imageUri = cachedImageUri;
+					}
+					else
+					{
+						using (WebClient client = new WebClient())
+						{
+							client.DownloadDataCompleted += (sender, e) =>
+							{
+								if (e.Error == null)
+								{
+									File.WriteAllBytes(cachedImageLocation, e.Result);
+									_imageUri = cachedImageUri;
+									PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("ImageUri"));
+								}
+							};
+							client.DownloadDataAsync(new Uri($"https://www.jceddy.com/mtg/rmm/v2/card_images/normal/{ScryfallId}.jpg"));
+						}
+					}
+				}
+				return _imageUri;
+			}
+		}
+
+		/// <summary>
+		/// File path to the cached card images folder.
+		/// </summary>
+		private static string _cachedCardImageFolder;
+
+		/// <summary>
+		/// Static constructor, sets up folder for local image caching, clears any images that haven't been used for over a month.
+		/// </summary>
+		static Card()
+		{
+			_cachedCardImageFolder = $"{Directory.GetCurrentDirectory()}\\cached_card_images";
+			if (!Directory.Exists(_cachedCardImageFolder))
+			{
+				Directory.CreateDirectory(_cachedCardImageFolder);
+			}
+			else
+			{
+				string[] files = Directory.GetFiles(_cachedCardImageFolder);
+				DateTime aMonthAgo = DateTime.Now.AddMonths(-1);
+				foreach (string file in files)
+				{
+					FileInfo fi = new FileInfo(file);
+					if(fi.LastAccessTime < aMonthAgo)
+					{
+						fi.Delete();
+					}
+				}
+			}
+		}
+
+		/// <summary>
 		/// The constructor for creating a new Card object. This is called internally by the public static CreateCard method.
 		/// </summary>
 		/// <param name="arenaId">The Unique Identifier of the card on Arena.</param>
@@ -84,8 +167,9 @@ namespace DailyArenaDeckAdvisor.Database
 		/// <param name="type">A string containing the card's types.</param>
 		/// <param name="cost">The card's casting cost.</param>
 		/// <param name="cmc">The card's converted mana cost.</param>
+		/// <param name="scryfallId">The card's unique identifier on Scryfall.</param>
 		private Card(int arenaId, string name, Set set, string collectorNumber, string rarity, string colors, string fullName, int rank, string type,
-			string cost, int cmc)
+			string cost, int cmc, string scryfallId)
 		{
 			ArenaId = arenaId;
 			Name = name;
@@ -98,8 +182,9 @@ namespace DailyArenaDeckAdvisor.Database
 			Type = type;
 			Cost = cost;
 			Cmc = cmc;
+			ScryfallId = scryfallId;
 
-			if(Rarity == CardRarity.BasicLand)
+			if (Rarity == CardRarity.BasicLand)
 			{
 				BoosterCost = 0;
 			}
@@ -217,13 +302,14 @@ namespace DailyArenaDeckAdvisor.Database
 		/// <param name="type">A string containing the card's types.</param>
 		/// <param name="cost">The card's casting cost</param>
 		/// <param name="cmc">The card's converted mana cost.</param>
+		/// <param name="scryfallId">The card's unique identifier on Scryfall.</param>
 		/// <returns>The new Card object that was added to the database.</returns>
 		public static Card CreateCard(int arenaId, string name, string setName, string collectorNumber, string rarity, string colors, int rank,
-			string type, string cost, int cmc)
+			string type, string cost, int cmc, string scryfallId)
 		{
 			Set set = Set.GetSet(setName);
 
-			string fullName = $"{name} ({set.Code}) {collectorNumber}";
+			string fullName = $"{name} ({set.ArenaCode}) {collectorNumber}";
 			if (_cardsById.ContainsKey(arenaId))
 			{
 				Card card = _cardsById[arenaId];
@@ -239,7 +325,7 @@ namespace DailyArenaDeckAdvisor.Database
 				return card;
 			}
 
-			Card newCard = new Card(arenaId, name, set, collectorNumber, rarity, colors, fullName, rank, type, cost, cmc);
+			Card newCard = new Card(arenaId, name, set, collectorNumber, rarity, colors, fullName, rank, type, cost, cmc, scryfallId);
 			_cardsById.Add(arenaId, newCard);
 			if (!_cardsByFullName.ContainsKey(fullName))
 			{
@@ -340,6 +426,11 @@ namespace DailyArenaDeckAdvisor.Database
 			{ CardRarity.Rare, (7.0 / 8) - (1.0 / 12) },
 			{ CardRarity.MythicRare, (1.0 / 8) - (1.0 / 12) }
 		};
+
+		/// <summary>
+		/// PropertyChanged Handler (only used for ImageUri, currently).
+		/// </summary>
+		public event PropertyChangedEventHandler PropertyChanged;
 
 		/// <summary>
 		/// Private field to store this card's booster freqeuency the first time it is computed.

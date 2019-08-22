@@ -8,18 +8,39 @@ using System.Net;
 
 namespace DailyArenaDeckAdvisor.Database
 {
+	/// <summary>
+	/// Class that imports and parses the card database, and keeps track of server timestamps for cached card/set/deck data.
+	/// </summary>
 	public static class CardDatabase
 	{
+		/// <summary>
+		/// Dictionary to keep track of server-side cache timestamps.
+		/// </summary>
 		private static Dictionary<string, string> _serverTimestamps = new Dictionary<string, string>();
 
+		/// <summary>
+		/// Get a server-side cache timestamp by key.
+		/// </summary>
+		/// <param name="key">The key of the server-side cache timestamp to fetch.</param>
+		/// <returns>The cache timestamp as an ISO 8601 string.</returns>
 		public static string GetServerTimestamp(string key)
 		{
 			return _serverTimestamps.ContainsKey(key) ? _serverTimestamps[key] : null;
 		}
 
+		/// <summary>
+		/// Timestamp of the last client-side card database update.
+		/// </summary>
 		public static string LastCardDatabaseUpdate { get; private set; }
+
+		/// <summary>
+		/// Timestamps of the last client-side standard sets update.
+		/// </summary>
 		public static string LastStandardSetsUpdate { get; private set; }
 
+		/// <summary>
+		/// Initialize the card database. Resets all timestamps, and reloads all card/set data from the server.
+		/// </summary>
 		public static void Initialize()
 		{
 			LastCardDatabaseUpdate = "1970-01-01T00:00:00Z";
@@ -30,12 +51,15 @@ namespace DailyArenaDeckAdvisor.Database
 			UpdateCardDatabase();
 		}
 
-		public static void LoadCardDatabase()
+		/// <summary>
+		/// Load the card database from the client-side cache.
+		/// </summary>
+		private static void LoadCardDatabase()
 		{
 			if (File.Exists("database.json"))
 			{
 				string json = File.ReadAllText("database.json");
-				dynamic data = JsonConvert.DeserializeObject(json);
+				dynamic data = JsonConvert.DeserializeObject(json, new JsonSerializerSettings() { DateParseHandling = DateParseHandling.None });
 
 				LastCardDatabaseUpdate = data.LastCardDatabaseUpdate;
 				LastStandardSetsUpdate = data.LastStandardSetsUpdate;
@@ -47,12 +71,15 @@ namespace DailyArenaDeckAdvisor.Database
 				foreach (dynamic card in data.Cards)
 				{
 					Card.CreateCard((int)card.ArenaId, (string)card.Name, (string)card.Set, (string)card.CollectorNumber, (string)card.Rarity,
-						(string)card.Colors, (int)card.Rank, (string)card.Type, (string)card.Cost, (int)card.Cmc);
+						(string)card.Colors, (int)card.Rank, (string)card.Type, (string)card.Cost, (int)card.Cmc, (string)card.ScryfallId);
 				}
 			}
 		}
 
-		public static void SaveCardDatabase()
+		/// <summary>
+		/// Save the card database to the client-side cache.
+		/// </summary>
+		private static void SaveCardDatabase()
 		{
 			var data = new
 			{
@@ -78,7 +105,8 @@ namespace DailyArenaDeckAdvisor.Database
 					x.Rank,
 					x.Type,
 					x.Cost,
-					x.Cmc
+					x.Cmc,
+					x.ScryfallId
 				})
 			};
 
@@ -86,7 +114,10 @@ namespace DailyArenaDeckAdvisor.Database
 			File.WriteAllText("database.json", json);
 		}
 
-		public static void UpdateCardDatabase()
+		/// <summary>
+		/// Check if the client-side card database cache is out of date. If so, re-load it from the server.
+		/// </summary>
+		private static void UpdateCardDatabase()
 		{
 			var ver = Guid.NewGuid();
 			var timestampJsonUrl = $"https://clans.dailyarena.net/update_timestamps.json?_c={ver}";
@@ -191,10 +222,16 @@ namespace DailyArenaDeckAdvisor.Database
 						{
 							if ((bool)card.Value["collectible"] || (bool)card.Value["craftable"])
 							{
+								string scryfallId = string.Empty;
+								if (card.Value["images"] != null)
+								{
+									scryfallId = (string)card.Value["images"]["normal"];
+									scryfallId = scryfallId.Substring(scryfallId.LastIndexOf('/') + 1).Split('.')[0];
+								}
 								Card.CreateCard((int)card.Value["id"], (string)card.Value["name"], (string)card.Value["set"], (string)card.Value["cid"],
 									(string)card.Value["rarity"], string.Join("", card.Value["cost"].ToObject<string[]>()).ToUpper(),
 									(int)card.Value["rank"], (string)card.Value["type"], string.Join("", card.Value["cost"].ToObject<string[]>()).ToUpper(),
-									(int)card.Value["cmc"]);
+									(int)card.Value["cmc"], scryfallId);
 							}
 						}
 					}

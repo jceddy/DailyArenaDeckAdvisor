@@ -18,6 +18,7 @@ namespace DailyArenaDeckAdvisor
 			public int TotalCopiesNeeded { get; set; }
 			public double Dominance { get; set; }
 			public string MetaStats { get; set; }
+			public Card Card { get; set; }
 		}
 
 		public List<MetaReportEntry> ReportEntries { get; private set; }
@@ -65,7 +66,8 @@ namespace DailyArenaDeckAdvisor
 				CopiesNeededForAverage = _cardStats[x.Value[0]].AverageCopies - Math.Min(playerInventoryCounts.ContainsKey(x.Key) ? playerInventoryCounts[x.Key] : 0, _cardStats[x.Value[0]].AverageCopies),
 				TotalCopiesNeeded = _cardStats[x.Value[0]].MaxCopies - Math.Min(playerInventoryCounts.ContainsKey(x.Key) ? playerInventoryCounts[x.Key] : 0, _cardStats[x.Value[0]].MaxCopies),
 				Dominance = _cardStats[x.Value[0]].DeckPercentage * (_cardStats[x.Value[0]].AverageCopies - Math.Min(playerInventoryCounts.ContainsKey(x.Key) ? playerInventoryCounts[x.Key] : 0, _cardStats[x.Value[0]].AverageCopies)),
-				MetaStats = _cardStats[x.Value[0]].MetaStatsView
+				MetaStats = _cardStats[x.Value[0]].MetaStatsView,
+				Card = x.Value[0]
 			}).Where(x => x.TotalCopiesNeeded > 0).ToList();
 
 			ReportEntries = new List<MetaReportEntry>(
