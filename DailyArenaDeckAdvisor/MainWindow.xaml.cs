@@ -137,9 +137,12 @@ namespace DailyArenaDeckAdvisor
 
 			int maxInventoryCount = Format.Value == "Brawl" ? 1 : 4;
 
-			Archetype.WildcardsOwned = _wildcardsOwned;
-			Archetype.CardStats = _cardStats;
-			Archetype.AnyNumber = _anyNumber;
+			Archetype.ClearWildcardsOwned();
+			Archetype.ClearCardStats();
+			if (Archetype.AnyNumber == null)
+			{
+				Archetype.AnyNumber = _anyNumber.AsReadOnly();
+			}
 
 			foreach (Card card in Card.AllCards)
 			{
@@ -276,6 +279,7 @@ namespace DailyArenaDeckAdvisor
 				CardStats stats = _cardStats[card];
 				stats.DeckPercentage = (double)stats.DeckCount / _archetypes.Count;
 			}
+			Archetype.CardStats = new ReadOnlyDictionary<Card, CardStats>(_cardStats);
 
 			_logger.Debug("{0} Deck Archetypes Loaded", _archetypes.Count);
 
@@ -382,6 +386,7 @@ namespace DailyArenaDeckAdvisor
 					}
 				}
 			}
+			Archetype.WildcardsOwned = new ReadOnlyDictionary<CardRarity, int>(_wildcardsOwned);
 
 			_logger.Debug("Player Collection Loaded with {0} Cards", _playerInventory.Count);
 
@@ -687,11 +692,11 @@ namespace DailyArenaDeckAdvisor
 				}
 
 				_logger.Debug("Updating Archetype objects with suggestions");
-				archetype.SuggestedMainDeck = mainDeckCards;
-				archetype.SuggestedSideboard = sideboardCards;
-				archetype.MainDeckToCollect = mainDeckToCollect;
-				archetype.SideboardToCollect = sideboardToCollect;
-				archetype.SuggestedReplacements = suggestedReplacements;
+				archetype.SuggestedMainDeck = new ReadOnlyDictionary<int, int>(mainDeckCards);
+				archetype.SuggestedSideboard = new ReadOnlyDictionary<int, int>(sideboardCards);
+				archetype.MainDeckToCollect = new ReadOnlyDictionary<int, int>(mainDeckToCollect);
+				archetype.SideboardToCollect = new ReadOnlyDictionary<int, int>(sideboardToCollect);
+				archetype.SuggestedReplacements = suggestedReplacements.AsReadOnly();
 			}
 
 			_logger.Debug("Sorting Archetypes and generating Meta Report");

@@ -5,6 +5,8 @@ using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Drawing;
+using System.Drawing.Imaging;
 
 namespace DailyArenaDeckAdvisor.Database
 {
@@ -113,6 +115,43 @@ namespace DailyArenaDeckAdvisor.Database
 									File.WriteAllBytes(cachedImageLocation, e.Result);
 									_imageUri = cachedImageUri;
 									PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("ImageUri"));
+								}
+								else
+								{
+									// this may be dfc...check dfc images
+									try
+									{
+										byte[] front = client.DownloadData(new Uri($"https://www.jceddy.com/mtg/rmm/v2/card_images/normal/{ScryfallId}_0.jpg"));
+										byte[] back = client.DownloadData(new Uri($"https://www.jceddy.com/mtg/rmm/v2/card_images/normal/{ScryfallId}_1.jpg"));
+
+										using (MemoryStream frontStream = new MemoryStream(front))
+										using (MemoryStream backStream = new MemoryStream(back))
+										using (Image frontImage = Image.FromStream(frontStream))
+										using (Image backImage = Image.FromStream(backStream))
+										{
+											int width = frontImage.Width + backImage.Width;
+											int height = Math.Max(frontImage.Height, backImage.Height);
+											float horizontalResolution = frontImage.HorizontalResolution;
+											float verticalResolution = frontImage.VerticalResolution;
+
+											using (Bitmap combinedImage = new Bitmap(width, height))
+											{
+												combinedImage.SetResolution(horizontalResolution, verticalResolution);
+												using (Graphics g = Graphics.FromImage(combinedImage))
+												{
+													g.Clear(Color.White);
+													g.DrawImage(frontImage, new Point(0, 0));
+													g.DrawImage(backImage, new Point(frontImage.Width, 0));
+
+													combinedImage.Save(cachedImageLocation, ImageFormat.Jpeg);
+												}
+											}
+										}
+
+										_imageUri = cachedImageUri;
+										PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("ImageUri"));
+									}
+									catch(WebException) { /* ignore WebException...just means we didn't find the image */ }
 								}
 							};
 							client.DownloadDataAsync(new Uri($"https://www.jceddy.com/mtg/rmm/v2/card_images/normal/{ScryfallId}.jpg"));

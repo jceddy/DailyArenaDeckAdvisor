@@ -3,13 +3,8 @@ using Serilog;
 using Serilog.Debugging;
 using Serilog.Formatting.Compact;
 using System;
-using System.Collections.Generic;
-using System.Configuration;
-using System.Data;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
 using System.Windows;
 
 namespace DailyArenaDeckAdvisor
@@ -19,9 +14,19 @@ namespace DailyArenaDeckAdvisor
 	/// </summary>
 	public partial class App : Application
 	{
+		/// <summary>
+		/// The application's Cached State.
+		/// </summary>
 		public CachedState State { get; private set; } = new CachedState();
+
+		/// <summary>
+		/// The application's Logger.
+		/// </summary>
 		public ILogger Logger { get; private set; }
 
+		/// <summary>
+		/// The application constructor.
+		/// </summary>
 		public App()
 		{
 			var dataFolder = string.Format("{0}Low\\DailyArena\\DailyArenaDeckAdvisor", Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData));
@@ -48,12 +53,18 @@ namespace DailyArenaDeckAdvisor
 			LoadState();
 		}
 
+		/// <summary>
+		/// Save the Cached State out to a file.
+		/// </summary>
 		public void SaveState()
 		{
 			string stateJson = JsonConvert.SerializeObject(State);
 			File.WriteAllText("state.json", stateJson);
 		}
 
+		/// <summary>
+		/// Load the Cached State from a file, or create a new one.
+		/// </summary>
 		public void LoadState()
 		{
 			if(File.Exists("state.json"))
@@ -67,6 +78,9 @@ namespace DailyArenaDeckAdvisor
 			}
 		}
 
+		/// <summary>
+		/// Clear the Cached State and delete the corresponding file if it exists.
+		/// </summary>
 		public void ClearState()
 		{
 			State = new CachedState();

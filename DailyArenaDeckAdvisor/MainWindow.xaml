@@ -42,13 +42,13 @@
 										<TextBlock x:Name="CardName" FontWeight="Bold" Text="{Binding Card.Name}" Foreground="Green" ToolTipService.ShowDuration="600000">
 											<TextBlock.ToolTip>
 												<ToolTip Background="Transparent" BorderThickness="0">
-													<Grid MaxHeight="400">
+													<Grid MaxHeight="340" MaxWidth="488">
 														<Border BorderBrush="Black" BorderThickness="1" Background="White"
 																HorizontalAlignment="Left" VerticalAlignment="Top">
 															<TextBlock Text="{Binding Card.FullName}" Margin="3" />
 														</Border>
 														<Image Source="{Binding Card.ImageUri, Converter={StaticResource NullImageConverter}}"
-															   Stretch="UniformToFill" StretchDirection="Both">
+															   Stretch="Uniform" StretchDirection="Both">
 														</Image>
 													</Grid>
 												</ToolTip>
@@ -83,13 +83,13 @@
 										<TextBlock x:Name="CardName" FontWeight="Bold" Text="{Binding Card.Name}" Foreground="Green" ToolTipService.ShowDuration="600000">
 											<TextBlock.ToolTip>
 												<ToolTip Background="Transparent" BorderThickness="0">
-													<Grid MaxHeight="400">
+													<Grid MaxHeight="340" MaxWidth="488">
 														<Border BorderBrush="Black" BorderThickness="1" Background="White"
 																HorizontalAlignment="Left" VerticalAlignment="Top">
 															<TextBlock Text="{Binding Card.FullName}" Margin="3" />
 														</Border>
 														<Image Source="{Binding Card.ImageUri, Converter={StaticResource NullImageConverter}}"
-															   Stretch="UniformToFill" StretchDirection="Both">
+															   Stretch="Uniform" StretchDirection="Both">
 														</Image>
 													</Grid>
 												</ToolTip>
@@ -179,13 +179,13 @@
 										<TextBlock Text="{Binding Item1}" ToolTipService.ShowDuration="600000">
 											<TextBlock.ToolTip>
 												<ToolTip Background="Transparent" BorderThickness="0">
-													<Grid MaxHeight="400">
+													<Grid MaxHeight="340" MaxWidth="488">
 														<Border BorderBrush="Black" BorderThickness="1" Background="White"
 																HorizontalAlignment="Left" VerticalAlignment="Top">
 															<TextBlock Text="{Binding Item4.FullName}" Margin="3" />
 														</Border>
 														<Image Source="{Binding Item4.ImageUri, Converter={StaticResource NullImageConverter}}"
-															   Stretch="UniformToFill" StretchDirection="Both">
+															   Stretch="Uniform" StretchDirection="Both">
 														</Image>
 													</Grid>
 												</ToolTip>
@@ -195,13 +195,13 @@
 										<TextBlock Text="{Binding Item2}" ToolTipService.ShowDuration="600000">
 											<TextBlock.ToolTip>
 												<ToolTip Background="Transparent" BorderThickness="0">
-													<Grid MaxHeight="400">
+													<Grid MaxHeight="340" MaxWidth="488">
 														<Border BorderBrush="Black" BorderThickness="1" Background="White"
 																HorizontalAlignment="Left" VerticalAlignment="Top">
 															<TextBlock Text="{Binding Item5.FullName}" Margin="3" />
 														</Border>
 														<Image Source="{Binding Item5.ImageUri, Converter={StaticResource NullImageConverter}}"
-															   Stretch="UniformToFill" StretchDirection="Both">
+															   Stretch="Uniform" StretchDirection="Both">
 														</Image>
 													</Grid>
 												</ToolTip>
@@ -249,13 +249,13 @@
 									<TextBlock FontWeight="Bold" Text="{Binding Name}" ToolTipService.ShowDuration="600000">
 										<TextBlock.ToolTip>
 											<ToolTip Background="Transparent" BorderThickness="0">
-												<Grid MaxHeight="400">
+												<Grid MaxHeight="340" MaxWidth="488">
 													<Border BorderBrush="Black" BorderThickness="1" Background="White"
 																HorizontalAlignment="Left" VerticalAlignment="Top">
 														<TextBlock Text="{Binding Card.FullName}" Margin="3" />
 													</Border>
 													<Image Source="{Binding Card.ImageUri, Converter={StaticResource NullImageConverter}}"
-															   Stretch="UniformToFill" StretchDirection="Both">
+															   Stretch="Uniform" StretchDirection="Both">
 													</Image>
 												</Grid>
 											</ToolTip>
