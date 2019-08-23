@@ -876,5 +876,14 @@ namespace DailyArenaDeckAdvisor
 			);
 			loadTask.Start();
 		}
+
+		private void Settings_Click(object sender, RoutedEventArgs e)
+		{
+			SettingsDialog settingsDialog = new SettingsDialog()
+			{
+				Owner = this
+			};
+			settingsDialog.ShowDialog();
+		}
 	}
 }

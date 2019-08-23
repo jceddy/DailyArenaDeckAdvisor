@@ -309,21 +309,37 @@
 		<TextBlock x:Name="ProcessingCollection" Grid.RowSpan="2" Visibility="Collapsed">Processing collection from log...</TextBlock>
 		<TextBlock x:Name="ComputingSuggestions" Grid.RowSpan="2" Visibility="Collapsed">Computing deck suggestions...</TextBlock>
 		<Border Grid.Row="0" x:Name="FilterPanel" Visibility="Collapsed" BorderThickness="0,0,0,1" BorderBrush="Gray">
-			<StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-				<Label Margin="3" FontWeight="Bold" VerticalContentAlignment="Center">Format:</Label>
-				<ComboBox x:Name="SelectedFormat" SelectedValue="{Binding Format.Value, Mode=TwoWay}" SelectedValuePath="Content"
+			<Grid>
+				<Grid.RowDefinitions>
+					<RowDefinition Height="Auto" />
+				</Grid.RowDefinitions>
+				<Grid.ColumnDefinitions>
+					<ColumnDefinition Width="Auto" />
+					<ColumnDefinition Width="*" />
+				</Grid.ColumnDefinitions>
+
+				<StackPanel Grid.Row="0" Grid.Column="0" Orientation="Horizontal" HorizontalAlignment="Left">
+					<Button Margin="3" Click="Settings_Click" ToolTip="Settings">
+						<Image Source="cog.png" Height="24" Width="24" RenderOptions.BitmapScalingMode="Fant" />
+					</Button>
+				</StackPanel>
+
+				<StackPanel Grid.Row="0" Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right">
+					<Label Margin="3" FontWeight="Bold" VerticalContentAlignment="Center">Format:</Label>
+					<ComboBox x:Name="SelectedFormat" SelectedValue="{Binding Format.Value, Mode=TwoWay}" SelectedValuePath="Content"
 						  Margin="3" VerticalContentAlignment="Center">
-					<ComboBoxItem>Standard</ComboBoxItem>
-					<ComboBoxItem>Arena Standard</ComboBoxItem>
-					<ComboBoxItem>Brawl</ComboBoxItem>
-				</ComboBox>
-				<Button Margin="3" Click="Refresh_Click" ToolTip="Refresh Player Inventory, then Recalculate">
-					<Image Source="refresh.png" Height="24" Width="24" RenderOptions.BitmapScalingMode="Fant" />
-				</Button>
-				<Button Margin="3" Click="HardRefresh_Click" ToolTip="Refresh Player Inventory and Check Server for Changes, then Recalculate">
-					<Image Source="hard_refresh.png" Height="24" Width="24" RenderOptions.BitmapScalingMode="Fant" />
-				</Button>
-			</StackPanel>
+						<ComboBoxItem>Standard</ComboBoxItem>
+						<ComboBoxItem>Arena Standard</ComboBoxItem>
+						<ComboBoxItem>Brawl</ComboBoxItem>
+					</ComboBox>
+					<Button Margin="3" Click="Refresh_Click" ToolTip="Refresh Player Inventory, then Recalculate">
+						<Image Source="refresh.png" Height="24" Width="24" RenderOptions.BitmapScalingMode="Fant" />
+					</Button>
+					<Button Margin="3" Click="HardRefresh_Click" ToolTip="Refresh Player Inventory and Check Server for Changes, then Recalculate">
+						<Image Source="hard_refresh.png" Height="24" Width="24" RenderOptions.BitmapScalingMode="Fant" />
+					</Button>
+				</StackPanel>
+			</Grid>
 		</Border>
 		<TabControl x:Name="DeckTabs" Grid.Row="1" Visibility="Collapsed" TabStripPlacement="Left"
 					ItemTemplateSelector="{StaticResource TabTemplateSelector}" ContentTemplateSelector="{StaticResource ContentTemplateSelector}">

@@ -264,7 +264,7 @@ namespace DailyArenaDeckAdvisor
 			{
 				if (_totalWildcardsNeeded < 0)
 				{
-					int? wc = WildcardsNeeded?.Sum(x => x.Item2);
+					int? wc = WildcardsNeeded?.Sum(x => Math.Max(x.Item2 - _wildcardsOwned[x.Item1], 0));
 					if(wc.HasValue)
 					{
 						_totalWildcardsNeeded = wc.Value;

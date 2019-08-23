@@ -1,0 +1,18 @@
+﻿<Window x:Class="DailyArenaDeckAdvisor.SettingsDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d"
+        Title="Daily Arena Deck Advisor - Settings" Height="225" Width="400"
+		WindowStyle="None" WindowStartupLocation="CenterOwner" ResizeMode="NoResize" BorderBrush="Black" BorderThickness="3">
+	<Grid>
+		<StackPanel Margin="3" Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Center">
+			<TextBlock FontSize="20" Margin="3" FontWeight="Bold" VerticalAlignment="Bottom" HorizontalAlignment="Center" Text="Settings" />
+			<TextBlock FontSize="10" Margin="3" VerticalAlignment="Bottom" HorizontalAlignment="Center" Text="(Coming Soon...)" />
+			<Button x:Name="GithubButton" Margin="3" Width="240" Content="Daily Arena Deck Advisor on Github" Click="GithubButton_Click" />
+			<Button x:Name="PatreonButton" Margin="3" Width="240" Content="Daily Arena on Patreon" Click="PatreonButton_Click" />
+			<Button Margin="3" Width="240" Click="Close_Click">Close</Button>
+		</StackPanel>
+	</Grid>
+</Window>
