@@ -25,6 +25,11 @@ namespace DailyArenaDeckAdvisor
 		public ILogger Logger { get; private set; }
 
 		/// <summary>
+		/// Logger for first chance exceptions.
+		/// </summary>
+		public ILogger FirstChanceLogger { get; private set; }
+
+		/// <summary>
 		/// The application constructor.
 		/// </summary>
 		public App()
@@ -49,6 +54,28 @@ namespace DailyArenaDeckAdvisor
 					fileSizeLimitBytes: 10485760,
 					rollOnFileSizeLimit: true).
 				CreateLogger();
+			FirstChanceLogger = new LoggerConfiguration().MinimumLevel.Debug().WriteTo.
+				File(new CompactJsonFormatter(), $"{dataFolder}\\logs\\firstChanceExceptions.txt",
+					rollingInterval: RollingInterval.Hour,
+					retainedFileCountLimit: 2,
+					fileSizeLimitBytes: 10485760,
+					rollOnFileSizeLimit: true).
+				CreateLogger();
+
+			DispatcherUnhandledException += (sender, e) =>
+			{
+				Logger.Error(e.Exception, "DispatcherUnhandledException");
+			};
+
+			AppDomain.CurrentDomain.UnhandledException += (sender, e) =>
+			{
+				Logger.Error((Exception)e.ExceptionObject, "UnhandledException");
+			};
+
+			AppDomain.CurrentDomain.FirstChanceException += (source, e) =>
+			{
+				FirstChanceLogger.Debug(e.Exception, "FirstChanceException");
+			};
 
 			LoadState();
 		}

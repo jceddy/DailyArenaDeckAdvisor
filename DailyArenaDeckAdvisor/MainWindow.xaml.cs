@@ -10,6 +10,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -25,17 +26,19 @@ namespace DailyArenaDeckAdvisor
 		List<Archetype> _archetypes = new List<Archetype>();
 		Dictionary<int, int> _playerInventory = new Dictionary<int, int>();
 		Dictionary<string, int> _playerInventoryCounts = new Dictionary<string, int>();
-		Dictionary<string, string> _colorsByLand = new Dictionary<string, string>();
+		Dictionary<string, CardColors> _colorsByLand = new Dictionary<string, CardColors>();
 		Dictionary<CardRarity, int> _wildcardsOwned = new Dictionary<CardRarity, int>();
 		List<object> _tabObjects = new List<object>();
 		Dictionary<Card, CardStats> _cardStats = new Dictionary<Card, CardStats>();
 
 		IOrderedEnumerable<Archetype> _orderedArchetypes;
 		List<string> _anyNumber = new List<string>() { "Persistent Petitioners", "Rat Colony" };
+		Dictionary<string, Card> _basicLands = new Dictionary<string, Card>();
 
 		ILogger _logger;
 
 		public BindableString Format { get; private set; } = new BindableString();
+		public BindableBool RotationProof { get; private set; } = new BindableBool();
 
 		public MainWindow()
 		{
@@ -62,8 +65,17 @@ namespace DailyArenaDeckAdvisor
 				string json = File.ReadAllText("lands.json");
 				dynamic data = JsonConvert.DeserializeObject(json);
 
-				cacheTimestamp = data.LastUpdate;
-				_colorsByLand = data.ColorsByLand.ToObject<Dictionary<string, string>>();
+				try
+				{
+					_colorsByLand = data.ColorsByLand.ToObject<Dictionary<string, CardColors>>();
+
+					// set cache timestamp after loading colors object to force a re-download if an exception happens
+					cacheTimestamp = data.LastUpdate;
+				}
+				catch(Exception e)
+				{
+					_logger.Error(e, "Exception in LoadStandardLands() - need to re-download");
+				}
 			}
 
 			_logger.Debug("LoadStandardLands() Finished - cacheTimestamp={0)", cacheTimestamp);
@@ -94,7 +106,7 @@ namespace DailyArenaDeckAdvisor
 			{
 				_colorsByLand.Clear();
 
-				var landsUrl = $"https://clans.dailyarena.net/standard_lands.php?_c={Guid.NewGuid()}";
+				var landsUrl = $"https://clans.dailyarena.net/standard_lands.json?_c={Guid.NewGuid()}";
 				var landsRequest = WebRequest.Create(landsUrl);
 				landsRequest.Method = "GET";
 
@@ -107,7 +119,11 @@ namespace DailyArenaDeckAdvisor
 						dynamic json = JToken.Parse(result.ToString());
 						foreach (dynamic lands in json)
 						{
-							_colorsByLand.Add((string)lands["Name"], (string)lands["Colors"]);
+							string landName = (string)lands["Name"];
+							if (!_colorsByLand.ContainsKey(landName))
+							{
+								_colorsByLand.Add((string)lands["Name"], CardColors.CardColorFromString((string)lands["Colors"]));
+							}
 						}
 					}
 				}
@@ -130,6 +146,7 @@ namespace DailyArenaDeckAdvisor
 
 			_archetypes.Clear();
 			_playerInventory.Clear();
+			_basicLands.Clear();
 			_wildcardsOwned.Clear();
 			_tabObjects.Clear();
 			_cardStats.Clear();
@@ -270,7 +287,7 @@ namespace DailyArenaDeckAdvisor
 					}
 				}
 
-				_archetypes.Add(new Archetype(name, mainDeck, sideboard));
+				_archetypes.Add(new Archetype(name, mainDeck, sideboard, RotationProof.Value));
 			}
 
 			_logger.Debug("Initializing Card Stats Objects");
@@ -308,6 +325,7 @@ namespace DailyArenaDeckAdvisor
 						if (line.Contains("PlayerInventory.GetPlayerCardsV3"))
 						{
 							_playerInventory.Clear();
+							_basicLands.Clear();
 							_playerInventoryCounts.Clear();
 							line = reader.ReadLine();
 							while (line != "}")
@@ -321,21 +339,30 @@ namespace DailyArenaDeckAdvisor
 									var lineInfo = line.Replace(",", "").Replace("\"", "").Trim().Split(':');
 									int id = int.Parse(lineInfo[0]);
 									int count = int.Parse(lineInfo[1]);
-									string name = cardsById[id].Name;
-									if (!_playerInventoryCounts.ContainsKey(name))
+									Card card = cardsById[id];
+									Set set = card.Set;
+									if (RotationProof.NotValue || set.RotationSafe)
 									{
-										_playerInventoryCounts.Add(name, 0);
-									}
-									int maxCount = _anyNumber.Contains(name) ? 4 : maxInventoryCount;
-									while (count > 0 && _playerInventoryCounts[name] < maxCount)
-									{
-										if (!_playerInventory.ContainsKey(id))
+										string name = card.Name;
+										if (card.Rarity == CardRarity.BasicLand && !_basicLands.ContainsKey(card.Colors.ColorString))
 										{
-											_playerInventory.Add(id, 0);
+											_basicLands[card.Colors.ColorString] = card;
 										}
-										_playerInventory[id]++;
-										_playerInventoryCounts[name]++;
-										count--;
+										if (!_playerInventoryCounts.ContainsKey(name))
+										{
+											_playerInventoryCounts.Add(name, 0);
+										}
+										int maxCount = _anyNumber.Contains(name) ? 4 : maxInventoryCount;
+										while (count > 0 && _playerInventoryCounts[name] < maxCount)
+										{
+											if (!_playerInventory.ContainsKey(id))
+											{
+												_playerInventory.Add(id, 0);
+											}
+											_playerInventory[id]++;
+											_playerInventoryCounts[name]++;
+											count--;
+										}
 									}
 								}
 								line = reader.ReadLine();
@@ -549,37 +576,11 @@ namespace DailyArenaDeckAdvisor
 					var cardToReplace = cardsById[find.Id];
 					var replacementsNeeded = find.Count;
 
-					_logger.Debug("Processing Candidates based on Type and Cost (or Color for lands)");
-					var candidates = cardToReplace.Type.Contains("Land") ?
-						playerInventory.Select(x => new { Card = cardsById[x.Key], Quantity = x.Value }).
+					if (cardToReplace.Type.Contains("Land"))
+					{
+						_logger.Debug("Processing Candidates based on Color");
+						var candidates = playerInventory.Select(x => new { Card = cardsById[x.Key], Quantity = x.Value }).
 							Where(x => x.Quantity > 0 && x.Card.Type == cardToReplace.Type && _colorsByLand[x.Card.Name] == _colorsByLand[cardToReplace.Name]).
-							OrderByDescending(x => x.Card.Rank) :
-						playerInventory.Select(x => new { Card = cardsById[x.Key], Quantity = x.Value }).
-							Where(x => x.Quantity > 0 && x.Card.Type == cardToReplace.Type && x.Card.Cost == cardToReplace.Cost).
-							OrderByDescending(x => x.Card.Rank);
-
-					foreach (var candidate in candidates)
-					{
-						if (replacementsNeeded == 0) { break; }
-						if (candidate.Quantity > replacementsNeeded)
-						{
-							suggestedReplacements.Add(new Tuple<int, int, int>(cardToReplace.ArenaId, candidate.Card.ArenaId, replacementsNeeded));
-							playerInventory[candidate.Card.ArenaId] -= replacementsNeeded;
-							replacementsNeeded = 0;
-						}
-						else
-						{
-							suggestedReplacements.Add(new Tuple<int, int, int>(cardToReplace.ArenaId, candidate.Card.ArenaId, candidate.Quantity));
-							playerInventory[candidate.Card.ArenaId] = 0;
-							replacementsNeeded -= candidate.Quantity;
-						}
-					}
-
-					if (replacementsNeeded > 0)
-					{
-						_logger.Debug("Insufficient Candidates Found, Getting Candidates by Cost");
-						candidates = playerInventory.Select(x => new { Card = cardsById[x.Key], Quantity = x.Value }).
-							Where(x => x.Quantity > 0 && x.Card.Cost == cardToReplace.Cost).
 							OrderByDescending(x => x.Card.Rank);
 
 						foreach (var candidate in candidates)
@@ -598,14 +599,45 @@ namespace DailyArenaDeckAdvisor
 								replacementsNeeded -= candidate.Quantity;
 							}
 						}
-					}
 
-					if (replacementsNeeded > 0)
+						if (replacementsNeeded > 0)
+						{
+							_logger.Debug("Insufficient Candidates Found, suggesting basic land replacements");
+							Random r = new Random();
+							// randomizing colors here so we don't always favor colors in WUBRG order
+							string[] colors = cardToReplace.Colors.ColorString.Select(x => new { Sort = r.Next(), Value = x.ToString() }).
+								OrderBy(y => y.Sort).Select(z => z.Value).ToArray();
+							Dictionary<string, int> _colorReplacements = new Dictionary<string, int>();
+							if (colors.Length > 0)
+							{
+								int colorIndex = 0;
+								while(replacementsNeeded > 0)
+								{
+									if(!_colorReplacements.ContainsKey(colors[colorIndex]))
+									{
+										_colorReplacements[colors[colorIndex]] = 0;
+									}
+									_colorReplacements[colors[colorIndex]]++;
+									replacementsNeeded--;
+									colorIndex = (colorIndex + 1) % colors.Length;
+								}
+								suggestedReplacements.AddRange(
+									_colorReplacements.Select(x => new Tuple<int, int, int>(cardToReplace.ArenaId, _basicLands[x.Key].ArenaId, x.Value))
+								);
+							}
+						}
+
+						if (replacementsNeeded > 0)
+						{
+							_logger.Debug("Insufficient Candidates Found, done looking");
+						}
+					}
+					else
 					{
-						_logger.Debug("Insufficient Candidates Found, Getting Candidates by Cmc and Color");
-						candidates = playerInventory.Select(x => new { Card = cardsById[x.Key], Quantity = x.Value }).
-							Where(x => x.Quantity > 0 && x.Card.Cmc == cardToReplace.Cmc && x.Card.Colors == cardToReplace.Colors).
-							OrderByDescending(x => x.Card.Rank);
+						_logger.Debug("Processing Candidates based on Type and Cost");
+						var candidates = playerInventory.Select(x => new { Card = cardsById[x.Key], Quantity = x.Value }).
+								Where(x => x.Quantity > 0 && x.Card.Type == cardToReplace.Type && x.Card.Cost == cardToReplace.Cost).
+								OrderByDescending(x => x.Card.Rank);
 
 						foreach (var candidate in candidates)
 						{
@@ -623,16 +655,12 @@ namespace DailyArenaDeckAdvisor
 								replacementsNeeded -= candidate.Quantity;
 							}
 						}
-					}
 
-					if (replacementsNeeded > 0)
-					{
-						_logger.Debug("Insufficient Candidates Found, Getting Candidates, looking for candidates with lower Cmc");
-						int cmcToTest = cardToReplace.Cmc - 1;
-						while (replacementsNeeded > 0 && cmcToTest > 0)
+						if (replacementsNeeded > 0)
 						{
+							_logger.Debug("Insufficient Candidates Found, Getting Candidates by Cost");
 							candidates = playerInventory.Select(x => new { Card = cardsById[x.Key], Quantity = x.Value }).
-								Where(x => x.Quantity > 0 && x.Card.Cmc == cmcToTest && x.Card.Colors == cardToReplace.Colors).
+								Where(x => x.Quantity > 0 && x.Card.Cost == cardToReplace.Cost).
 								OrderByDescending(x => x.Card.Rank);
 
 							foreach (var candidate in candidates)
@@ -651,18 +679,13 @@ namespace DailyArenaDeckAdvisor
 									replacementsNeeded -= candidate.Quantity;
 								}
 							}
-							cmcToTest--;
 						}
-					}
 
-					if (replacementsNeeded > 0)
-					{
-						_logger.Debug("Insufficient Candidates Found, Getting Candidates, relaxing color requirments and looping through Cmc <= {0}", cardToReplace.Cmc);
-						int cmcToTest = cardToReplace.Cmc;
-						while (replacementsNeeded > 0 && cmcToTest > 0)
+						if (replacementsNeeded > 0)
 						{
+							_logger.Debug("Insufficient Candidates Found, Getting Candidates by Cmc and Color");
 							candidates = playerInventory.Select(x => new { Card = cardsById[x.Key], Quantity = x.Value }).
-								Where(x => x.Quantity > 0 && x.Card.Cmc == cmcToTest && cardToReplace.Colors.Contains(x.Card.Colors)).
+								Where(x => x.Quantity > 0 && x.Card.Cmc == cardToReplace.Cmc && x.Card.Colors == cardToReplace.Colors).
 								OrderByDescending(x => x.Card.Rank);
 
 							foreach (var candidate in candidates)
@@ -681,13 +704,72 @@ namespace DailyArenaDeckAdvisor
 									replacementsNeeded -= candidate.Quantity;
 								}
 							}
-							cmcToTest--;
 						}
-					}
 
-					if(replacementsNeeded > 0)
-					{
-						_logger.Debug("Insufficient Candidates Found, done looking");
+						if (replacementsNeeded > 0)
+						{
+							_logger.Debug("Insufficient Candidates Found, Getting Candidates, looking for candidates with lower Cmc");
+							int cmcToTest = cardToReplace.Cmc - 1;
+							while (replacementsNeeded > 0 && cmcToTest > 0)
+							{
+								candidates = playerInventory.Select(x => new { Card = cardsById[x.Key], Quantity = x.Value }).
+									Where(x => x.Quantity > 0 && x.Card.Cmc == cmcToTest && x.Card.Colors == cardToReplace.Colors).
+									OrderByDescending(x => x.Card.Rank);
+
+								foreach (var candidate in candidates)
+								{
+									if (replacementsNeeded == 0) { break; }
+									if (candidate.Quantity > replacementsNeeded)
+									{
+										suggestedReplacements.Add(new Tuple<int, int, int>(cardToReplace.ArenaId, candidate.Card.ArenaId, replacementsNeeded));
+										playerInventory[candidate.Card.ArenaId] -= replacementsNeeded;
+										replacementsNeeded = 0;
+									}
+									else
+									{
+										suggestedReplacements.Add(new Tuple<int, int, int>(cardToReplace.ArenaId, candidate.Card.ArenaId, candidate.Quantity));
+										playerInventory[candidate.Card.ArenaId] = 0;
+										replacementsNeeded -= candidate.Quantity;
+									}
+								}
+								cmcToTest--;
+							}
+						}
+
+						if (replacementsNeeded > 0)
+						{
+							_logger.Debug("Insufficient Candidates Found, Getting Candidates, relaxing color requirments and looping through Cmc <= {0}", cardToReplace.Cmc);
+							int cmcToTest = cardToReplace.Cmc;
+							while (replacementsNeeded > 0 && cmcToTest > 0)
+							{
+								candidates = playerInventory.Select(x => new { Card = cardsById[x.Key], Quantity = x.Value }).
+									Where(x => x.Quantity > 0 && x.Card.Cmc == cmcToTest && cardToReplace.Colors.Contains(x.Card.Colors)).
+									OrderByDescending(x => x.Card.Rank);
+
+								foreach (var candidate in candidates)
+								{
+									if (replacementsNeeded == 0) { break; }
+									if (candidate.Quantity > replacementsNeeded)
+									{
+										suggestedReplacements.Add(new Tuple<int, int, int>(cardToReplace.ArenaId, candidate.Card.ArenaId, replacementsNeeded));
+										playerInventory[candidate.Card.ArenaId] -= replacementsNeeded;
+										replacementsNeeded = 0;
+									}
+									else
+									{
+										suggestedReplacements.Add(new Tuple<int, int, int>(cardToReplace.ArenaId, candidate.Card.ArenaId, candidate.Quantity));
+										playerInventory[candidate.Card.ArenaId] = 0;
+										replacementsNeeded -= candidate.Quantity;
+									}
+								}
+								cmcToTest--;
+							}
+						}
+
+						if (replacementsNeeded > 0)
+						{
+							_logger.Debug("Insufficient Candidates Found, done looking");
+						}
 					}
 				}
 
@@ -701,7 +783,7 @@ namespace DailyArenaDeckAdvisor
 
 			_logger.Debug("Sorting Archetypes and generating Meta Report");
 			_orderedArchetypes = _archetypes.OrderBy(x => x.BoosterCostAfterWC).ThenBy(x => x.BoosterCost);
-			MetaReport report = new MetaReport(cardsByName, _cardStats, cardsById, _playerInventoryCounts, _archetypes);
+			MetaReport report = new MetaReport(cardsByName, _cardStats, cardsById, _playerInventoryCounts, _archetypes, RotationProof.Value);
 			_tabObjects.Add(report);
 			_tabObjects.AddRange(_orderedArchetypes);
 
@@ -738,6 +820,8 @@ namespace DailyArenaDeckAdvisor
 				application.SaveState();
 			}
 			Format.PropertyChanged += Format_PropertyChanged;
+			RotationProof.Value = application.State.RotationProof;
+			RotationProof.PropertyChanged += RotationProof_PropertyChanged;
 
 			Task loadTask = new Task(() => {
 				_logger.Debug("Initializing Card Database");
@@ -788,26 +872,80 @@ namespace DailyArenaDeckAdvisor
 			loadTask.Start();
 		}
 
+		private void RotationProof_PropertyChanged(object sender, PropertyChangedEventArgs e)
+		{
+			if (e.PropertyName == "Value")
+			{
+				_logger.Debug("Rotation Proof toggled, RotationProof={0}", RotationProof.Value);
+
+				App application = (App)Application.Current;
+				application.State.RotationProof = RotationProof.Value;
+				application.SaveState();
+
+				Dispatcher.Invoke(() =>
+				{
+					FilterPanel.Visibility = Visibility.Collapsed;
+					DeckTabs.Visibility = Visibility.Collapsed;
+					DeckTabs.ItemsSource = null;
+					LoadingDatabase.Visibility = Visibility.Visible;
+				});
+
+				Task loadTask = new Task(() => { ReloadAndCrunchAllData(); });
+				loadTask.ContinueWith(t =>
+					{
+						if (t.Exception != null)
+						{
+							_logger.Error(t.Exception, "Exception in {0} ({1} - {2})", "loadTask", "RotationProof_PropertyChanged", "Main Application");
+						}
+					},
+					TaskContinuationOptions.OnlyOnFaulted
+				);
+				loadTask.Start();
+			}
+		}
+
 		private void Export_Click(object sender, RoutedEventArgs e)
 		{
-			var button = (Button)sender;
-			var item = (Archetype)button.DataContext;
+			try
+			{
+				var button = (Button)sender;
+				var item = (Archetype)button.DataContext;
 
-			_logger.Debug("Deck Export Clicked, Deck={0}", item.Name);
+				_logger.Debug("Deck Export Clicked, Deck={0}", item.Name);
 
-			Clipboard.SetText(item.ExportList);
-			MessageBox.Show($"{item.Name} Export Successful", "Export");
+				Clipboard.SetText(item.ExportList);
+				MessageBox.Show($"{item.Name} Export Successful", "Export");
+			}
+			catch(Exception ex)
+			{
+				_logger.Error(ex, "Exception in Export_Clicked");
+				if(!(ex is ExternalException || ex is ArgumentNullException))
+				{
+					throw;
+				}
+			}
 		}
 
 		private void ExportSuggested_Click(object sender, RoutedEventArgs e)
 		{
-			var button = (Button)sender;
-			var item = (Archetype)button.DataContext;
+			try
+			{
+				var button = (Button)sender;
+				var item = (Archetype)button.DataContext;
 
-			_logger.Debug("Deck Export Suggested Clicked, Deck={0}", item.Name);
+				_logger.Debug("Deck Export Suggested Clicked, Deck={0}", item.Name);
 
-			Clipboard.SetText(item.ExportListSuggested);
-			MessageBox.Show($"{item.Name} Export (with Replacements) Successful", "Export");
+				Clipboard.SetText(item.ExportListSuggested);
+				MessageBox.Show($"{item.Name} Export (with Replacements) Successful", "Export");
+			}
+			catch (Exception ex)
+			{
+				_logger.Error(ex, "Exception in ExportSuggested_Click");
+				if (!(ex is ExternalException || ex is ArgumentNullException))
+				{
+					throw;
+				}
+			}
 		}
 
 		private void Hyperlink_Click(object sender, RoutedEventArgs e)

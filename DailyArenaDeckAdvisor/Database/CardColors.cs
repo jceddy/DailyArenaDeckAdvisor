@@ -1,13 +1,70 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Globalization;
 
 namespace DailyArenaDeckAdvisor.Database
 {
 	/// <summary>
 	/// Class that represents a set of Magic colors.
 	/// </summary>
+	[TypeConverter(typeof(Converter))]
 	public class CardColors : IComparable<CardColors>, IComparable<int>, IComparable<string>
 	{
+		/// <summary>
+		/// A converter that converts between string and CardColors.
+		/// </summary>
+		public class Converter : TypeConverter
+		{
+			/// <summary>
+			/// Check whether the converter can convert from a specified source Type.
+			/// </summary>
+			/// <param name="context">The Type Descriptor Context (not used).</param>
+			/// <param name="sourceType">The source Type to check.</param>
+			/// <returns>True if this converter can convert from the source Type, false otherwise.</returns>
+			public override bool CanConvertFrom(ITypeDescriptorContext context, Type sourceType)
+			{
+				if (sourceType == typeof(string))
+				{
+					return true;
+				}
+				return base.CanConvertFrom(context, sourceType);
+			}
+
+			/// <summary>
+			/// Convert an object to a CardColors.
+			/// </summary>
+			/// <param name="context">The Type Descriptor Context (not used).</param>
+			/// <param name="culture">The current Culture info (not used).</param>
+			/// <param name="value">The object to convert.</param>
+			/// <returns>A CardColors object converted from the source value.</returns>
+			public override object ConvertFrom(ITypeDescriptorContext context, CultureInfo culture, object value)
+			{
+				if (value is string)
+				{
+					return CardColorFromString(value.ToString());
+				}
+				return base.ConvertFrom(context, culture, value);
+			}
+
+			/// <summary>
+			/// Convert an CardColors object to a specified destination Type.
+			/// </summary>
+			/// <param name="context">The Type Descriptor Context (not used).</param>
+			/// <param name="culture">The current Culture info (not used).</param>
+			/// <param name="value">The CardColors object to convert.</param>
+			/// <param name="destinationType">The destination Type to convert the CardColors object to.</param>
+			/// <returns>An object of the destination Type that represents the CardColors object value.</returns>
+			public override object ConvertTo(ITypeDescriptorContext context, CultureInfo culture, object value, Type destinationType)
+			{
+				if (destinationType == typeof(string))
+				{
+					return ((CardColors)value).ToString();
+				}
+				return base.ConvertTo(context, culture, value, destinationType);
+			}
+		}
+
 		/// <summary>
 		/// Is White one of the colors?
 		/// </summary>

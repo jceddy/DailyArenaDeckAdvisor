@@ -36,14 +36,24 @@ namespace DailyArenaDeckAdvisor.Database
 		public ReadOnlyDictionary<CardRarity, int> RarityCounts { get; private set; }
 
 		/// <summary>
-		/// The total number of cards in the set.
+		/// Gets the total number of cards in the set.
 		/// </summary>
 		public int TotalCards { get; private set; }
 
 		/// <summary>
-		/// The set's hash code (this is a hash of the set's Arena Code string).
+		/// Gets the set's hash code (this is a hash of the set's Arena Code string).
 		/// </summary>
 		public int HashCode { get; private set; }
+
+		/// <summary>
+		/// Gets the set's rotation date.
+		/// </summary>
+		public DateTime Rotation { get; private set; }
+
+		/// <summary>
+		/// Gets a flag representing whether the set is "rotation safe" (will not rotate within the next 80 days).
+		/// </summary>
+		public bool RotationSafe { get; private set; }
 
 		/// <summary>
 		/// The Set constructor, called by the static CreateSet method.
@@ -54,7 +64,8 @@ namespace DailyArenaDeckAdvisor.Database
 		/// <param name="notInBooster">A list of names of cards in the set that don't appear in boosters (from Planeswalker decks, etc.)</param>
 		/// <param name="totalCards">The total number of cards in the set.</param>
 		/// <param name="rarityCounts">The number of cards of each rarity in the set.</param>
-		private Set(string name, string code, string arenaCode, List<string> notInBooster, int totalCards, Dictionary<CardRarity, int> rarityCounts)
+		/// <param name="rotation">The date the set rotates out of standard.</param>
+		private Set(string name, string code, string arenaCode, List<string> notInBooster, int totalCards, Dictionary<CardRarity, int> rarityCounts, DateTime rotation)
 		{
 			Code = code;
 			ArenaCode = arenaCode;
@@ -69,6 +80,8 @@ namespace DailyArenaDeckAdvisor.Database
 				{ CardRarity.MythicRare, rarityCounts.ContainsKey(CardRarity.MythicRare) ? rarityCounts[CardRarity.MythicRare] : 0 }
 			});
 			HashCode = arenaCode.GetHashCode();
+			Rotation = rotation;
+			RotationSafe = Rotation.AddDays(-80) > DateTime.Now;
 		}
 
 		/// <summary>
@@ -126,9 +139,10 @@ namespace DailyArenaDeckAdvisor.Database
 		/// <param name="notInBooster">A list of names of cards in the set that don't appear in boosters (from Planeswalker decks, etc.)</param>
 		/// <param name="totalCards">The total number of cards in the set.</param>
 		/// <param name="rarityCounts">The number of cards of each rarity in the set.</param>
+		/// <param name="rotation">The date the set rotates out of standard.</param>
 		/// <returns>The new Set object.</returns>
 		public static Set CreateSet(string name, string code, string arenaCode, List<string> notInBooster, int totalCards,
-			Dictionary<CardRarity, int> rarityCounts)
+			Dictionary<CardRarity, int> rarityCounts, DateTime rotation)
 		{
 			if (_setsByName.ContainsKey(name))
 			{
@@ -140,7 +154,7 @@ namespace DailyArenaDeckAdvisor.Database
 				return set;
 			}
 
-			Set newSet = new Set(name, code, arenaCode, notInBooster, totalCards, rarityCounts);
+			Set newSet = new Set(name, code, arenaCode, notInBooster, totalCards, rarityCounts, rotation);
 			_setsByName.Add(name, newSet);
 			_recomputeAllSets = true;
 			return newSet;

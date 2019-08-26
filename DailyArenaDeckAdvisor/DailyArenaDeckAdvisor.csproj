@@ -80,6 +80,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="BindableBool.cs" />
     <Compile Include="BindableString.cs" />
     <Compile Include="CachedState.cs" />
     <Compile Include="Database\Card.cs" />

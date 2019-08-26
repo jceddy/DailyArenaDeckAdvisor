@@ -36,12 +36,22 @@ namespace DailyArenaDeckAdvisor
 			/// An objest that contains meta statistics for the card represented by this view.
 			/// </summary>
 			public CardStats Stats { get; set; }
+
+			/// <summary>
+			/// The state of the "rotation-proof" toggle.
+			/// </summary>
+			public bool RotationProof { get; set; }
 		}
 
 		/// <summary>
 		/// Gets the name of the deck archetype.
 		/// </summary>
 		public string Name { get; private set; }
+
+		/// <summary>
+		/// Gets whether we favor "rotation-proof" cards.
+		/// </summary>
+		public bool RotationProof { get; private set; }
 
 		/// <summary>
 		/// Gets a readonly dictionary containing the names and quantities of cards in the the main deck list.
@@ -118,11 +128,13 @@ namespace DailyArenaDeckAdvisor
 		/// <param name="name">The name of the deck archetype.</param>
 		/// <param name="mainDeck">The names and quantities of cards in the the main deck list.</param>
 		/// <param name="sideboard">The names and quantities of cards in the sideboard.</param>
-		public Archetype(string name, Dictionary<string, int> mainDeck, Dictionary<string, int> sideboard)
+		/// <param name="rotationProof">Whether we favor "rotation-proof" cards.</param>
+		public Archetype(string name, Dictionary<string, int> mainDeck, Dictionary<string, int> sideboard, bool rotationProof)
 		{
 			Name = name;
 			MainDeck = new ReadOnlyDictionary<string, int>(mainDeck);
 			Sideboard = new ReadOnlyDictionary<string, int>(sideboard);
+			RotationProof = rotationProof;
 		}
 
 		/// <summary>
@@ -410,8 +422,8 @@ namespace DailyArenaDeckAdvisor
 				if (_mainDeckView == null && _mainDeckToCollect != null && _suggestedMainDeck != null)
 				{
 					ReadOnlyDictionary<int, Card> cardsById = Card.CardsById;
-					_mainDeckView = _mainDeckToCollect.Select(x => new CardView() { Card = cardsById[x.Key], Quantity = x.Value, Collected = false, Stats = CardStats[cardsById[x.Key]] }).
-						Concat(_suggestedMainDeck.Select(x => new CardView() { Card = cardsById[x.Key], Quantity = x.Value, Collected = true, Stats = CardStats[cardsById[x.Key]] }))
+					_mainDeckView = _mainDeckToCollect.Select(x => new CardView() { Card = cardsById[x.Key], Quantity = x.Value, Collected = false, Stats = CardStats[cardsById[x.Key]], RotationProof = RotationProof }).
+						Concat(_suggestedMainDeck.Select(x => new CardView() { Card = cardsById[x.Key], Quantity = x.Value, Collected = true, Stats = CardStats[cardsById[x.Key]], RotationProof = RotationProof }))
 						.ToList().AsReadOnly();
 				}
 				return _mainDeckView;
@@ -441,6 +453,17 @@ namespace DailyArenaDeckAdvisor
 		}
 
 		/// <summary>
+		/// The visibility of the "next booster to collect" section (used to hide that section on the GUI when there is no set to show).
+		/// </summary>
+		public Visibility PurchaseBoosterVisibility
+		{
+			get
+			{
+				return string.IsNullOrWhiteSpace(NextBoosterSetToPurchase) ? Visibility.Collapsed : Visibility.Visible;
+			}
+		}
+
+		/// <summary>
 		/// A list of objects representing a view into the sideboard, for Xaml binding.
 		/// </summary>
 		private IReadOnlyList<CardView> _sideboardView = null;
@@ -455,8 +478,8 @@ namespace DailyArenaDeckAdvisor
 				if (_sideboardView == null && _sideboardToCollect != null && _suggestedSideboard != null)
 				{
 					ReadOnlyDictionary<int, Card> cardsById = Card.CardsById;
-					_sideboardView = _sideboardToCollect.Select(x => new CardView() { Card = cardsById[x.Key], Quantity = x.Value, Collected = false, Stats = CardStats[cardsById[x.Key]] }).
-						Concat(_suggestedSideboard.Select(x => new CardView() { Card = cardsById[x.Key], Quantity = x.Value, Collected = true, Stats = CardStats[cardsById[x.Key]] }))
+					_sideboardView = _sideboardToCollect.Select(x => new CardView() { Card = cardsById[x.Key], Quantity = x.Value, Collected = false, Stats = CardStats[cardsById[x.Key]], RotationProof = RotationProof }).
+						Concat(_suggestedSideboard.Select(x => new CardView() { Card = cardsById[x.Key], Quantity = x.Value, Collected = true, Stats = CardStats[cardsById[x.Key]], RotationProof = RotationProof }))
 						.ToList().AsReadOnly();
 				}
 				return _sideboardView;
@@ -581,6 +604,7 @@ namespace DailyArenaDeckAdvisor
 					ReadOnlyDictionary<int, Card> cardsById = Card.CardsById;
 					var orderedSets = MainDeckToCollect.Select(x => new { Card = cardsById[x.Key], Quantity = x.Value }).
 						Concat(SideboardToCollect.Select(x => new { Card = cardsById[x.Key], Quantity = x.Value })).
+						Where(x => x.Card.Set.RotationSafe || !RotationProof).
 						Select(x => new { SetName = x.Card.Set.Name, BoosterCost = x.Card.BoosterCost * x.Quantity }).
 						GroupBy(x => x.SetName).
 						Select(x => new { SetName = x.Key, BoosterCost = x.Sum(y => y.BoosterCost) }).
@@ -590,8 +614,10 @@ namespace DailyArenaDeckAdvisor
 					{
 						_nextBoosterSetToPurchase = orderedSets.First().SetName;
 					}
-
-					_nextBoosterSetToPurchase = string.Empty;
+					else
+					{
+						_nextBoosterSetToPurchase = string.Empty;
+					}
 				}
 				return _nextBoosterSetToPurchase;
 			}

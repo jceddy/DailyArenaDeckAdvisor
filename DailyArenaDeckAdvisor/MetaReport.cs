@@ -55,11 +55,11 @@ namespace DailyArenaDeckAdvisor
 		private List<MetaReportEntry> _allReportEntries;
 
 		public MetaReport(ReadOnlyDictionary<string, List<Card>> cardsByName, Dictionary<Card, CardStats> cardStats, ReadOnlyDictionary<int, Card> cardsById,
-			Dictionary<string, int> playerInventoryCounts, List<Archetype> archetypes)
+			Dictionary<string, int> playerInventoryCounts, List<Archetype> archetypes, bool rotationProof)
 		{
 			_cardsByName = cardsByName;
 			_cardStats = cardStats;
-			_allReportEntries = cardsByName.Where(x => x.Value[0].Rarity != CardRarity.BasicLand).Select(x => new MetaReportEntry()
+			_allReportEntries = cardsByName.Where(x => x.Value[0].Rarity != CardRarity.BasicLand && (!rotationProof || x.Value[0].Set.RotationSafe)).Select(x => new MetaReportEntry()
 			{
 				Name = x.Key,
 				DeckPercentage = _cardStats[x.Value[0]].DeckPercentage,

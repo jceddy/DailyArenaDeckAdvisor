@@ -20,6 +20,7 @@
 				<DataTrigger Binding="{Binding BoosterCost}" Value="0">
 					<Setter Property="Foreground" TargetName="TabHeader" Value="Green" />
 					<Setter Property="FontWeight" TargetName="TabHeader" Value="Bold" />
+					<Setter Property="FontStyle" TargetName="TabHeader" Value="Italic" />
 				</DataTrigger>
 			</DataTemplate.Triggers>
 		</DataTemplate>
@@ -39,7 +40,7 @@
 									<StackPanel Orientation="Horizontal">
 										<TextBlock Text="{Binding Quantity}" Width="15" TextAlignment="Right" />
 										<TextBlock Text="x " />
-										<TextBlock x:Name="CardName" FontWeight="Bold" Text="{Binding Card.Name}" Foreground="Green" ToolTipService.ShowDuration="600000">
+										<TextBlock x:Name="CardName" FontWeight="Bold" Text="{Binding Card.Name}" Foreground="Green" FontStyle="Italic" ToolTipService.ShowDuration="600000">
 											<TextBlock.ToolTip>
 												<ToolTip Background="Transparent" BorderThickness="0">
 													<Grid MaxHeight="340" MaxWidth="488">
@@ -56,10 +57,27 @@
 										</TextBlock>
 										<TextBlock Text=" " />
 										<TextBlock Text="{Binding Stats.MetaStatsView}" />
+										<TextBlock x:Name="RotationCallout" Text="!!" FontWeight="Bold" Foreground="DarkOrange" Visibility="Collapsed">
+											<TextBlock.ToolTip>
+												<StackPanel Orientation="Horizontal">
+													<TextBlock Text="This card will rotate out of Standard on " />
+													<TextBlock Text="{Binding Card.Set.Rotation, StringFormat=yyyy-MM-dd}" />
+													<TextBlock Text="." />
+												</StackPanel>
+											</TextBlock.ToolTip>
+										</TextBlock>
 									</StackPanel>
 									<DataTemplate.Triggers>
 										<DataTrigger Binding="{Binding Collected}" Value="False">
 											<Setter Property="Foreground" TargetName="CardName" Value="Red" />
+											<Setter Property="TextDecorations" TargetName="CardName" Value="Underline" />
+											<Setter Property="FontStyle" TargetName="CardName" Value="Normal" />
+										</DataTrigger>
+										<DataTrigger Binding="{Binding Card.Set.RotationSafe}" Value="False">
+											<Setter Property="Visibility" TargetName="RotationCallout" Value="Visible" />
+										</DataTrigger>
+										<DataTrigger Binding="{Binding RotationProof}" Value="False">
+											<Setter Property="Visibility" TargetName="RotationCallout" Value="Collapsed" />
 										</DataTrigger>
 									</DataTemplate.Triggers>
 								</DataTemplate>
@@ -80,7 +98,7 @@
 									<StackPanel Orientation="Horizontal">
 										<TextBlock Text="{Binding Quantity}" Width="15" TextAlignment="Right" />
 										<TextBlock Text="x " />
-										<TextBlock x:Name="CardName" FontWeight="Bold" Text="{Binding Card.Name}" Foreground="Green" ToolTipService.ShowDuration="600000">
+										<TextBlock x:Name="CardName" FontWeight="Bold" Text="{Binding Card.Name}" Foreground="Green" FontStyle="Italic" ToolTipService.ShowDuration="600000">
 											<TextBlock.ToolTip>
 												<ToolTip Background="Transparent" BorderThickness="0">
 													<Grid MaxHeight="340" MaxWidth="488">
@@ -97,10 +115,27 @@
 										</TextBlock>
 										<TextBlock Text=" " />
 										<TextBlock Text="{Binding Stats.MetaStatsView}" />
+										<TextBlock x:Name="RotationCallout" Text="!!" FontWeight="Bold" Foreground="DarkOrange" Visibility="Collapsed">
+											<TextBlock.ToolTip>
+												<StackPanel Orientation="Horizontal">
+													<TextBlock Text="This card will rotate out of Standard on " />
+													<TextBlock Text="{Binding Card.Set.Rotation, StringFormat=yyyy-MM-dd}" />
+													<TextBlock Text="." />
+												</StackPanel>
+											</TextBlock.ToolTip>
+										</TextBlock>
 									</StackPanel>
 									<DataTemplate.Triggers>
 										<DataTrigger Binding="{Binding Collected}" Value="False">
 											<Setter Property="Foreground" TargetName="CardName" Value="Red" />
+											<Setter Property="TextDecorations" TargetName="CardName" Value="Underline" />
+											<Setter Property="FontStyle" TargetName="CardName" Value="Normal" />
+										</DataTrigger>
+										<DataTrigger Binding="{Binding Card.Set.RotationSafe}" Value="False">
+											<Setter Property="Visibility" TargetName="RotationCallout" Value="Visible" />
+										</DataTrigger>
+										<DataTrigger Binding="{Binding RotationProof}" Value="False">
+											<Setter Property="Visibility" TargetName="RotationCallout" Value="Collapsed" />
 										</DataTrigger>
 									</DataTemplate.Triggers>
 								</DataTemplate>
@@ -151,10 +186,10 @@
 
 						<TextBlock HorizontalAlignment="Left" Visibility="{Binding CollectVisibility}" />
 
-						<TextBlock FontWeight="Bold" HorizontalAlignment="Left" TextDecorations="Underline" Visibility="{Binding CollectVisibility}">
+						<TextBlock FontWeight="Bold" HorizontalAlignment="Left" TextDecorations="Underline" Visibility="{Binding PurchaseBoosterVisibility}">
 							Next Booster Set to Purchase
 						</TextBlock>
-						<TextBlock HorizontalAlignment="Left" Text="{Binding NextBoosterSetToPurchase}" Visibility="{Binding CollectVisibility}"/>
+						<TextBlock HorizontalAlignment="Left" Text="{Binding NextBoosterSetToPurchase}" Visibility="{Binding PurchaseBoosterVisibility}"/>
 
 						<TextBlock HorizontalAlignment="Left" />
 
@@ -332,6 +367,20 @@
 						<ComboBoxItem>Arena Standard</ComboBoxItem>
 						<ComboBoxItem>Brawl</ComboBoxItem>
 					</ComboBox>
+					<ToggleButton HorizontalAlignment="Center" Margin="3" Width="120" FontWeight="Bold" IsChecked="{Binding RotationProof.Value, Mode=TwoWay}">
+						<ToggleButton.Style>
+							<Style TargetType="{x:Type ToggleButton}">
+								<Setter Property="Content" Value="Rotation Agnostic"/>
+								<Setter Property="Foreground" Value="DarkGreen"/>
+								<Style.Triggers>
+									<Trigger Property="IsChecked" Value="True">
+										<Setter Property="Content" Value="Rotation Proof"/>
+										<Setter Property="Foreground" Value="Red"/>
+									</Trigger>
+								</Style.Triggers>
+							</Style>
+						</ToggleButton.Style>
+					</ToggleButton>
 					<Button Margin="3" Click="Refresh_Click" ToolTip="Refresh Player Inventory, then Recalculate">
 						<Image Source="refresh.png" Height="24" Width="24" RenderOptions.BitmapScalingMode="Fant" />
 					</Button>

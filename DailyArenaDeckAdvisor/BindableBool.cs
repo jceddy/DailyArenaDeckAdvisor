@@ -5,19 +5,19 @@ using System.Linq.Expressions;
 namespace DailyArenaDeckAdvisor
 {
 	/// <summary>
-	/// A string value that Xaml fields can easily bind to.
+	/// A boolean value that Xaml fields can easily bind to.
 	/// </summary>
-	public class BindableString : INotifyPropertyChanged
+	public class BindableBool : INotifyPropertyChanged
 	{
 		/// <summary>
-		/// The internal string value.
+		/// The internal boolean value.
 		/// </summary>
-		private string _value;
+		private bool _value;
 
 		/// <summary>
-		/// Gets or sets the internal string value.
+		/// Gets or sets the internal boolean value.
 		/// </summary>
-		public string Value
+		public bool Value
 		{
 			get
 			{
@@ -29,7 +29,19 @@ namespace DailyArenaDeckAdvisor
 				{
 					_value = value;
 					RaisePropertyChanged(() => Value);
+					RaisePropertyChanged(() => NotValue);
 				}
+			}
+		}
+		
+		/// <summary>
+		/// Gets the opposite of the internal boolan value.
+		/// </summary>
+		public bool NotValue
+		{
+			get
+			{
+				return !_value;
 			}
 		}
 
@@ -65,7 +77,8 @@ namespace DailyArenaDeckAdvisor
 
 			if (handler != null)
 			{
-				if (propertyExpression.Body is MemberExpression body)
+				var body = propertyExpression.Body as MemberExpression;
+				if (body != null)
 					handler(this, new PropertyChangedEventArgs(body.Member.Name));
 			}
 		}
