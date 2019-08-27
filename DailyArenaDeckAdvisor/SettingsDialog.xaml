@@ -19,18 +19,20 @@
 			<Grid.ColumnDefinitions>
 				<ColumnDefinition Width="Auto" />
 				<ColumnDefinition Width="Auto" />
+				<ColumnDefinition Width="Auto" />
 			</Grid.ColumnDefinitions>
 
-			<TextBlock Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" FontSize="24" Margin="3" FontWeight="Bold" VerticalAlignment="Bottom" HorizontalAlignment="Center" Text="Settings" />
-			<StackPanel Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Orientation="Horizontal" HorizontalAlignment="Center">
+			<TextBlock Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" FontSize="24" Margin="3" FontWeight="Bold" VerticalAlignment="Bottom" HorizontalAlignment="Center" Text="Settings" />
+			<StackPanel Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" Orientation="Horizontal" HorizontalAlignment="Center">
 				<Label Margin="3" FontWeight="Bold" VerticalContentAlignment="Center">Font Size:</Label>
 				<ComboBox x:Name="FontSize" SelectedValue="{Binding Owner.SelectedFontSize.Value, Mode=TwoWay}"
 						  Margin="3" VerticalContentAlignment="Center" ItemsSource="{Binding FontSizes}" />
 			</StackPanel>
-			<Button Grid.Row="2" Grid.Column="0" x:Name="WikiButton" Margin="3" Padding="3" Content="Wiki on Github" Click="WikiButton_Click" />
-			<Button Grid.Row="2" Grid.Column="1" x:Name="GithubButton" Margin="3" Padding="3" Content="Code on Github" Click="GithubButton_Click" />
-			<Button Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" x:Name="PatreonButton" Margin="3" Padding="3" Content="Daily Arena on Patreon" Click="PatreonButton_Click" />
-			<Button Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2" Margin="3" Padding="3" Click="Close_Click">Close</Button>
+			<Button Grid.Row="2" Grid.Column="0" x:Name="Code" Margin="3" Padding="3" Content="Code" ToolTip="View the Code on Github" Click="GithubButton_Click" />
+			<Button Grid.Row="2" Grid.Column="1" x:Name="Issues" Margin="3" Padding="3" Content="Issues" ToolTip="View Issues on Github" Click="IssuesButton_Click" />
+			<Button Grid.Row="2" Grid.Column="2" x:Name="Wiki" Margin="3" Padding="3" Content="Wiki" ToolTip="View the Wiki on Github" Click="WikiButton_Click" />
+			<Button Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="3" x:Name="PatreonButton" Margin="3" Padding="3" ToolTip="Visit the Daily Arena Patreon Page" Content="Patreon" Click="PatreonButton_Click" />
+			<Button Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="3" Margin="3" Padding="3" Click="Close_Click">Close</Button>
 		</Grid>
 	</Grid>
 </Window>

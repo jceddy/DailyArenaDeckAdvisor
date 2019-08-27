@@ -60,6 +60,7 @@
       <HintPath>..\packages\Serilog.Sinks.File.4.0.0\lib\net45\Serilog.Sinks.File.dll</HintPath>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Configuration" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Management" />
@@ -90,6 +91,7 @@
     <Compile Include="Database\CardDatabase.cs" />
     <Compile Include="Database\CardRarity.cs" />
     <Compile Include="Database\Set.cs" />
+    <Compile Include="Extensions.cs" />
     <Compile Include="MetaReport.cs" />
     <Compile Include="ContentTemplateSelector.cs" />
     <Compile Include="NullImageConverter.cs" />

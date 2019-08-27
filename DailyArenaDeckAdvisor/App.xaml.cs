@@ -3,10 +3,13 @@ using Serilog;
 using Serilog.Debugging;
 using Serilog.Formatting.Compact;
 using System;
+using System.Configuration;
 using System.Diagnostics;
 using System.IO;
 using System.Management;
 using System.Windows;
+using System.Windows.Interop;
+using System.Windows.Media;
 
 namespace DailyArenaDeckAdvisor
 {
@@ -35,6 +38,12 @@ namespace DailyArenaDeckAdvisor
 		/// </summary>
 		public App()
 		{
+			//string processRenderMode = ConfigurationManager.AppSettings["ProcessRenderMode"];
+			//if (processRenderMode == "SoftwareOnly")
+			//{
+				//RenderOptions.ProcessRenderMode = RenderMode.SoftwareOnly;
+			//}
+
 			var dataFolder = string.Format("{0}Low\\DailyArena\\DailyArenaDeckAdvisor", Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData));
 			if (!Directory.Exists(dataFolder))
 			{
@@ -130,8 +139,8 @@ namespace DailyArenaDeckAdvisor
 			{
 				Logger.Debug("Video Controller Info:\nName:{Name}\nStatus:{Status}\nCaption:{Caption}\nDeviceID:{DeviceID}\nAdapterRAM:{AdapterRAM}\nAdapterDACType:{AdapterDACType}\nMonochrome:{Monochrome}\n" +
 					"InstalledDisplayDrivers:{InstalledDisplayDrivers}\nDriverVersion:{DriverVersion}\nVideoProcessor:{VideoProcessor}\nVideoArchitecture:{VideoArchitecture}\nVideoMemoryType:{VideoMemoryType}",
-					obj["Name"], obj["Status"], obj["Caption"], obj["DeviceID"], SizeSuffix((long)Convert.ToDouble(obj["AdapterRAM"])), obj["AdapterDACType"], obj["Monochrome"],
-					obj["InstalledDisplayDrivers"], obj["DriverVersion"], obj["VideoProcessor"], obj["VideoArchitecture"], obj["VideoMemoryType"]);
+					obj.TryGetProperty("Name"), obj.TryGetProperty("Status"), obj.TryGetProperty("Caption"), obj.TryGetProperty("DeviceID"), SizeSuffix((long)Convert.ToDouble(obj.TryGetProperty("AdapterRAM"))), obj.TryGetProperty("AdapterDACType"), obj.TryGetProperty("Monochrome"),
+					obj.TryGetProperty("InstalledDisplayDrivers"), obj.TryGetProperty("DriverVersion"), obj.TryGetProperty("VideoProcessor"), obj.TryGetProperty("VideoArchitecture"), obj.TryGetProperty("VideoMemoryType"));
 			}
 
 			ManagementObjectSearcher processor = new ManagementObjectSearcher("select * from Win32_Processor");
@@ -140,8 +149,8 @@ namespace DailyArenaDeckAdvisor
 			{
 				Logger.Debug("Processor Info:\nName:{Name}\nDeviceID:{DeviceID}\nManufacturer:{Manufacturer}\nCurrentClockSpeed:{CurrentClockSpeed}\nCaption:{Caption}\nNumberOfCores:{NumberOfCores}\nNumberOfEnabledCore:{NumberOfEnabledCore}\n" +
 					"NumberOfLogicalProcessors:{NumberOfLogicalProcessors}\nArchitecture:{Architecture}\nFamily:{Family}\nProcessorType:{ProcessorType}\nCharacteristics:{Characteristics}\nAddressWidth:{AddressWidth}",
-					obj["Name"], obj["DeviceID"], obj["Manufacturer"], obj["CurrentClockSpeed"], obj["Caption"], obj["NumberOfCores"], obj["NumberOfEnabledCore"],
-					obj["NumberOfLogicalProcessors"], obj["Architecture"], obj["Family"], obj["ProcessorType"], obj["Characteristics"], obj["AddressWidth"]);
+					obj.TryGetProperty("Name"), obj.TryGetProperty("DeviceID"), obj.TryGetProperty("Manufacturer"), obj.TryGetProperty("CurrentClockSpeed"), obj.TryGetProperty("Caption"), obj.TryGetProperty("NumberOfCores"), obj.TryGetProperty("NumberOfEnabledCore"),
+					obj.TryGetProperty("NumberOfLogicalProcessors"), obj.TryGetProperty("Architecture"), obj.TryGetProperty("Family"), obj.TryGetProperty("ProcessorType"), obj.TryGetProperty("Characteristics"), obj.TryGetProperty("AddressWidth"));
 			}
 
 			ManagementObjectSearcher operatingSystem = new ManagementObjectSearcher("select * from Win32_OperatingSystem");
@@ -150,8 +159,8 @@ namespace DailyArenaDeckAdvisor
 			{
 				Logger.Debug("Operating System Info:\nCaption:{Caption}\nWindowsDirectory:{WindowsDirectory}\nProductType:{ProductType}\nSerialNumber:{SerialNumber}\nSystemDirectory:{SystemDirectory}\nCountryCode:{CountryCode}\nCurrentTimeZone:{CurrentTimeZone}\n" +
 					"EncryptionLevel:{EncryptionLevel}\nOSType:{OSType}\nVersion:{Version}",
-					obj["Caption"], obj["WindowsDirectory"], obj["ProductType"], obj["SerialNumber"], obj["SystemDirectory"], obj["CountryCode"], obj["CurrentTimeZone"],
-					obj["EncryptionLevel"], obj["OSType"], obj["Version"]);
+					obj.TryGetProperty("Caption"), obj.TryGetProperty("WindowsDirectory"), obj.TryGetProperty("ProductType"), obj.TryGetProperty("SerialNumber"), obj.TryGetProperty("SystemDirectory"), obj.TryGetProperty("CountryCode"), obj.TryGetProperty("CurrentTimeZone"),
+					obj.TryGetProperty("EncryptionLevel"), obj.TryGetProperty("OSType"), obj.TryGetProperty("Version"));
 			}
 		}
 

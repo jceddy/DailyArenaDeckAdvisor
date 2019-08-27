@@ -371,10 +371,12 @@
 						<ToggleButton.Style>
 							<Style TargetType="{x:Type ToggleButton}">
 								<Setter Property="Content" Value="Rotation Agnostic"/>
+								<Setter Property="ToolTip" Value="Currently showing all cards, regardless of pending rotation.&#x0a;Click to toggle to &quot;Rotation Proof&quot;"/>
 								<Setter Property="Foreground" Value="DarkGreen"/>
 								<Style.Triggers>
 									<Trigger Property="IsChecked" Value="True">
 										<Setter Property="Content" Value="Rotation Proof"/>
+										<Setter Property="ToolTip" Value="Ignoring cards in collection that will rotate soon an suggesting replacements for them.&#x0a;Click to toggle to &quot;Rotation Agnostic&quot;"/>
 										<Setter Property="Foreground" Value="Red"/>
 									</Trigger>
 								</Style.Triggers>

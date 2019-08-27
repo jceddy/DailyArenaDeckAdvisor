@@ -17,14 +17,19 @@ namespace DailyArenaDeckAdvisor
 			DataContext = this;
 		}
 
-		private void WikiButton_Click(object sender, RoutedEventArgs e)
-		{
-			Process.Start("https://github.com/jceddy/DailyArenaDeckAdvisor/wiki");
-		}
-
 		private void GithubButton_Click(object sender, RoutedEventArgs e)
 		{
 			Process.Start("https://github.com/jceddy/DailyArenaDeckAdvisor");
+		}
+
+		private void IssuesButton_Click(object sender, RoutedEventArgs e)
+		{
+			Process.Start("https://github.com/jceddy/DailyArenaDeckAdvisor/issues");
+		}
+
+		private void WikiButton_Click(object sender, RoutedEventArgs e)
+		{
+			Process.Start("https://github.com/jceddy/DailyArenaDeckAdvisor/wiki");
 		}
 
 		private void PatreonButton_Click(object sender, RoutedEventArgs e)
