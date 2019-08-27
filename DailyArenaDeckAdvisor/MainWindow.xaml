@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 		xmlns:local="clr-namespace:DailyArenaDeckAdvisor"
         mc:Ignorable="d"
-        Title="Daily Arena Deck Advisor" Height="660" Width="1040" Loaded="Window_Loaded">
+        Title="Daily Arena Deck Advisor" Height="660" Width="1040" Loaded="Window_Loaded" FontSize="{Binding SelectedFontSize.Value}">
 	<Window.Resources>
 		<local:NullImageConverter x:Key="NullImageConverter" />
 		<local:TabTemplateSelector x:Key="TabTemplateSelector" />
@@ -367,7 +367,7 @@
 						<ComboBoxItem>Arena Standard</ComboBoxItem>
 						<ComboBoxItem>Brawl</ComboBoxItem>
 					</ComboBox>
-					<ToggleButton HorizontalAlignment="Center" Margin="3" Width="120" FontWeight="Bold" IsChecked="{Binding RotationProof.Value, Mode=TwoWay}">
+					<ToggleButton HorizontalAlignment="Center" Margin="3" Padding="3" FontWeight="Bold" IsChecked="{Binding RotationProof.Value, Mode=TwoWay}">
 						<ToggleButton.Style>
 							<Style TargetType="{x:Type ToggleButton}">
 								<Setter Property="Content" Value="Rotation Agnostic"/>

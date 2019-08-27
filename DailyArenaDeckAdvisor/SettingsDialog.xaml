@@ -5,14 +5,32 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
         Title="Daily Arena Deck Advisor - Settings" Height="225" Width="400"
-		WindowStyle="None" WindowStartupLocation="CenterOwner" ResizeMode="NoResize" BorderBrush="Black" BorderThickness="3">
+		WindowStyle="None" WindowStartupLocation="CenterOwner" ResizeMode="NoResize" BorderBrush="Black" BorderThickness="3" FontSize="{Binding Owner.SelectedFontSize.Value}">
 	<Grid>
-		<StackPanel Margin="3" Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Center">
-			<TextBlock FontSize="20" Margin="3" FontWeight="Bold" VerticalAlignment="Bottom" HorizontalAlignment="Center" Text="Settings" />
-			<TextBlock FontSize="10" Margin="3" VerticalAlignment="Bottom" HorizontalAlignment="Center" Text="(Coming Soon...)" />
-			<Button x:Name="GithubButton" Margin="3" Width="240" Content="Daily Arena Deck Advisor on Github" Click="GithubButton_Click" />
-			<Button x:Name="PatreonButton" Margin="3" Width="240" Content="Daily Arena on Patreon" Click="PatreonButton_Click" />
-			<Button Margin="3" Width="240" Click="Close_Click">Close</Button>
-		</StackPanel>
+		<Grid HorizontalAlignment="Center" VerticalAlignment="Center">
+			<Grid.RowDefinitions>
+				<RowDefinition Height="Auto" />
+				<RowDefinition Height="Auto" />
+				<RowDefinition Height="Auto" />
+				<RowDefinition Height="Auto" />
+				<RowDefinition Height="Auto" />
+			</Grid.RowDefinitions>
+
+			<Grid.ColumnDefinitions>
+				<ColumnDefinition Width="Auto" />
+				<ColumnDefinition Width="Auto" />
+			</Grid.ColumnDefinitions>
+
+			<TextBlock Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" FontSize="24" Margin="3" FontWeight="Bold" VerticalAlignment="Bottom" HorizontalAlignment="Center" Text="Settings" />
+			<StackPanel Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Orientation="Horizontal" HorizontalAlignment="Center">
+				<Label Margin="3" FontWeight="Bold" VerticalContentAlignment="Center">Font Size:</Label>
+				<ComboBox x:Name="FontSize" SelectedValue="{Binding Owner.SelectedFontSize.Value, Mode=TwoWay}"
+						  Margin="3" VerticalContentAlignment="Center" ItemsSource="{Binding FontSizes}" />
+			</StackPanel>
+			<Button Grid.Row="2" Grid.Column="0" x:Name="WikiButton" Margin="3" Padding="3" Content="Wiki on Github" Click="WikiButton_Click" />
+			<Button Grid.Row="2" Grid.Column="1" x:Name="GithubButton" Margin="3" Padding="3" Content="Code on Github" Click="GithubButton_Click" />
+			<Button Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" x:Name="PatreonButton" Margin="3" Padding="3" Content="Daily Arena on Patreon" Click="PatreonButton_Click" />
+			<Button Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2" Margin="3" Padding="3" Click="Close_Click">Close</Button>
+		</Grid>
 	</Grid>
 </Window>

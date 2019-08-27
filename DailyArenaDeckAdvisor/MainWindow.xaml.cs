@@ -39,6 +39,7 @@ namespace DailyArenaDeckAdvisor
 
 		public BindableString Format { get; private set; } = new BindableString();
 		public BindableBool RotationProof { get; private set; } = new BindableBool();
+		public BindableInt SelectedFontSize { get; private set; } = new BindableInt() { Value = 12 };
 
 		public MainWindow()
 		{
@@ -820,8 +821,22 @@ namespace DailyArenaDeckAdvisor
 				application.SaveState();
 			}
 			Format.PropertyChanged += Format_PropertyChanged;
+
 			RotationProof.Value = application.State.RotationProof;
 			RotationProof.PropertyChanged += RotationProof_PropertyChanged;
+
+			int fontSize = application.State.FontSize;
+			if (fontSize < 8 || fontSize > 24)
+			{
+				SelectedFontSize.Value = 12;
+				application.State.FontSize = SelectedFontSize.Value;
+				application.SaveState();
+			}
+			else
+			{
+				SelectedFontSize.Value = fontSize;
+			}
+			SelectedFontSize.PropertyChanged += SelectedFontSize_PropertyChanged;
 
 			Task loadTask = new Task(() => {
 				_logger.Debug("Initializing Card Database");
@@ -902,6 +917,15 @@ namespace DailyArenaDeckAdvisor
 				);
 				loadTask.Start();
 			}
+		}
+
+		private void SelectedFontSize_PropertyChanged(object sender, PropertyChangedEventArgs e)
+		{
+			_logger.Debug("New Font Size Selected, FontSize={0}", SelectedFontSize.Value);
+
+			App application = (App)Application.Current;
+			application.State.FontSize = SelectedFontSize.Value;
+			application.SaveState();
 		}
 
 		private void Export_Click(object sender, RoutedEventArgs e)

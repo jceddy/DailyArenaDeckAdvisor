@@ -5,6 +5,7 @@ using Serilog.Formatting.Compact;
 using System;
 using System.Diagnostics;
 using System.IO;
+using System.Management;
 using System.Windows;
 
 namespace DailyArenaDeckAdvisor
@@ -77,6 +78,7 @@ namespace DailyArenaDeckAdvisor
 				FirstChanceLogger.Debug(e.Exception, "FirstChanceException");
 			};
 
+			LogSystemInfo();
 			LoadState();
 		}
 
@@ -115,6 +117,63 @@ namespace DailyArenaDeckAdvisor
 			{
 				File.Delete("state.json");
 			}
+		}
+
+		/// <summary>
+		/// Logs information about the system the application is running on.
+		/// </summary>
+		public void LogSystemInfo()
+		{
+			ManagementObjectSearcher videoController = new ManagementObjectSearcher("select * from Win32_VideoController");
+
+			foreach (ManagementObject obj in videoController.Get())
+			{
+				Logger.Debug("Video Controller Info:\nName:{Name}\nStatus:{Status}\nCaption:{Caption}\nDeviceID:{DeviceID}\nAdapterRAM:{AdapterRAM}\nAdapterDACType:{AdapterDACType}\nMonochrome:{Monochrome}\n" +
+					"InstalledDisplayDrivers:{InstalledDisplayDrivers}\nDriverVersion:{DriverVersion}\nVideoProcessor:{VideoProcessor}\nVideoArchitecture:{VideoArchitecture}\nVideoMemoryType:{VideoMemoryType}",
+					obj["Name"], obj["Status"], obj["Caption"], obj["DeviceID"], SizeSuffix((long)Convert.ToDouble(obj["AdapterRAM"])), obj["AdapterDACType"], obj["Monochrome"],
+					obj["InstalledDisplayDrivers"], obj["DriverVersion"], obj["VideoProcessor"], obj["VideoArchitecture"], obj["VideoMemoryType"]);
+			}
+
+			ManagementObjectSearcher processor = new ManagementObjectSearcher("select * from Win32_Processor");
+
+			foreach (ManagementObject obj in processor.Get())
+			{
+				Logger.Debug("Processor Info:\nName:{Name}\nDeviceID:{DeviceID}\nManufacturer:{Manufacturer}\nCurrentClockSpeed:{CurrentClockSpeed}\nCaption:{Caption}\nNumberOfCores:{NumberOfCores}\nNumberOfEnabledCore:{NumberOfEnabledCore}\n" +
+					"NumberOfLogicalProcessors:{NumberOfLogicalProcessors}\nArchitecture:{Architecture}\nFamily:{Family}\nProcessorType:{ProcessorType}\nCharacteristics:{Characteristics}\nAddressWidth:{AddressWidth}",
+					obj["Name"], obj["DeviceID"], obj["Manufacturer"], obj["CurrentClockSpeed"], obj["Caption"], obj["NumberOfCores"], obj["NumberOfEnabledCore"],
+					obj["NumberOfLogicalProcessors"], obj["Architecture"], obj["Family"], obj["ProcessorType"], obj["Characteristics"], obj["AddressWidth"]);
+			}
+
+			ManagementObjectSearcher operatingSystem = new ManagementObjectSearcher("select * from Win32_OperatingSystem");
+
+			foreach (ManagementObject obj in operatingSystem.Get())
+			{
+				Logger.Debug("Operating System Info:\nCaption:{Caption}\nWindowsDirectory:{WindowsDirectory}\nProductType:{ProductType}\nSerialNumber:{SerialNumber}\nSystemDirectory:{SystemDirectory}\nCountryCode:{CountryCode}\nCurrentTimeZone:{CurrentTimeZone}\n" +
+					"EncryptionLevel:{EncryptionLevel}\nOSType:{OSType}\nVersion:{Version}",
+					obj["Caption"], obj["WindowsDirectory"], obj["ProductType"], obj["SerialNumber"], obj["SystemDirectory"], obj["CountryCode"], obj["CurrentTimeZone"],
+					obj["EncryptionLevel"], obj["OSType"], obj["Version"]);
+			}
+		}
+
+		/// <summary>
+		/// Size suffixes for human-readable RAM strings.
+		/// </summary>
+		static readonly string[] SizeSuffixes = { "bytes", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB" };
+
+		/// <summary>
+		/// Convert RAM value to human-readable format.
+		/// </summary>
+		/// <param name="value">The bare value.</param>
+		/// <returns>The passed value as a human-readable stirng.</returns>
+		static string SizeSuffix(long value)
+		{
+			if (value < 0) { return "-" + SizeSuffix(-value); }
+			if (value == 0) { return "0.0 bytes"; }
+
+			int mag = (int)Math.Log(value, 1024);
+			decimal adjustedSize = (decimal)value / (1L << (mag * 10));
+
+			return string.Format("{0:n1} {1}", adjustedSize, SizeSuffixes[mag]);
 		}
 	}
 }
