@@ -3,13 +3,10 @@ using Serilog;
 using Serilog.Debugging;
 using Serilog.Formatting.Compact;
 using System;
-using System.Configuration;
 using System.Diagnostics;
 using System.IO;
 using System.Management;
 using System.Windows;
-using System.Windows.Interop;
-using System.Windows.Media;
 
 namespace DailyArenaDeckAdvisor
 {
@@ -38,12 +35,6 @@ namespace DailyArenaDeckAdvisor
 		/// </summary>
 		public App()
 		{
-			//string processRenderMode = ConfigurationManager.AppSettings["ProcessRenderMode"];
-			//if (processRenderMode == "SoftwareOnly")
-			//{
-				//RenderOptions.ProcessRenderMode = RenderMode.SoftwareOnly;
-			//}
-
 			var dataFolder = string.Format("{0}Low\\DailyArena\\DailyArenaDeckAdvisor", Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData));
 			if (!Directory.Exists(dataFolder))
 			{

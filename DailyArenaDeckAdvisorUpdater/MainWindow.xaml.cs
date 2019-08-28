@@ -45,23 +45,30 @@ namespace DailyArenaDeckAdvisorUpdater
 				{
 					FileLogger.Log("Downloading Updater Zip File");
 					string ver = Guid.NewGuid().ToString();
-					if (assemblyArchitecture == "X86")
+					try
 					{
-						client.DownloadFile($"https://clans.dailyarena.net/download/advisor/x86/DailyArenaDeckAdvisor.zip?ver={ver}", zipFile);
-					}
-					else
-					{
-						client.DownloadFile($"https://clans.dailyarena.net/download/advisor/x64/DailyArenaDeckAdvisor.zip?ver={ver}", zipFile);
-					}
-
-					FileLogger.Log("Extracting Updater Zip Entries");
-					using (ZipArchive archive = ZipFile.Open(zipFile, ZipArchiveMode.Read))
-					{
-						var entries = archive.Entries.Where(x => x.Name != "DailyArenaDeckAdvisorUpdater.exe");
-						foreach (var entry in entries)
+						if (assemblyArchitecture == "X86")
 						{
-							entry.ExtractToFile(entry.Name, true);
+							client.DownloadFile($"https://clans.dailyarena.net/download/advisor/x86/DailyArenaDeckAdvisor.zip?ver={ver}", zipFile);
 						}
+						else
+						{
+							client.DownloadFile($"https://clans.dailyarena.net/download/advisor/x64/DailyArenaDeckAdvisor.zip?ver={ver}", zipFile);
+						}
+
+						FileLogger.Log("Extracting Updater Zip Entries");
+						using (ZipArchive archive = ZipFile.Open(zipFile, ZipArchiveMode.Read))
+						{
+							var entries = archive.Entries.Where(x => x.Name != "DailyArenaDeckAdvisorUpdater.exe");
+							foreach (var entry in entries)
+							{
+								entry.ExtractToFile(entry.Name, true);
+							}
+						}
+					}
+					catch (WebException we)
+					{
+						FileLogger.Log(we, "WebException in {0}, {1} - {2}", "updateTask", "Re-Running Launcher", "Updater");
 					}
 
 					FileLogger.Log("Starting Launcher");

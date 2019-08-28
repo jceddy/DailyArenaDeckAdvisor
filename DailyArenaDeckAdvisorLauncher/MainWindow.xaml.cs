@@ -98,27 +98,40 @@ namespace DailyArenaDeckAdvisorLauncher
 						_logger.Debug("Detected a Problem with the previous update, forcing a new one");
 					}
 
-					string s = client.DownloadString($"https://clans.dailyarena.net/download/advisor/version.json?ver={ver}");
-					dynamic versionObj = JsonConvert.DeserializeObject(s);
-					string version = versionObj.version;
-					_logger.Debug("Latest Version: {0}", version);
-
-					if ((version == assemblyVersion) && !forceUpdate)
+					try
 					{
-						_logger.Debug("Starting Main Application");
+						string s = client.DownloadString($"https://clans.dailyarena.net/download/advisor/version.json?ver={ver}");
+						dynamic versionObj = JsonConvert.DeserializeObject(s);
+						string version = versionObj.version;
+						_logger.Debug("Latest Version: {0}", version);
+
+						if ((version == assemblyVersion) && !forceUpdate)
+						{
+							_logger.Debug("Starting Main Application");
+							using (Process advisorApp = new Process())
+							{
+								advisorApp.StartInfo.FileName = "DailyArenaDeckAdvisor.exe";
+								advisorApp.StartInfo.WorkingDirectory = Directory.GetCurrentDirectory();
+								advisorApp.Start();
+							}
+						}
+						else
+						{
+							_logger.Debug("Starting Updater");
+							using (Process advisorApp = new Process())
+							{
+								advisorApp.StartInfo.FileName = "DailyArenaDeckAdvisorUpdater.exe";
+								advisorApp.StartInfo.WorkingDirectory = Directory.GetCurrentDirectory();
+								advisorApp.Start();
+							}
+						}
+					}
+					catch(WebException we)
+					{
+						_logger.Error(we, "WebException in {0}, {1} - {2}", "updateTask", "Starting Main Application", "Launcher");
 						using (Process advisorApp = new Process())
 						{
 							advisorApp.StartInfo.FileName = "DailyArenaDeckAdvisor.exe";
-							advisorApp.StartInfo.WorkingDirectory = Directory.GetCurrentDirectory();
-							advisorApp.Start();
-						}
-					}
-					else
-					{
-						_logger.Debug("Starting Updater");
-						using (Process advisorApp = new Process())
-						{
-							advisorApp.StartInfo.FileName = "DailyArenaDeckAdvisorUpdater.exe";
 							advisorApp.StartInfo.WorkingDirectory = Directory.GetCurrentDirectory();
 							advisorApp.Start();
 						}

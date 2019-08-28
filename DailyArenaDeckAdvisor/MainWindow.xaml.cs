@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Configuration;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -15,6 +16,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
+using System.Windows.Media;
 
 namespace DailyArenaDeckAdvisor
 {
@@ -40,12 +42,15 @@ namespace DailyArenaDeckAdvisor
 		public BindableString Format { get; private set; } = new BindableString();
 		public BindableBool RotationProof { get; private set; } = new BindableBool();
 		public BindableInt SelectedFontSize { get; private set; } = new BindableInt() { Value = 12 };
+		public BitmapScalingMode BitmapScalingMode { get; private set; }
 
 		public MainWindow()
 		{
 			App application = (App)Application.Current;
 			_logger = application.Logger;
 			_logger.Debug("Main Window Constructor Called - {0}", "Main Application");
+
+			BitmapScalingMode = GetBitmapScalingMode();
 
 			InitializeComponent();
 			DataContext = this;
@@ -105,31 +110,35 @@ namespace DailyArenaDeckAdvisor
 
 			if (string.Compare(serverUpdateTime, cacheTimestamp) > 0)
 			{
-				_colorsByLand.Clear();
-
 				var landsUrl = $"https://clans.dailyarena.net/standard_lands.json?_c={Guid.NewGuid()}";
 				var landsRequest = WebRequest.Create(landsUrl);
 				landsRequest.Method = "GET";
 
-				using (var landsResponse = landsRequest.GetResponse())
+				try
 				{
-					using (Stream landsResponseStream = landsResponse.GetResponseStream())
-					using (StreamReader landsResponseReader = new StreamReader(landsResponseStream))
+					using (var landsResponse = landsRequest.GetResponse())
 					{
-						var result = landsResponseReader.ReadToEnd();
-						dynamic json = JToken.Parse(result.ToString());
-						foreach (dynamic lands in json)
+						_colorsByLand.Clear();
+
+						using (Stream landsResponseStream = landsResponse.GetResponseStream())
+						using (StreamReader landsResponseReader = new StreamReader(landsResponseStream))
 						{
-							string landName = (string)lands["Name"];
-							if (!_colorsByLand.ContainsKey(landName))
+							var result = landsResponseReader.ReadToEnd();
+							dynamic json = JToken.Parse(result.ToString());
+							foreach (dynamic lands in json)
 							{
-								_colorsByLand.Add((string)lands["Name"], CardColors.CardColorFromString((string)lands["Colors"]));
+								string landName = (string)lands["Name"];
+								if (!_colorsByLand.ContainsKey(landName))
+								{
+									_colorsByLand.Add((string)lands["Name"], CardColors.CardColorFromString((string)lands["Colors"]));
+								}
 							}
 						}
 					}
-				}
 
-				SaveStandardLands(serverUpdateTime);
+					SaveStandardLands(serverUpdateTime);
+				}
+				catch (WebException) { /* if we didn't find the file, ignore it */ }
 			}
 			_logger.Debug("PopulateColorsByLand() Finished");
 		}
@@ -205,26 +214,30 @@ namespace DailyArenaDeckAdvisor
 				var archetypesRequest = WebRequest.Create(archetypesUrl);
 				archetypesRequest.Method = "GET";
 
-				using (var archetypesResponse = archetypesRequest.GetResponse())
+				try
 				{
-					using (Stream archetypesResponseStream = archetypesResponse.GetResponseStream())
-					using (StreamReader archetypesResponseReader = new StreamReader(archetypesResponseStream))
+					using (var archetypesResponse = archetypesRequest.GetResponse())
 					{
-						var result = archetypesResponseReader.ReadToEnd();
-						using (StringReader resultStringReader = new StringReader(result))
-						using (JsonTextReader resultJsonReader = new JsonTextReader(resultStringReader) { DateParseHandling = DateParseHandling.None })
+						using (Stream archetypesResponseStream = archetypesResponse.GetResponseStream())
+						using (StreamReader archetypesResponseReader = new StreamReader(archetypesResponseStream))
 						{
-							decksJson = JToken.ReadFrom(resultJsonReader);
-							File.WriteAllText($"{mappedFormat}_decks.json", JsonConvert.SerializeObject(
-								new
-								{
-									Timestamp = serverTimestamp,
-									Decks = decksJson
-								}
-							));
+							var result = archetypesResponseReader.ReadToEnd();
+							using (StringReader resultStringReader = new StringReader(result))
+							using (JsonTextReader resultJsonReader = new JsonTextReader(resultStringReader) { DateParseHandling = DateParseHandling.None })
+							{
+								decksJson = JToken.ReadFrom(resultJsonReader);
+								File.WriteAllText($"{mappedFormat}_decks.json", JsonConvert.SerializeObject(
+									new
+									{
+										Timestamp = serverTimestamp,
+										Decks = decksJson
+									}
+								));
+							}
 						}
 					}
 				}
+				catch (WebException) { /* if we didn't find the file, ignore it */ }
 			}
 
 			_logger.Debug("Parsing decksJson");
@@ -234,6 +247,40 @@ namespace DailyArenaDeckAdvisor
 				string name = archetype["deck_name"];
 				Dictionary<string, int> mainDeck = new Dictionary<string, int>();
 				Dictionary<string, int> sideboard = new Dictionary<string, int>();
+				if(RotationProof.Value)
+				{
+					// check whether there are any cards in the deck that aren't rotation-proof...if so, ignore this deck
+					bool ignoreDeck = false;
+					foreach (dynamic card in archetype["deck_list"])
+					{
+						string cardName = (string)card["name"];
+
+						if(cardsByName[cardName].Count(x => x.Set.RotationSafe) == 0)
+						{
+							ignoreDeck = true;
+							break;
+						}
+					}
+
+					if(!ignoreDeck)
+					{
+						foreach (dynamic card in archetype["sideboard"])
+						{
+							string cardName = (string)card["name"];
+
+							if (cardsByName[cardName].Count(x => x.Set.RotationSafe) == 0)
+							{
+								ignoreDeck = true;
+								break;
+							}
+						}
+					}
+
+					if(ignoreDeck)
+					{
+						continue;
+					}
+				}
 				foreach (dynamic card in archetype["deck_list"])
 				{
 					string cardName = (string)card["name"];
@@ -309,7 +356,7 @@ namespace DailyArenaDeckAdvisor
 
 			_logger.Debug("Processing Player Collection");
 
-			var logFolder = string.Format("{0}Low\\Wizards of the Coast\\MTGA", Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData));
+			var logFolder = GetLogFolderLocation();
 			using (var fs = new FileStream(logFolder + "\\output_log.txt", FileMode.Open, FileAccess.Read, FileShare.ReadWrite | FileShare.Delete))
 			{
 				using (var reader = new StreamReader(fs))
@@ -1046,6 +1093,72 @@ namespace DailyArenaDeckAdvisor
 				Owner = this
 			};
 			settingsDialog.ShowDialog();
+		}
+
+		private BitmapScalingMode GetBitmapScalingMode()
+		{
+			_logger.Debug("GetBitmapScalingMode() Called - {0}", "Main Application");
+
+			try
+			{
+				var appSettings = ConfigurationManager.AppSettings;
+				if (appSettings == null)
+				{
+					_logger.Debug("No AppSettings Found, Using Fant");
+					return BitmapScalingMode.Fant;
+				}
+				string bitmapScalingMode = appSettings["BitmapScalingMode"] ?? "Fant";
+				switch (bitmapScalingMode)
+				{
+					case "Fant":
+						_logger.Debug("Using BitmapScalingMode {0}", "Fant");
+						return BitmapScalingMode.Fant;
+					case "HighQuality":
+						_logger.Debug("Using BitmapScalingMode {0}", "HighQuality");
+						return BitmapScalingMode.HighQuality;
+					case "Linear":
+						_logger.Debug("Using BitmapScalingMode {0}", "Linear");
+						return BitmapScalingMode.Linear;
+					case "LowQuality":
+						_logger.Debug("Using BitmapScalingMode {0}", "LowQuality");
+						return BitmapScalingMode.LowQuality;
+					case "NearestNeighbor":
+						_logger.Debug("Using BitmapScalingMode {0}", "NearestNeighbor");
+						return BitmapScalingMode.NearestNeighbor;
+					default:
+						return BitmapScalingMode.Fant;
+				}
+			}
+			catch (ConfigurationErrorsException e)
+			{
+				_logger.Error(e, "Exception in GetBitmapScalingMode(), Using Fant");
+				return BitmapScalingMode.Fant;
+			}
+		}
+
+		private string GetLogFolderLocation()
+		{
+			_logger.Debug("GetLogFolderLocation() Called - {0}", "Main Application");
+			var logFolder = string.Format("{0}Low\\Wizards of the Coast\\MTGA", Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData));
+
+			try
+			{
+				var appSettings = ConfigurationManager.AppSettings;
+				if (appSettings == null)
+				{
+					_logger.Debug("No AppSettings Found, Using Default Log Folder Location: {0}", logFolder);
+					return logFolder;
+				}
+				logFolder = appSettings["MTGALogFolder"] ?? logFolder;
+			}
+			catch (ConfigurationErrorsException e)
+			{
+				_logger.Error(e, "Exception in GetLogFolderLocation(), Using Default Log Folder Location: {0}", logFolder);
+				return logFolder;
+			}
+
+			_logger.Debug("Using Log Folder Location: {0}", logFolder);
+			return logFolder;
 		}
 	}
 }

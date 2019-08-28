@@ -2,11 +2,11 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Drawing;
+using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 using System.Net;
-using System.Drawing;
-using System.Drawing.Imaging;
 
 namespace DailyArenaDeckAdvisor.Database
 {
@@ -88,14 +88,15 @@ namespace DailyArenaDeckAdvisor.Database
 		/// <summary>
 		/// The Uri for the card's (normal size) image.
 		/// </summary>
-		public Uri ImageUri {
+		public Uri ImageUri
+		{
 			get
 			{
-				if(string.IsNullOrWhiteSpace(ScryfallId))
+				if (string.IsNullOrWhiteSpace(ScryfallId))
 				{
 					return null;
 				}
-				if(_imageUri == null)
+				if (_imageUri == null)
 				{
 					string cachedImageLocation = $"{_cachedCardImageFolder}\\{ScryfallId}.jpg";
 					Uri cachedImageUri = new Uri(cachedImageLocation);
@@ -151,7 +152,7 @@ namespace DailyArenaDeckAdvisor.Database
 										_imageUri = cachedImageUri;
 										PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("ImageUri"));
 									}
-									catch(WebException) { /* ignore WebException...just means we didn't find the image */ }
+									catch (WebException) { /* ignore WebException...just means we didn't find the image */ }
 								}
 							};
 							client.DownloadDataAsync(new Uri($"https://www.jceddy.com/mtg/rmm/v2/card_images/normal/{ScryfallId}.jpg"));

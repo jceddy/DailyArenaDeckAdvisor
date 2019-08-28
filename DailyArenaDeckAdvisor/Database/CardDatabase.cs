@@ -130,28 +130,41 @@ namespace DailyArenaDeckAdvisor.Database
 			var timestampJsonRequest = (HttpWebRequest)WebRequest.Create(timestampJsonUrl);
 			timestampJsonRequest.Method = "GET";
 
-			using (var timestampJsonResponse = timestampJsonRequest.GetResponse())
+			try
 			{
-				using (Stream timestampJsonResponseStream = timestampJsonResponse.GetResponseStream())
-				using (StreamReader timestampJsonResponseReader = new StreamReader(timestampJsonResponseStream))
+				using (var timestampJsonResponse = timestampJsonRequest.GetResponse())
 				{
-					string  result = timestampJsonResponseReader.ReadToEnd();
-					using (StringReader resultStringReader = new StringReader(result))
-					using (JsonTextReader resultJsonReader = new JsonTextReader(resultStringReader) { DateParseHandling = DateParseHandling.None })
+					using (Stream timestampJsonResponseStream = timestampJsonResponse.GetResponseStream())
+					using (StreamReader timestampJsonResponseReader = new StreamReader(timestampJsonResponseStream))
 					{
-						dynamic json = JToken.ReadFrom(resultJsonReader);
-						foreach (var timestamp in json)
+						string result = timestampJsonResponseReader.ReadToEnd();
+						using (StringReader resultStringReader = new StringReader(result))
+						using (JsonTextReader resultJsonReader = new JsonTextReader(resultStringReader) { DateParseHandling = DateParseHandling.None })
 						{
-							_serverTimestamps[(string)timestamp.Name] = (string)timestamp.Value;
-						}
+							dynamic json = JToken.ReadFrom(resultJsonReader);
+							foreach (var timestamp in json)
+							{
+								_serverTimestamps[(string)timestamp.Name] = (string)timestamp.Value;
+							}
 
-						if ((string.Compare(_serverTimestamps["CardDatabase"], LastCardDatabaseUpdate) > 0) ||
-							(string.Compare(_serverTimestamps["StandardSets"], LastStandardSetsUpdate) > 0))
-						{
-							downloadData = true;
+							if ((string.Compare(_serverTimestamps["CardDatabase"], LastCardDatabaseUpdate) > 0) ||
+								(string.Compare(_serverTimestamps["StandardSets"], LastStandardSetsUpdate) > 0))
+							{
+								downloadData = true;
+							}
 						}
 					}
 				}
+			}
+			catch(WebException)
+			{
+				// if we got a webexception here, set some fake server timestamp values to keep the application from downloading more data
+				_serverTimestamps["CardDatabase"] = "1970-01-01T00:00:00Z";
+				_serverTimestamps["StandardSets"] = "1970-01-01T00:00:00Z";
+				_serverTimestamps["StandardLands"] = "1970-01-01T00:00:00Z";
+				_serverTimestamps["StandardDecks"] = "1970-01-01T00:00:00Z";
+				_serverTimestamps["BrawlDecks"] = "1970-01-01T00:00:00Z";
+				_serverTimestamps["ArenaStandardDecks"] = "1970-01-01T00:00:00Z";
 			}
 
 			if (downloadData)
@@ -161,85 +174,103 @@ namespace DailyArenaDeckAdvisor.Database
 				//   Item1 => NotInBooster
 				//   Item2 => RarityCounts
 				//   Item3 => TotalCards
+				//   Item4 => RotationDate
 				Dictionary<string, Tuple<List<string>, Dictionary<CardRarity, int>, int, DateTime>> standardSetsInfo =
 					new Dictionary<string, Tuple<List<string>, Dictionary<CardRarity, int>, int, DateTime>>();
 
 				LastCardDatabaseUpdate = _serverTimestamps["CardDatabase"];
 				LastStandardSetsUpdate = _serverTimestamps["StandardSets"];
+				bool saveCardDatabase = true;
 
 				var standardSetsRequest = WebRequest.Create(standardSetsUrl);
 				standardSetsRequest.Method = "GET";
-				using (var standardSetsResponse = standardSetsRequest.GetResponse())
+				try
 				{
-					using (Stream standardSetsResponseStream = standardSetsResponse.GetResponseStream())
-					using (StreamReader standardSetsResponseReader = new StreamReader(standardSetsResponseStream))
+					using (var standardSetsResponse = standardSetsRequest.GetResponse())
 					{
-						var result = standardSetsResponseReader.ReadToEnd();
-						dynamic data = JToken.Parse(result);
-
-						foreach(dynamic set in data)
+						using (Stream standardSetsResponseStream = standardSetsResponse.GetResponseStream())
+						using (StreamReader standardSetsResponseReader = new StreamReader(standardSetsResponseStream))
 						{
-							standardSetsInfo[(string)set.Value["name"]] = new Tuple<List<string>, Dictionary<CardRarity, int>, int, DateTime>(
-								set.Value["not_in_booster"].ToObject<List<string>>(),
-								set.Value["rarity_counts"].ToObject<Dictionary<CardRarity, int>>(),
-								(int)set.Value["total_cards"],
-								set.Value["rotation"] == null ? DateTime.MaxValue : DateTime.Parse((string)set.Value["rotation"])
-							);
+							var result = standardSetsResponseReader.ReadToEnd();
+							dynamic data = JToken.Parse(result);
+
+							foreach (dynamic set in data)
+							{
+								standardSetsInfo[(string)set.Value["name"]] = new Tuple<List<string>, Dictionary<CardRarity, int>, int, DateTime>(
+									set.Value["not_in_booster"].ToObject<List<string>>(),
+									set.Value["rarity_counts"].ToObject<Dictionary<CardRarity, int>>(),
+									(int)set.Value["total_cards"],
+									set.Value["rotation"] == null ? DateTime.MaxValue : DateTime.Parse((string)set.Value["rotation"])
+								);
+							}
 						}
 					}
+				}
+				catch (WebException)
+				{
+					saveCardDatabase = false;
 				}
 
 				var cardDatabaseRequest = WebRequest.Create(cardDatabaseUrl);
 				cardDatabaseRequest.Method = "GET";
-
-				using (var cardDatabaseResponse = cardDatabaseRequest.GetResponse())
+				try
 				{
-					using (Stream cardDatabaseResponseStream = cardDatabaseResponse.GetResponseStream())
-					using (StreamReader cardDatabaseResponseReader = new StreamReader(cardDatabaseResponseStream))
+					using (var cardDatabaseResponse = cardDatabaseRequest.GetResponse())
 					{
-						var result = cardDatabaseResponseReader.ReadToEnd();
-						dynamic data = JToken.Parse(result);
-
-						Set.ClearSets();
-						foreach (dynamic set in data["sets"])
+						using (Stream cardDatabaseResponseStream = cardDatabaseResponse.GetResponseStream())
+						using (StreamReader cardDatabaseResponseReader = new StreamReader(cardDatabaseResponseStream))
 						{
-							if (standardSetsInfo.ContainsKey(set.Name))
+							var result = cardDatabaseResponseReader.ReadToEnd();
+							dynamic data = JToken.Parse(result);
+
+							Set.ClearSets();
+							foreach (dynamic set in data["sets"])
 							{
-								Tuple<List<string>, Dictionary<CardRarity, int>, int, DateTime> setInfo = standardSetsInfo[set.Name];
-								Set.CreateSet(set.Name, (string)set.Value["scryfall"], (string)set.Value["arenacode"], setInfo.Item1, setInfo.Item3, setInfo.Item2, setInfo.Item4);
-							}
-							else
-							{
-								Set.CreateSet(set.Name, (string)set.Value["scryfall"], (string)set.Value["arenacode"], new List<string>(), 0,
-									new Dictionary<CardRarity, int>() {
+								if (standardSetsInfo.ContainsKey(set.Name))
+								{
+									Tuple<List<string>, Dictionary<CardRarity, int>, int, DateTime> setInfo = standardSetsInfo[set.Name];
+									Set.CreateSet(set.Name, (string)set.Value["scryfall"], (string)set.Value["arenacode"], setInfo.Item1, setInfo.Item3, setInfo.Item2, setInfo.Item4);
+								}
+								else
+								{
+									Set.CreateSet(set.Name, (string)set.Value["scryfall"], (string)set.Value["arenacode"], new List<string>(), 0,
+										new Dictionary<CardRarity, int>() {
 										{ CardRarity.Common, 0 },
 										{ CardRarity.Uncommon, 0 },
 										{ CardRarity.Rare, 0 },
 										{ CardRarity.MythicRare, 0 }
-									}, DateTime.MaxValue);
-							}
-						}
-						Card.ClearCards();
-						foreach (dynamic card in data.cards)
-						{
-							if ((bool)card.Value["collectible"] || (bool)card.Value["craftable"])
-							{
-								string scryfallId = string.Empty;
-								if (card.Value["images"] != null)
-								{
-									scryfallId = (string)card.Value["images"]["normal"];
-									scryfallId = scryfallId.Substring(scryfallId.LastIndexOf('/') + 1).Split('.')[0];
+										}, DateTime.MaxValue);
 								}
-								Card.CreateCard((int)card.Value["id"], (string)card.Value["name"], (string)card.Value["set"], (string)card.Value["cid"],
-									(string)card.Value["rarity"], string.Join("", card.Value["cost"].ToObject<string[]>()).ToUpper(),
-									(int)card.Value["rank"], (string)card.Value["type"], string.Join("", card.Value["cost"].ToObject<string[]>()).ToUpper(),
-									(int)card.Value["cmc"], scryfallId);
+							}
+							Card.ClearCards();
+							foreach (dynamic card in data.cards)
+							{
+								if ((bool)card.Value["collectible"] || (bool)card.Value["craftable"])
+								{
+									string scryfallId = string.Empty;
+									if (card.Value["images"] != null)
+									{
+										scryfallId = (string)card.Value["images"]["normal"];
+										scryfallId = scryfallId.Substring(scryfallId.LastIndexOf('/') + 1).Split('.')[0];
+									}
+									Card.CreateCard((int)card.Value["id"], (string)card.Value["name"], (string)card.Value["set"], (string)card.Value["cid"],
+										(string)card.Value["rarity"], string.Join("", card.Value["cost"].ToObject<string[]>()).ToUpper(),
+										(int)card.Value["rank"], (string)card.Value["type"], string.Join("", card.Value["cost"].ToObject<string[]>()).ToUpper(),
+										(int)card.Value["cmc"], scryfallId);
+								}
 							}
 						}
 					}
 				}
+				catch (WebException)
+				{
+					saveCardDatabase = false;
+				}
 
-				SaveCardDatabase();
+				if (saveCardDatabase)
+				{
+					SaveCardDatabase();
+				}
 			}
 		}
 	}
