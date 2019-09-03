@@ -496,5 +496,16 @@ namespace DailyArenaDeckAdvisor.Database
 			}
 			return _boosterFreq;
 		}
+
+		/// <summary>
+		/// Gets whether the card is rotation-safe.
+		/// </summary>
+		public bool RotationSafe
+		{
+			get
+			{
+				return CardsByName[Name].Where(x => x.Set.RotationSafe).Count() > 0;
+			}
+		}
 	}
 }

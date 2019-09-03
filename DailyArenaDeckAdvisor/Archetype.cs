@@ -604,7 +604,7 @@ namespace DailyArenaDeckAdvisor
 					ReadOnlyDictionary<int, Card> cardsById = Card.CardsById;
 					var orderedSets = MainDeckToCollect.Select(x => new { Card = cardsById[x.Key], Quantity = x.Value }).
 						Concat(SideboardToCollect.Select(x => new { Card = cardsById[x.Key], Quantity = x.Value })).
-						Where(x => x.Card.Set.RotationSafe || !RotationProof).
+						Where(x => x.Card.RotationSafe || !RotationProof).
 						Select(x => new { SetName = x.Card.Set.Name, BoosterCost = x.Card.BoosterCost * x.Quantity }).
 						GroupBy(x => x.SetName).
 						Select(x => new { SetName = x.Key, BoosterCost = x.Sum(y => y.BoosterCost) }).

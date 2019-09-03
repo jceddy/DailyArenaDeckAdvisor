@@ -73,7 +73,7 @@
 											<Setter Property="TextDecorations" TargetName="CardName" Value="Underline" />
 											<Setter Property="FontStyle" TargetName="CardName" Value="Normal" />
 										</DataTrigger>
-										<DataTrigger Binding="{Binding Card.Set.RotationSafe}" Value="False">
+										<DataTrigger Binding="{Binding Card.RotationSafe}" Value="False">
 											<Setter Property="Visibility" TargetName="RotationCallout" Value="Visible" />
 										</DataTrigger>
 										<DataTrigger Binding="{Binding RotationProof}" Value="False">
@@ -131,7 +131,7 @@
 											<Setter Property="TextDecorations" TargetName="CardName" Value="Underline" />
 											<Setter Property="FontStyle" TargetName="CardName" Value="Normal" />
 										</DataTrigger>
-										<DataTrigger Binding="{Binding Card.Set.RotationSafe}" Value="False">
+										<DataTrigger Binding="{Binding Card.RotationSafe}" Value="False">
 											<Setter Property="Visibility" TargetName="RotationCallout" Value="Visible" />
 										</DataTrigger>
 										<DataTrigger Binding="{Binding RotationProof}" Value="False">
