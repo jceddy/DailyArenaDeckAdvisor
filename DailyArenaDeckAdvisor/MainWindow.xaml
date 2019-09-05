@@ -144,6 +144,10 @@
 					</StackPanel>
 
 					<StackPanel Orientation="Vertical" Margin="3">
+						<TextBlock FontWeight="Bold" HorizontalAlignment="Left" TextDecorations="Underline" Visibility="{Binding WinLossVisibility}">Win/Loss Record</TextBlock>
+						<TextBlock Text="{Binding WinLossView}" Visibility="{Binding WinLossVisibility}" />
+						<TextBlock Visibility="{Binding WinLossVisibility}" />
+						
 						<TextBlock FontWeight="Bold" HorizontalAlignment="Left" TextDecorations="Underline">Expected Booster Cost</TextBlock>
 						<StackPanel Orientation="Horizontal">
 							<TextBlock HorizontalAlignment="Left" Text="{Binding BoosterCost, StringFormat={}{0:0.00}}"/>

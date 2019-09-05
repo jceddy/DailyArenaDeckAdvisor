@@ -54,6 +54,26 @@ namespace DailyArenaDeckAdvisor
 		public bool RotationProof { get; private set; }
 
 		/// <summary>
+		/// The number of recorded wins for this archetype.
+		/// </summary>
+		public int Win { get; private set; }
+
+		/// <summary>
+		/// The number of recorded losses for this archetype.
+		/// </summary>
+		public int Loss { get; private set; }
+
+		/// <summary>
+		/// A string version of the win/loss information for this deck, for Xaml binding.
+		/// </summary>
+		public string WinLossView { get; private set; }
+
+		/// <summary>
+		/// Visibility modifier for win/loss information on the GUI.
+		/// </summary>
+		public Visibility WinLossVisibility { get; private set; }
+
+		/// <summary>
 		/// Gets a readonly dictionary containing the names and quantities of cards in the the main deck list.
 		/// </summary>
 		public ReadOnlyDictionary<string, int> MainDeck { get; private set; }
@@ -129,12 +149,27 @@ namespace DailyArenaDeckAdvisor
 		/// <param name="mainDeck">The names and quantities of cards in the the main deck list.</param>
 		/// <param name="sideboard">The names and quantities of cards in the sideboard.</param>
 		/// <param name="rotationProof">Whether we favor "rotation-proof" cards.</param>
-		public Archetype(string name, Dictionary<string, int> mainDeck, Dictionary<string, int> sideboard, bool rotationProof)
+		/// <param name="win">The number of recorded wins for this archetype (if available).</param>
+		/// <param name="loss">The number of recorded losses for this archetype (if available).</param>
+		public Archetype(string name, Dictionary<string, int> mainDeck, Dictionary<string, int> sideboard, bool rotationProof, int win = -1, int loss = -1)
 		{
 			Name = name;
 			MainDeck = new ReadOnlyDictionary<string, int>(mainDeck);
 			Sideboard = new ReadOnlyDictionary<string, int>(sideboard);
 			RotationProof = rotationProof;
+			Win = win;
+			Loss = loss;
+			
+			if(win == -1 || loss == -1)
+			{
+				WinLossView = string.Empty;
+				WinLossVisibility = Visibility.Collapsed;
+			}
+			else
+			{
+				WinLossView = $"Win: {win}, Loss: {loss}, Total: {win + loss} ({(double)win/(win+loss):P})";
+				WinLossVisibility = Visibility.Visible;
+			}
 		}
 
 		/// <summary>

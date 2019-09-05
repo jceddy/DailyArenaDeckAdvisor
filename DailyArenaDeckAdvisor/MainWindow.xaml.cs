@@ -25,25 +25,84 @@ namespace DailyArenaDeckAdvisor
 	/// </summary>
 	public partial class MainWindow : Window
 	{
+		/// <summary>
+		/// The list of Archetypes pulled down from the server.
+		/// </summary>
 		List<Archetype> _archetypes = new List<Archetype>();
+
+		/// <summary>
+		/// The player's card inventory; key = Arena Id of a card, value = Quantity of that card owned.
+		/// </summary>
 		Dictionary<int, int> _playerInventory = new Dictionary<int, int>();
+
+		/// <summary>
+		/// The player inventory keyed by Card Name instead of by Arena Id. The Stored Quantity will "max out" at the maximum card copy count for the selected format.
+		/// </summary>
 		Dictionary<string, int> _playerInventoryCounts = new Dictionary<string, int>();
+
+		/// <summary>
+		/// Dictionary that stores "colors" for nonbasic lands in Standard. Used for generating replacement suggestions for nonbasic lands.
+		/// </summary>
 		Dictionary<string, CardColors> _colorsByLand = new Dictionary<string, CardColors>();
+
+		/// <summary>
+		/// Dictionary containing counts of wildcards the player owns, keyed by rarity.
+		/// </summary>
 		Dictionary<CardRarity, int> _wildcardsOwned = new Dictionary<CardRarity, int>();
+
+		/// <summary>
+		/// List of objects that will be shown in the Tab control on the GUI.
+		/// </summary>
 		List<object> _tabObjects = new List<object>();
+
+		/// <summary>
+		/// Dictionary mapping each card in the card database to its metagame statistics.
+		/// </summary>
 		Dictionary<Card, CardStats> _cardStats = new Dictionary<Card, CardStats>();
 
+		/// <summary>
+		/// List of deck archetypes, ordered by the estimated "booster cost" of each deck after wildcards, and then byt the average "booster cost" disregarding wildcards.
+		/// </summary>
 		IOrderedEnumerable<Archetype> _orderedArchetypes;
+
+		/// <summary>
+		/// A list of names of cards in Arena that allow a player to include any number of copies.
+		/// </summary>
 		List<string> _anyNumber = new List<string>() { "Persistent Petitioners", "Rat Colony" };
+
+		/// <summary>
+		/// A list mapping basic land names to a Card of that type the player owns.
+		/// </summary>
 		Dictionary<string, Card> _basicLands = new Dictionary<string, Card>();
 
+		/// <summary>
+		/// A reference to the application logger.
+		/// </summary>
 		ILogger _logger;
 
+		/// <summary>
+		/// The selected format being viewed.
+		/// </summary>
 		public BindableString Format { get; private set; } = new BindableString();
+
+		/// <summary>
+		/// The state of the "Rotation" toggle button.
+		/// </summary>
 		public BindableBool RotationProof { get; private set; } = new BindableBool();
+
+		/// <summary>
+		/// The selected font size for the display.
+		/// </summary>
 		public BindableInt SelectedFontSize { get; private set; } = new BindableInt() { Value = 12 };
+
+		/// <summary>
+		/// The Bitmap Scaling Mode (can be overridden in App.config for users with funky video card/driver combinations that cause crashing under high-quality scaling.
+		/// </summary>
 		public BitmapScalingMode BitmapScalingMode { get; private set; }
 
+		/// <summary>
+		/// Default constructor. Sets the logger and scaling mode, and does GUI initialization stuff.
+		/// </summary>
 		public MainWindow()
 		{
 			App application = (App)Application.Current;
@@ -56,11 +115,21 @@ namespace DailyArenaDeckAdvisor
 			DataContext = this;
 		}
 
+		/// <summary>
+		/// Get thw lowest of two rarities.
+		/// </summary>
+		/// <param name="r1">The first rarity to compare.</param>
+		/// <param name="r2">The second rarity to compare.</param>
+		/// <returns>Whichever of the compared rarities has the lowest "value".</returns>
 		private CardRarity LowestRarity(CardRarity r1, CardRarity r2)
 		{
 			return r1.CompareTo(r2) > 0 ? r2 : r1;
 		}
 
+		/// <summary>
+		/// Loads a list of nonbasic lands in Standard, using the local cached if it's up to date, otherwise refreshing the local cache from the server.
+		/// </summary>
+		/// <returns>The updated cache timestamp in a sortable string format.</returns>
 		private string LoadStandardLands()
 		{
 			_logger.Debug("LoadStandardLands() Called");
@@ -88,6 +157,10 @@ namespace DailyArenaDeckAdvisor
 			return cacheTimestamp;
 		}
 
+		/// <summary>
+		/// Save data on nonbasic lands in Standard to the local cache file.
+		/// </summary>
+		/// <param name="lastUpdate">The latest timestamp for the standard lands data that was pulled from the server.</param>
 		public void SaveStandardLands(string lastUpdate)
 		{
 			_logger.Debug("SaveStandardLands() Called - lastUpdate={0}", lastUpdate);
@@ -102,6 +175,9 @@ namespace DailyArenaDeckAdvisor
 			_logger.Debug("SaveStandardLands() Finished");
 		}
 
+		/// <summary>
+		/// Populate the _colorsByLand dictionary.
+		/// </summary>
 		private void PopulateColorsByLand()
 		{
 			_logger.Debug("PopulateColorsByLand() Called");
@@ -143,6 +219,9 @@ namespace DailyArenaDeckAdvisor
 			_logger.Debug("PopulateColorsByLand() Finished");
 		}
 
+		/// <summary>
+		/// A dictionary mapping the Format names shown on the GUI drop-down to the name to use when querying archetype data from the server.
+		/// </summary>
 		private Dictionary<string, string> _formatMappings = new Dictionary<string, string>()
 		{
 			{ "Standard", "standard" },
@@ -150,6 +229,9 @@ namespace DailyArenaDeckAdvisor
 			{ "Brawl", "brawl" }
 		};
 
+		/// <summary>
+		/// Reload all of the player data from the Arena real-time logs and recompute all of the app data.
+		/// </summary>
 		private void ReloadAndCrunchAllData()
 		{
 			_logger.Debug("ReloadAndCrunchAllData() Called");
@@ -335,7 +417,9 @@ namespace DailyArenaDeckAdvisor
 					}
 				}
 
-				_archetypes.Add(new Archetype(name, mainDeck, sideboard, RotationProof.Value));
+				int win = archetype["win"] == null ? -1 : (int)archetype["win"];
+				int loss = archetype["loss"] == null ? -1 : (int)archetype["loss"];
+				_archetypes.Add(new Archetype(name, mainDeck, sideboard, RotationProof.Value, win, loss));
 			}
 
 			_logger.Debug("Initializing Card Stats Objects");
@@ -849,6 +933,11 @@ namespace DailyArenaDeckAdvisor
 			_logger.Debug("ReloadAndCrunchAllData() Finished");
 		}
 
+		/// <summary>
+		/// Callback that runs when the main window first loads.
+		/// </summary>
+		/// <param name="sender">The object that triggered the callback.</param>
+		/// <param name="e">Arguments regarding the event that triggered the callback.</param>
 		private void Window_Loaded(object sender, RoutedEventArgs e)
 		{
 			_logger.Debug("Main Window Loaded - {0}", "Main Application");
@@ -905,6 +994,11 @@ namespace DailyArenaDeckAdvisor
 			loadTask.Start();
 		}
 
+		/// <summary>
+		/// Callback that is triggered when the user selects a different Format from the drop-down on the GUI.
+		/// </summary>
+		/// <param name="sender">The object that triggered the callback.</param>
+		/// <param name="e">Arguments regarding the event that triggered the callback.</param>
 		private void Format_PropertyChanged(object sender, PropertyChangedEventArgs e)
 		{
 			_logger.Debug("New Format Selected, Format={0}", Format.Value);
@@ -934,6 +1028,11 @@ namespace DailyArenaDeckAdvisor
 			loadTask.Start();
 		}
 
+		/// <summary>
+		/// Callback that is triggered when the user switches the Rotation toggle on the GUI.
+		/// </summary>
+		/// <param name="sender">The object that triggered the callback.</param>
+		/// <param name="e">Arguments regarding the event that triggered the callback.</param>
 		private void RotationProof_PropertyChanged(object sender, PropertyChangedEventArgs e)
 		{
 			if (e.PropertyName == "Value")
@@ -966,6 +1065,11 @@ namespace DailyArenaDeckAdvisor
 			}
 		}
 
+		/// <summary>
+		/// Callback that is triggered when the user changes the font size selection in the Settings popup.
+		/// </summary>
+		/// <param name="sender">The object that triggered the callback.</param>
+		/// <param name="e">Arguments regarding the event that triggered the callback.</param>
 		private void SelectedFontSize_PropertyChanged(object sender, PropertyChangedEventArgs e)
 		{
 			_logger.Debug("New Font Size Selected, FontSize={0}", SelectedFontSize.Value);
@@ -975,6 +1079,11 @@ namespace DailyArenaDeckAdvisor
 			application.SaveState();
 		}
 
+		/// <summary>
+		/// Callback that is triggered when the user clicks the "Export Deck" button on the deck details GUI.
+		/// </summary>
+		/// <param name="sender">The object that triggered the callback.</param>
+		/// <param name="e">Arguments regarding the event that triggered the callback.</param>
 		private void Export_Click(object sender, RoutedEventArgs e)
 		{
 			try
@@ -997,6 +1106,11 @@ namespace DailyArenaDeckAdvisor
 			}
 		}
 
+		/// <summary>
+		/// Callback that is triggered when the user clicks the "Export w/Replacements" button on the deck details GUI.
+		/// </summary>
+		/// <param name="sender">The object that triggered the callback.</param>
+		/// <param name="e">Arguments regarding the event that triggered the callback.</param>
 		private void ExportSuggested_Click(object sender, RoutedEventArgs e)
 		{
 			try
@@ -1019,6 +1133,11 @@ namespace DailyArenaDeckAdvisor
 			}
 		}
 
+		/// <summary>
+		/// Callback that is triggered when the user clicks an archetype hyperlink on the Meta Report detail screen, focuses the selected archetype's tab.
+		/// </summary>
+		/// <param name="sender">The object that triggered the callback.</param>
+		/// <param name="e">Arguments regarding the event that triggered the callback.</param>
 		private void Hyperlink_Click(object sender, RoutedEventArgs e)
 		{
 			Hyperlink link = (Hyperlink)sender;
@@ -1029,6 +1148,11 @@ namespace DailyArenaDeckAdvisor
 			DeckTabs.SelectedItem = item;
 		}
 
+		/// <summary>
+		/// Callback that is triggered when the user clicks the refresh button the GUI. (Only re-loads user log information, doesn't check for new data on server.)
+		/// </summary>
+		/// <param name="sender">The object that triggered the callback.</param>
+		/// <param name="e">Arguments regarding the event that triggered the callback.</param>
 		private void Refresh_Click(object sender, RoutedEventArgs e)
 		{
 			_logger.Debug("Refresh Clicked");
@@ -1054,6 +1178,11 @@ namespace DailyArenaDeckAdvisor
 			loadTask.Start();
 		}
 
+		/// <summary>
+		/// Callback that is triggered when the user clicks the "hard" refresh button the GUI. (Pulls new data from server, if needed.)
+		/// </summary>
+		/// <param name="sender">The object that triggered the callback.</param>
+		/// <param name="e">Arguments regarding the event that triggered the callback.</param>
 		private void HardRefresh_Click(object sender, RoutedEventArgs e)
 		{
 			_logger.Debug("Hard Refresh Clicked");
@@ -1086,6 +1215,11 @@ namespace DailyArenaDeckAdvisor
 			loadTask.Start();
 		}
 
+		/// <summary>
+		/// Callback that is triggered when the user clicks the settings button the GUI. Opens the settings popup.
+		/// </summary>
+		/// <param name="sender">The object that triggered the callback.</param>
+		/// <param name="e">Arguments regarding the event that triggered the callback.</param>
 		private void Settings_Click(object sender, RoutedEventArgs e)
 		{
 			SettingsDialog settingsDialog = new SettingsDialog()
@@ -1095,6 +1229,10 @@ namespace DailyArenaDeckAdvisor
 			settingsDialog.ShowDialog();
 		}
 
+		/// <summary>
+		/// Gets the bitmap scaling mode.
+		/// </summary>
+		/// <returns>Fant, or whatever override value the user set in App.config.</returns>
 		private BitmapScalingMode GetBitmapScalingMode()
 		{
 			_logger.Debug("GetBitmapScalingMode() Called - {0}", "Main Application");
@@ -1136,6 +1274,10 @@ namespace DailyArenaDeckAdvisor
 			}
 		}
 
+		/// <summary>
+		/// Gets the location of the folder that contains the MTGA real-time log output.
+		/// </summary>
+		/// <returns>The default location in the current user's AppData, unless there is an override value set in App.config.</returns>
 		private string GetLogFolderLocation()
 		{
 			_logger.Debug("GetLogFolderLocation() Called - {0}", "Main Application");

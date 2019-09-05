@@ -251,7 +251,10 @@ namespace DailyArenaDeckAdvisor.Database
 									if (card.Value["images"] != null)
 									{
 										scryfallId = (string)card.Value["images"]["normal"];
-										scryfallId = scryfallId.Substring(scryfallId.LastIndexOf('/') + 1).Split('.')[0];
+										if (!string.IsNullOrWhiteSpace(scryfallId))
+										{
+											scryfallId = scryfallId.Substring(scryfallId.LastIndexOf('/') + 1).Split('.')[0];
+										}
 									}
 									Card.CreateCard((int)card.Value["id"], (string)card.Value["name"], (string)card.Value["set"], (string)card.Value["cid"],
 										(string)card.Value["rarity"], string.Join("", card.Value["cost"].ToObject<string[]>()).ToUpper(),
