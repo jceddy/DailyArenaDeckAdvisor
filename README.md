@@ -8,6 +8,11 @@ View the blog here: https://www.dailyarena.net
 64-bit Windows: https://clans.dailyarena.net/download/advisor/x64/DailyArenaDeckAdvisorSetup.msi  
 32-bit Windows: https://clans.dailyarena.net/download/advisor/x86/DailyArenaDeckAdvisorSetup.msi
 
+# Release 1.0.3.1 Changes
+- Deck Win/Loss Record
+- Fixed bug with Rotating cards that have nonrotating reprints
+- Arena 9/4 Update detailed logging notes:
+
 # Release 1.0.2.9 Changes
 - Expanded Standard Archetypes to include more niche/budget decks
 - Added Rotation Agnostic/Proof toggle button to filter decks/cards by rotation status
