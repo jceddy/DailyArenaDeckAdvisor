@@ -14,7 +14,9 @@ View the blog here: https://www.dailyarena.net
 - Arena 9/4 Update detailed logging notes:
 
 The 9/4 Arena update added a user settings to enable/disable detailed logging, and disabled it by default. The setting needs to be enabled in order for player inventory information (that trackers and plugins like Daily Arena Deck Advisor, mtgarena.pro, etc. rely on) to show up in the Arena real-time logs.
+
 In order to enable that setting, you need to go to Settings->View Account and check “Detailed Logs(Plugin Support)”.
+
 ![Arena Detailed Log Setting](https://www.dailyarena.net/wp-content/uploads/2019/09/advisor_13.png)
 
 # Release 1.0.2.9 Changes
