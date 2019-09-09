@@ -19,6 +19,8 @@ In order to enable that setting, you need to go to Settings->View Account and ch
 
 ![Arena Detailed Log Setting](https://www.dailyarena.net/wp-content/uploads/2019/09/advisor_13.png)
 
+_**Note**: You might have to restart Arena for this change to take effect._
+
 # Release 1.0.2.9 Changes
 - Expanded Standard Archetypes to include more niche/budget decks
 - Added Rotation Agnostic/Proof toggle button to filter decks/cards by rotation status
