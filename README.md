@@ -11,6 +11,9 @@ View the blog here: https://www.dailyarena.net
 # User Guide
 https://github.com/jceddy/DailyArenaDeckAdvisor/wiki/User-Guide
 
+# Developer Guide
+https://github.com/jceddy/DailyArenaDeckAdvisor/wiki/Getting-Started:-Developing-DADA
+
 # Release 1.0.3.1 Changes
 - Deck Win/Loss Record
 - Fixed bug with Rotating cards that have nonrotating reprints
