@@ -419,7 +419,9 @@ namespace DailyArenaDeckAdvisor
 
 				int win = archetype["win"] == null ? -1 : (int)archetype["win"];
 				int loss = archetype["loss"] == null ? -1 : (int)archetype["loss"];
-				_archetypes.Add(new Archetype(name, mainDeck, sideboard, RotationProof.Value, win, loss));
+				Archetype newArchetype = new Archetype(name, mainDeck, sideboard, RotationProof.Value, win, loss);
+				CardStats.UpdateDeckAssociations(newArchetype);
+				_archetypes.Add(newArchetype);
 			}
 
 			_logger.Debug("Initializing Card Stats Objects");
@@ -713,7 +715,7 @@ namespace DailyArenaDeckAdvisor
 						_logger.Debug("Processing Candidates based on Color");
 						var candidates = playerInventory.Select(x => new { Card = cardsById[x.Key], Quantity = x.Value }).
 							Where(x => x.Quantity > 0 && x.Card.Type == cardToReplace.Type && _colorsByLand[x.Card.Name] == _colorsByLand[cardToReplace.Name]).
-							OrderByDescending(x => x.Card.Rank);
+							OrderByDescending(x => x.Card.Rank + CardStats.GetAssociationModifier(cardToReplace.Name, x.Card.Name, _cardStats));
 
 						foreach (var candidate in candidates)
 						{
@@ -769,7 +771,7 @@ namespace DailyArenaDeckAdvisor
 						_logger.Debug("Processing Candidates based on Type and Cost");
 						var candidates = playerInventory.Select(x => new { Card = cardsById[x.Key], Quantity = x.Value }).
 								Where(x => x.Quantity > 0 && x.Card.Type == cardToReplace.Type && x.Card.Cost == cardToReplace.Cost).
-								OrderByDescending(x => x.Card.Rank);
+								OrderByDescending(x => x.Card.Rank + CardStats.GetAssociationModifier(cardToReplace.Name, x.Card.Name, _cardStats));
 
 						foreach (var candidate in candidates)
 						{
@@ -793,7 +795,7 @@ namespace DailyArenaDeckAdvisor
 							_logger.Debug("Insufficient Candidates Found, Getting Candidates by Cost");
 							candidates = playerInventory.Select(x => new { Card = cardsById[x.Key], Quantity = x.Value }).
 								Where(x => x.Quantity > 0 && x.Card.Cost == cardToReplace.Cost).
-								OrderByDescending(x => x.Card.Rank);
+								OrderByDescending(x => x.Card.Rank + CardStats.GetAssociationModifier(cardToReplace.Name, x.Card.Name, _cardStats));
 
 							foreach (var candidate in candidates)
 							{
@@ -818,7 +820,7 @@ namespace DailyArenaDeckAdvisor
 							_logger.Debug("Insufficient Candidates Found, Getting Candidates by Cmc and Color");
 							candidates = playerInventory.Select(x => new { Card = cardsById[x.Key], Quantity = x.Value }).
 								Where(x => x.Quantity > 0 && x.Card.Cmc == cardToReplace.Cmc && x.Card.Colors == cardToReplace.Colors).
-								OrderByDescending(x => x.Card.Rank);
+								OrderByDescending(x => x.Card.Rank + CardStats.GetAssociationModifier(cardToReplace.Name, x.Card.Name, _cardStats));
 
 							foreach (var candidate in candidates)
 							{
@@ -846,7 +848,7 @@ namespace DailyArenaDeckAdvisor
 							{
 								candidates = playerInventory.Select(x => new { Card = cardsById[x.Key], Quantity = x.Value }).
 									Where(x => x.Quantity > 0 && x.Card.Cmc == cmcToTest && x.Card.Colors == cardToReplace.Colors).
-									OrderByDescending(x => x.Card.Rank);
+									OrderByDescending(x => x.Card.Rank + CardStats.GetAssociationModifier(cardToReplace.Name, x.Card.Name, _cardStats));
 
 								foreach (var candidate in candidates)
 								{
@@ -876,7 +878,7 @@ namespace DailyArenaDeckAdvisor
 							{
 								candidates = playerInventory.Select(x => new { Card = cardsById[x.Key], Quantity = x.Value }).
 									Where(x => x.Quantity > 0 && x.Card.Cmc == cmcToTest && cardToReplace.Colors.Contains(x.Card.Colors)).
-									OrderByDescending(x => x.Card.Rank);
+									OrderByDescending(x => x.Card.Rank + CardStats.GetAssociationModifier(cardToReplace.Name, x.Card.Name, _cardStats));
 
 								foreach (var candidate in candidates)
 								{
