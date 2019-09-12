@@ -81,6 +81,17 @@ namespace DailyArenaDeckAdvisor.Database
 		public string ScryfallId { get; private set; }
 
 		/// <summary>
+		/// Gets the card's color identity;
+		/// </summary>
+		public CardColors ColorIdentity
+		{
+			get
+			{
+				return Set.ExtendedCardInfo.ContainsKey(ArenaId) ? Set.ExtendedCardInfo[ArenaId].ColorIdentity : null;
+			}
+		}
+
+		/// <summary>
 		/// The Uri for the card's (cached) image.
 		/// </summary>
 		private Uri _imageUri = null;

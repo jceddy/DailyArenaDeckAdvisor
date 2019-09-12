@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Windows;
 
 namespace DailyArenaDeckAdvisor
@@ -143,6 +144,72 @@ namespace DailyArenaDeckAdvisor
 		public long Index { get; private set; } = NextIndex++;
 
 		/// <summary>
+		/// Gets or sets the deck archetype's Commander name (for Brawl).
+		/// </summary>
+		public string CommanderName { get; private set; }
+
+		/// <summary>
+		/// Whether commander info should be shown.
+		/// </summary>
+		public Visibility CommanderVisibility { get; private set; }
+
+		/// <summary>
+		/// A view-friendly version of the commander card (for Brawl).
+		/// </summary>
+		private CardView _commanderCard = null;
+
+		/// <summary>
+		/// Gets a view-friendly version of the commander card (for Brawl).
+		/// </summary>
+		public CardView CommanderCard
+		{
+			get
+			{
+				if(CommanderName == null)
+				{
+					return null;
+				}
+
+				if (_commanderCard == null && _mainDeckToCollect != null && _suggestedMainDeck != null)
+				{
+					ReadOnlyDictionary<int, Card> cardsById = Card.CardsById;
+					_commanderCard = _mainDeckToCollect.Where(x => cardsById[x.Key].Name == CommanderName).
+						Select(x => new CardView() { Card = cardsById[x.Key], Quantity = x.Value, Collected = false, Stats = CardStats[cardsById[x.Key]], RotationProof = RotationProof }).
+						Concat(_suggestedMainDeck.Where(x => cardsById[x.Key].Name == CommanderName)
+							.Select(x => new CardView() { Card = cardsById[x.Key], Quantity = x.Value, Collected = true, Stats = CardStats[cardsById[x.Key]], RotationProof = RotationProof })
+						).
+						First();
+				}
+				return _commanderCard;
+			}
+		}
+
+		/// <summary>
+		/// The commander's color identity (for Brawl).
+		/// </summary>
+		private CardColors _commanderColorIdentity = null;
+
+		/// <summary>
+		/// Gets the commander's color identity (for Brawl).
+		/// </summary>
+		public CardColors CommanderColorIdentity
+		{
+			get
+			{
+				if (_commanderColorIdentity == null && CommanderCard != null)
+				{
+					_commanderColorIdentity = CommanderCard.Card.ColorIdentity;
+				}
+				return _commanderColorIdentity;
+			}
+		}
+
+		/// <summary>
+		/// Regex used to parse commander name out of archetype name for Brawl.
+		/// </summary>
+		private Regex _nonAlphaRegex = new Regex("^([-a-z ,']+)(.*)", RegexOptions.IgnoreCase);
+
+		/// <summary>
 		/// Archetype constructor.
 		/// </summary>
 		/// <param name="name">The name of the deck archetype.</param>
@@ -151,7 +218,8 @@ namespace DailyArenaDeckAdvisor
 		/// <param name="rotationProof">Whether we favor "rotation-proof" cards.</param>
 		/// <param name="win">The number of recorded wins for this archetype (if available).</param>
 		/// <param name="loss">The number of recorded losses for this archetype (if available).</param>
-		public Archetype(string name, Dictionary<string, int> mainDeck, Dictionary<string, int> sideboard, bool rotationProof, int win = -1, int loss = -1)
+		/// <param name="isBrawl">Whether the selected format is Brawl.</param>
+		public Archetype(string name, Dictionary<string, int> mainDeck, Dictionary<string, int> sideboard, bool rotationProof, int win = -1, int loss = -1, bool isBrawl = false)
 		{
 			Name = name;
 			MainDeck = new ReadOnlyDictionary<string, int>(mainDeck);
@@ -169,6 +237,17 @@ namespace DailyArenaDeckAdvisor
 			{
 				WinLossView = $"Win: {win}, Loss: {loss}, Total: {win + loss} ({(double)win/(win+loss):P})";
 				WinLossVisibility = Visibility.Visible;
+			}
+
+			if(isBrawl)
+			{
+				CommanderVisibility = Visibility.Visible;
+				var m = _nonAlphaRegex.Match(name);
+				CommanderName = m.Groups[1].Value.Trim();
+			}
+			else
+			{
+				CommanderVisibility = Visibility.Collapsed;
 			}
 		}
 

@@ -11,6 +11,31 @@ namespace DailyArenaDeckAdvisor.Database
 	public class Set : IComparable<Set>, IComparable<string>
 	{
 		/// <summary>
+		/// Class that contains extended card info for the set that isn't found in the main card database.
+		/// </summary>
+		public class CardInfo
+		{
+			/// <summary>
+			/// The card's color identity.
+			/// </summary>
+			public CardColors ColorIdentity { get; private set; }
+
+			/// <summary>
+			/// Constructor, sets the fixed property values.
+			/// </summary>
+			/// <param name="colorIdentity">The card's color identity.</param>
+			public CardInfo(string colorIdentity)
+			{
+				ColorIdentity = CardColors.CardColorFromString(colorIdentity);
+			}
+		}
+
+		/// <summary>
+		/// Gets a readonly dictionary containing extended card info for the set that isn't found in the main card database.
+		/// </summary>
+		public ReadOnlyDictionary<int, CardInfo> ExtendedCardInfo { get; private set; }
+
+		/// <summary>
 		/// The set's canonical short code.
 		/// </summary>
 		public string Code { get; private set; }
@@ -65,7 +90,9 @@ namespace DailyArenaDeckAdvisor.Database
 		/// <param name="totalCards">The total number of cards in the set.</param>
 		/// <param name="rarityCounts">The number of cards of each rarity in the set.</param>
 		/// <param name="rotation">The date the set rotates out of standard.</param>
-		private Set(string name, string code, string arenaCode, List<string> notInBooster, int totalCards, Dictionary<CardRarity, int> rarityCounts, DateTime rotation)
+		/// <param name="extendedCardInfo">A dictionary containing extended card info for the set that isn't found in the main card database.</param>
+		private Set(string name, string code, string arenaCode, List<string> notInBooster, int totalCards, Dictionary<CardRarity, int> rarityCounts, DateTime rotation,
+			Dictionary<int, CardInfo> extendedCardInfo)
 		{
 			Code = code;
 			ArenaCode = arenaCode;
@@ -82,6 +109,7 @@ namespace DailyArenaDeckAdvisor.Database
 			HashCode = arenaCode.GetHashCode();
 			Rotation = rotation;
 			RotationSafe = Rotation.AddDays(-80) > DateTime.Now;
+			ExtendedCardInfo = new ReadOnlyDictionary<int, CardInfo>(extendedCardInfo);
 		}
 
 		/// <summary>
@@ -140,9 +168,10 @@ namespace DailyArenaDeckAdvisor.Database
 		/// <param name="totalCards">The total number of cards in the set.</param>
 		/// <param name="rarityCounts">The number of cards of each rarity in the set.</param>
 		/// <param name="rotation">The date the set rotates out of standard.</param>
+		/// <param name="extendedCardInfo">A dictionary containing extended card info for the set that isn't found in the main card database.</param>
 		/// <returns>The new Set object.</returns>
 		public static Set CreateSet(string name, string code, string arenaCode, List<string> notInBooster, int totalCards,
-			Dictionary<CardRarity, int> rarityCounts, DateTime rotation)
+			Dictionary<CardRarity, int> rarityCounts, DateTime rotation, Dictionary<int, CardInfo> extendedCardInfo)
 		{
 			if (_setsByName.ContainsKey(name))
 			{
@@ -154,7 +183,7 @@ namespace DailyArenaDeckAdvisor.Database
 				return set;
 			}
 
-			Set newSet = new Set(name, code, arenaCode, notInBooster, totalCards, rarityCounts, rotation);
+			Set newSet = new Set(name, code, arenaCode, notInBooster, totalCards, rarityCounts, rotation, extendedCardInfo);
 			_setsByName.Add(name, newSet);
 			_recomputeAllSets = true;
 			return newSet;

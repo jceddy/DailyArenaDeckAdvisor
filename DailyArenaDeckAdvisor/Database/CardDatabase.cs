@@ -66,7 +66,8 @@ namespace DailyArenaDeckAdvisor.Database
 				foreach (dynamic set in data.Sets)
 				{
 					Set.CreateSet((string)set.Name, (string)set.Code, (string)set.ArenaCode, set.NotInBooster.ToObject<List<string>>(), (int)set.TotalCards,
-						set.RarityCounts.ToObject<Dictionary<CardRarity, int>>(), (DateTime)(set.Rotation ?? DateTime.MaxValue));
+						set.RarityCounts.ToObject<Dictionary<CardRarity, int>>(), (DateTime)(set.Rotation ?? DateTime.MaxValue),
+						set.ExtendedCardInfo == null ? new Dictionary<int, Set.CardInfo>() : set.ExtendedCardInfo.ToObject<Dictionary<int, Set.CardInfo>>());
 				}
 				foreach (dynamic card in data.Cards)
 				{
@@ -93,7 +94,8 @@ namespace DailyArenaDeckAdvisor.Database
 					x.NotInBooster,
 					x.TotalCards,
 					x.RarityCounts,
-					x.Rotation
+					x.Rotation,
+					x.ExtendedCardInfo
 				}),
 				Cards = Card.AllCards.Select(x => new
 				{
@@ -175,8 +177,8 @@ namespace DailyArenaDeckAdvisor.Database
 				//   Item2 => RarityCounts
 				//   Item3 => TotalCards
 				//   Item4 => RotationDate
-				Dictionary<string, Tuple<List<string>, Dictionary<CardRarity, int>, int, DateTime>> standardSetsInfo =
-					new Dictionary<string, Tuple<List<string>, Dictionary<CardRarity, int>, int, DateTime>>();
+				Dictionary<string, Tuple<List<string>, Dictionary<CardRarity, int>, int, DateTime, Dictionary<int, Set.CardInfo>>> standardSetsInfo =
+					new Dictionary<string, Tuple<List<string>, Dictionary<CardRarity, int>, int, DateTime, Dictionary<int, Set.CardInfo>>>();
 
 				LastCardDatabaseUpdate = _serverTimestamps["CardDatabase"];
 				LastStandardSetsUpdate = _serverTimestamps["StandardSets"];
@@ -196,11 +198,18 @@ namespace DailyArenaDeckAdvisor.Database
 
 							foreach (dynamic set in data)
 							{
-								standardSetsInfo[(string)set.Value["name"]] = new Tuple<List<string>, Dictionary<CardRarity, int>, int, DateTime>(
+								Dictionary<int, Set.CardInfo> extendedCardInfo = new Dictionary<int, Set.CardInfo>();
+								foreach(dynamic cardInfo in set.Value["extended_card_info"])
+								{
+									extendedCardInfo[int.Parse(cardInfo.Name)] = new Set.CardInfo((string)cardInfo.Value["color_identity"]);
+								}
+
+								standardSetsInfo[(string)set.Value["name"]] = new Tuple<List<string>, Dictionary<CardRarity, int>, int, DateTime, Dictionary<int, Set.CardInfo>>(
 									set.Value["not_in_booster"].ToObject<List<string>>(),
 									set.Value["rarity_counts"].ToObject<Dictionary<CardRarity, int>>(),
 									(int)set.Value["total_cards"],
-									set.Value["rotation"] == null ? DateTime.MaxValue : DateTime.Parse((string)set.Value["rotation"])
+									set.Value["rotation"] == null ? DateTime.MaxValue : DateTime.Parse((string)set.Value["rotation"]),
+									extendedCardInfo
 								);
 							}
 						}
@@ -228,8 +237,8 @@ namespace DailyArenaDeckAdvisor.Database
 							{
 								if (standardSetsInfo.ContainsKey(set.Name))
 								{
-									Tuple<List<string>, Dictionary<CardRarity, int>, int, DateTime> setInfo = standardSetsInfo[set.Name];
-									Set.CreateSet(set.Name, (string)set.Value["scryfall"], (string)set.Value["arenacode"], setInfo.Item1, setInfo.Item3, setInfo.Item2, setInfo.Item4);
+									Tuple<List<string>, Dictionary<CardRarity, int>, int, DateTime, Dictionary<int, Set.CardInfo>> setInfo = standardSetsInfo[set.Name];
+									Set.CreateSet(set.Name, (string)set.Value["scryfall"], (string)set.Value["arenacode"], setInfo.Item1, setInfo.Item3, setInfo.Item2, setInfo.Item4, setInfo.Item5);
 								}
 								else
 								{
@@ -239,7 +248,7 @@ namespace DailyArenaDeckAdvisor.Database
 										{ CardRarity.Uncommon, 0 },
 										{ CardRarity.Rare, 0 },
 										{ CardRarity.MythicRare, 0 }
-										}, DateTime.MaxValue);
+										}, DateTime.MaxValue, new Dictionary<int, Set.CardInfo>());
 								}
 							}
 							Card.ClearCards();

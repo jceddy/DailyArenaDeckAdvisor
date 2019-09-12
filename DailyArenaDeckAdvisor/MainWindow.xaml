@@ -28,6 +28,43 @@
 			<ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
 				<StackPanel Orientation="Horizontal" Margin="3">
 					<StackPanel Orientation="Vertical" Margin="3">
+						<TextBlock FontWeight="Bold" HorizontalAlignment="Left" TextDecorations="Underline" Visibility="{Binding CommanderVisibility}">Commander</TextBlock>
+						<StackPanel Orientation="Horizontal" Margin="3" Visibility="{Binding CommanderVisibility}">
+							<TextBlock FontWeight="Bold" Text="{Binding CommanderName}" ToolTipService.ShowDuration="600000">
+								<TextBlock.ToolTip>
+									<ToolTip Background="Transparent" BorderThickness="0">
+										<Grid MaxHeight="340" MaxWidth="488">
+											<Border BorderBrush="Black" BorderThickness="1" Background="White"
+																	HorizontalAlignment="Left" VerticalAlignment="Top">
+												<TextBlock Text="{Binding CommanderCard.Card.FullName}" Margin="3" />
+											</Border>
+											<Image Source="{Binding CommanderCard.Card.ImageUri, Converter={StaticResource NullImageConverter}}"
+																   Stretch="Uniform" StretchDirection="Both" RenderOptions.BitmapScalingMode="{Binding BitmapScalingMode}">
+											</Image>
+										</Grid>
+									</ToolTip>
+								</TextBlock.ToolTip>
+								<TextBlock.Style>
+									<Style TargetType="TextBlock">
+										<Style.Triggers>
+											<DataTrigger Binding="{Binding CommanderCard.Collected}" Value="False">
+												<Setter Property="Foreground" Value="Red" />
+												<Setter Property="TextDecorations" Value="Underline" />
+												<Setter Property="FontStyle" Value="Normal" />
+											</DataTrigger>
+											<DataTrigger Binding="{Binding CommanderCard.Collected}" Value="True">
+												<Setter Property="Foreground" Value="Green" />
+												<Setter Property="FontStyle" Value="Italic" />
+											</DataTrigger>
+										</Style.Triggers>
+									</Style>
+								</TextBlock.Style>
+							</TextBlock>
+							<TextBlock HorizontalAlignment="Left" Text=" " />
+							<TextBlock HorizontalAlignment="Left" Text="{Binding CommanderColorIdentity, StringFormat=({0})}" />
+						</StackPanel>
+						<TextBlock FontWeight="Bold" HorizontalAlignment="Left" Visibility="{Binding CommanderVisibility}" />
+
 						<TextBlock FontWeight="Bold" HorizontalAlignment="Left" TextDecorations="Underline">Main Deck</TextBlock>
 						<ItemsControl ItemsSource="{Binding MainDeckView}">
 							<ItemsControl.ItemsPanel>

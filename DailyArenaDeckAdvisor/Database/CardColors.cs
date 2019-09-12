@@ -132,6 +132,10 @@ namespace DailyArenaDeckAdvisor.Database
 		/// <returns>True if this color is the same as the other, or completely contains it; false otherwise.</returns>
 		public bool Contains(CardColors other)
 		{
+			if(other == null)
+			{
+				return false;
+			}
 			if (other.IsWhite && !IsWhite) return false;
 			if (other.IsBlue && !IsBlue) return false;
 			if (other.IsBlack && !IsBlack) return false;
