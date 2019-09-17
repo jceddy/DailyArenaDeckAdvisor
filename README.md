@@ -14,6 +14,10 @@ https://github.com/jceddy/DailyArenaDeckAdvisor/wiki/User-Guide
 # Developer Guide
 https://github.com/jceddy/DailyArenaDeckAdvisor/wiki/Getting-Started:-Developing-DADA
 
+# Dependent Libraries
+Libraries used by this project:  
+https://github.com/jceddy/DailyArenaDatabase
+
 # Release 1.0.3.2 Changes
 - Replacement Suggestion Improvements
 - Brawl Deck Commander Info
