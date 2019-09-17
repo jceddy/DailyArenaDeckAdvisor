@@ -432,7 +432,7 @@
 
 				<StackPanel Grid.Row="0" Grid.Column="0" Orientation="Horizontal" HorizontalAlignment="Left">
 					<Button Margin="3" Click="Settings_Click" ToolTip="Settings">
-						<Image Source="cog.png" Height="24" Width="24" RenderOptions.BitmapScalingMode="{Binding BitmapScalingMode}" />
+						<Image Source="Resources/cog.png" Height="24" Width="24" RenderOptions.BitmapScalingMode="{Binding BitmapScalingMode}" />
 					</Button>
 				</StackPanel>
 
@@ -461,10 +461,10 @@
 						</ToggleButton.Style>
 					</ToggleButton>
 					<Button Margin="3" Click="Refresh_Click" ToolTip="Refresh Player Inventory, then Recalculate">
-						<Image Source="refresh.png" Height="24" Width="24" RenderOptions.BitmapScalingMode="{Binding BitmapScalingMode}" />
+						<Image Source="Resources/refresh.png" Height="24" Width="24" RenderOptions.BitmapScalingMode="{Binding BitmapScalingMode}" />
 					</Button>
 					<Button Margin="3" Click="HardRefresh_Click" ToolTip="Refresh Player Inventory and Check Server for Changes, then Recalculate">
-						<Image Source="hard_refresh.png" Height="24" Width="24" RenderOptions.BitmapScalingMode="{Binding BitmapScalingMode}" />
+						<Image Source="Resources/hard_refresh.png" Height="24" Width="24" RenderOptions.BitmapScalingMode="{Binding BitmapScalingMode}" />
 					</Button>
 				</StackPanel>
 			</Grid>

@@ -16,7 +16,7 @@
     <Deterministic>false</Deterministic>
   </PropertyGroup>
   <PropertyGroup>
-    <ApplicationIcon>DA_tiny.ico</ApplicationIcon>
+    <ApplicationIcon>Resources\DA_tiny.ico</ApplicationIcon>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
     <DebugSymbols>true</DebugSymbols>
@@ -148,16 +148,16 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="DA_tiny.ico" />
+    <Resource Include="Resources\DA_tiny.ico" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="refresh.png" />
+    <Resource Include="Resources\refresh.png" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="hard_refresh.png" />
+    <Resource Include="Resources\hard_refresh.png" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="cog.png" />
+    <Resource Include="Resources\cog.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
