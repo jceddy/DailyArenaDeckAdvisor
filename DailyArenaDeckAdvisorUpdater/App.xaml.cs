@@ -10,6 +10,9 @@ namespace DailyArenaDeckAdvisorUpdater
 	/// </summary>
 	public partial class App : Application
 	{
+		/// <summary>
+		/// Default constructer, sets up the data folder, current directory, and logging.
+		/// </summary>
 		public App()
 		{
 			var dataFolder = string.Format("{0}Low\\DailyArena\\DailyArenaDeckAdvisor", Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData));

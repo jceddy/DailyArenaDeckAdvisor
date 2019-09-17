@@ -15,6 +15,9 @@ namespace DailyArenaDeckAdvisorUpdater
 	/// </summary>
 	public partial class MainWindow : Window
 	{
+		/// <summary>
+		/// Default constructer, initializes the GUI components.
+		/// </summary>
 		public MainWindow()
 		{
 			App application = (App)Application.Current;
@@ -23,12 +26,22 @@ namespace DailyArenaDeckAdvisorUpdater
 			InitializeComponent();
 		}
 
+		/// <summary>
+		/// Event handler that is called when the window closes. Shuts down the executable.
+		/// </summary>
+		/// <param name="sender">The Window.</param>
+		/// <param name="e">The event arguments.</param>
 		private void Window_Closed(object sender, EventArgs e)
 		{
 			FileLogger.Log("Window Closed, Shutting Down - {0}", "Updater");
 			Application.Current.Shutdown();
 		}
 
+		/// <summary>
+		/// Event handler that is called when the window is loaded. Fires off updater activities.
+		/// </summary>
+		/// <param name="sender">The Window.</param>
+		/// <param name="e">The routed event arguments.</param>
 		private void Window_Loaded(object sender, RoutedEventArgs e)
 		{
 			FileLogger.Log("Main Window Loaded - {0}", "Updater");
