@@ -1,4 +1,4 @@
-﻿using DailyArenaDeckAdvisor.Database;
+﻿using DailyArena.Database;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Windows;
 
-namespace DailyArenaDeckAdvisor
+namespace DailyArena.DeckAdvisor
 {
 	/// <summary>
 	/// Class that represents a Magic deck archetype.

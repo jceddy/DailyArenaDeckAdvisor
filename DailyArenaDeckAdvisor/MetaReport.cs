@@ -1,10 +1,10 @@
-﻿using DailyArenaDeckAdvisor.Database;
+﻿using DailyArena.Database;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 
-namespace DailyArenaDeckAdvisor
+namespace DailyArena.DeckAdvisor
 {
 	/// <summary>
 	/// Class that represents a "Meta Report" for a given format.

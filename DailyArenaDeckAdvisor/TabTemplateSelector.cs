@@ -1,7 +1,7 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
 
-namespace DailyArenaDeckAdvisor
+namespace DailyArena.DeckAdvisor
 {
 	/// <summary>
 	/// Class that selects the template used for tab details (switches between templates for Meta Report vs. Archetype).

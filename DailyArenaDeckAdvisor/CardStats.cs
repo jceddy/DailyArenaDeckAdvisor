@@ -1,8 +1,8 @@
-﻿using DailyArenaDeckAdvisor.Database;
+﻿using DailyArena.Database;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace DailyArenaDeckAdvisor
+namespace DailyArena.DeckAdvisor
 {
 	/// <summary>
 	/// Class that represent non-static meta statistics computed for a Card.

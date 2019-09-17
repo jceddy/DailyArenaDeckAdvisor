@@ -8,7 +8,7 @@ using System.IO;
 using System.Management;
 using System.Windows;
 
-namespace DailyArenaDeckAdvisor
+namespace DailyArena.DeckAdvisor
 {
 	/// <summary>
 	/// Interaction logic for App.xaml

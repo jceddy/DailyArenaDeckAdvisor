@@ -2,7 +2,7 @@
 using System.Management;
 using System.Windows;
 
-namespace DailyArenaDeckAdvisor
+namespace DailyArena.DeckAdvisor
 {
 	/// <summary>
 	/// Class that contains static extension methods for other classes.

@@ -2,7 +2,7 @@
 using System.Diagnostics;
 using System.Windows;
 
-namespace DailyArenaDeckAdvisor
+namespace DailyArena.DeckAdvisor
 {
 	/// <summary>
 	/// Interaction logic for SettingsDialog.xaml

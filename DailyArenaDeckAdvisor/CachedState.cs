@@ -1,4 +1,4 @@
-﻿namespace DailyArenaDeckAdvisor
+﻿namespace DailyArena.DeckAdvisor
 {
 	/// <summary>
 	/// Class to Cache state information for the application.

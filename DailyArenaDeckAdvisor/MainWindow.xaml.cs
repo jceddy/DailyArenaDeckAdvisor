@@ -1,4 +1,4 @@
-﻿using DailyArenaDeckAdvisor.Database;
+﻿using DailyArena.Database;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Serilog;
@@ -18,7 +18,7 @@ using System.Windows.Controls;
 using System.Windows.Documents;
 using System.Windows.Media;
 
-namespace DailyArenaDeckAdvisor
+namespace DailyArena.DeckAdvisor
 {
 	/// <summary>
 	/// Interaction logic for MainWindow.xaml
@@ -1403,7 +1403,7 @@ namespace DailyArenaDeckAdvisor
 
 			Task loadTask = new Task(() => {
 				_logger.Debug("Initializing Card Database");
-				CardDatabase.Initialize();
+				CardDatabase.Initialize(false);
 
 				PopulateColorsByLand();
 
@@ -1658,7 +1658,7 @@ namespace DailyArenaDeckAdvisor
 
 			Task loadTask = new Task(() => {
 				_logger.Debug("Initializing Card Database");
-				CardDatabase.Initialize();
+				CardDatabase.Initialize(false);
 
 				PopulateColorsByLand();
 

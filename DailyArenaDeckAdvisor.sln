@@ -16,6 +16,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DailyArenaDeckAdvisorUpdate
 EndProject
 Project("{930C7802-8A8C-48F9-8165-68863BCCD9DD}") = "DailyArenaDeckAdvisorSetup", "DailyArenaDeckAdvisorSetup\DailyArenaDeckAdvisorSetup.wixproj", "{54173857-C11E-49C8-8CDC-46FD269E506A}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "libraries", "libraries", "{DB7BDEFC-DD2B-4083-8B63-4A777E490E5C}"
+	ProjectSection(SolutionItems) = preProject
+		libraries\DailyArena.Database.dll = libraries\DailyArena.Database.dll
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

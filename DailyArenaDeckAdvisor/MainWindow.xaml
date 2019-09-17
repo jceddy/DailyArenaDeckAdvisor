@@ -1,9 +1,9 @@
-﻿<Window x:Class="DailyArenaDeckAdvisor.MainWindow"
+﻿<Window x:Class="DailyArena.DeckAdvisor.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-		xmlns:local="clr-namespace:DailyArenaDeckAdvisor"
+		xmlns:local="clr-namespace:DailyArena.DeckAdvisor"
         mc:Ignorable="d"
         Title="Daily Arena Deck Advisor" Height="880" Width="1270" Loaded="Window_Loaded" FontSize="{Binding SelectedFontSize.Value}">
 	<Window.Resources>
