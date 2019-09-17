@@ -151,7 +151,7 @@ namespace DailyArenaDeckAdvisor
 			)).Where(x => x.TotalCopiesNeeded > 0).ToList();
 
 			ReportEntries = new List<MetaReportEntry>(
-				_allReportEntries.OrderByDescending(x => x.Dominance).Take(70)
+				_allReportEntries.OrderByDescending(x => x.Dominance).Take(98)
 			);
 
 			TopDecksToBuild = new List<Archetype>(

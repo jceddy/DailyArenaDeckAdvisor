@@ -45,6 +45,34 @@ namespace DailyArenaDeckAdvisor
 		}
 
 		/// <summary>
+		///  Gets or sets a list of alternate deck configurations for the same archetype.
+		/// </summary>
+		public ReadOnlyCollection<Archetype> SimilarDecks { get; private set; }
+
+		/// <summary>
+		/// Gets or sets a visibility modifier for alternate deck configuration information on the GUI.
+		/// </summary>
+		public Visibility SimilarDecksVisibility { get; private set; }
+
+		/// <summary>
+		/// Re-sort the Similar Decks collection.
+		/// </summary>
+		public void SortSimilarDecks()
+		{
+			SimilarDecks = SimilarDecks.OrderBy(x => x.BoosterCostAfterWC).ThenBy(x => x.BoosterCost).ToList().AsReadOnly();
+		}
+
+		/// <summary>
+		/// Gets or sets a link back to the main deck for this deck's archetype.
+		/// </summary>
+		public Archetype Parent { get; protected set; }
+
+		/// <summary>
+		/// Gets or sets a visibility modifier for the Parent deck link on the GUI.
+		/// </summary>
+		public Visibility ParentVisibility { get; protected set; } = Visibility.Collapsed;
+
+		/// <summary>
 		/// Gets the name of the deck archetype.
 		/// </summary>
 		public string Name { get; private set; }
@@ -219,7 +247,9 @@ namespace DailyArenaDeckAdvisor
 		/// <param name="win">The number of recorded wins for this archetype (if available).</param>
 		/// <param name="loss">The number of recorded losses for this archetype (if available).</param>
 		/// <param name="isBrawl">Whether the selected format is Brawl.</param>
-		public Archetype(string name, Dictionary<string, int> mainDeck, Dictionary<string, int> sideboard, bool rotationProof, int win = -1, int loss = -1, bool isBrawl = false)
+		/// <param name="similarDecks">List of alternate deck configurations for this archetype.</param>
+		public Archetype(string name, Dictionary<string, int> mainDeck, Dictionary<string, int> sideboard, bool rotationProof, int win = -1, int loss = -1, bool isBrawl = false,
+			List<Archetype> similarDecks = null)
 		{
 			Name = name;
 			MainDeck = new ReadOnlyDictionary<string, int>(mainDeck);
@@ -248,6 +278,22 @@ namespace DailyArenaDeckAdvisor
 			else
 			{
 				CommanderVisibility = Visibility.Collapsed;
+			}
+
+			if(similarDecks == null || similarDecks.Count == 0)
+			{
+				SimilarDecksVisibility = Visibility.Collapsed;
+			}
+			else
+			{
+				foreach (Archetype similar in similarDecks)
+				{
+					similar.Parent = this;
+					similar.ParentVisibility = Visibility.Visible;
+				}
+
+				SimilarDecks = similarDecks.AsReadOnly();
+				SimilarDecksVisibility = Visibility.Visible;
 			}
 		}
 

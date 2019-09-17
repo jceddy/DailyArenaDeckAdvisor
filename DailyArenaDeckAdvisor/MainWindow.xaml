@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 		xmlns:local="clr-namespace:DailyArenaDeckAdvisor"
         mc:Ignorable="d"
-        Title="Daily Arena Deck Advisor" Height="660" Width="1040" Loaded="Window_Loaded" FontSize="{Binding SelectedFontSize.Value}">
+        Title="Daily Arena Deck Advisor" Height="880" Width="1270" Loaded="Window_Loaded" FontSize="{Binding SelectedFontSize.Value}">
 	<Window.Resources>
 		<local:NullImageConverter x:Key="NullImageConverter" />
 		<local:TabTemplateSelector x:Key="TabTemplateSelector" />
@@ -292,6 +292,42 @@
 
 						<Button Click="ExportSuggested_Click" Visibility="{Binding CollectVisibility}">Export w/Replacements</Button>
 					</StackPanel>
+
+					<StackPanel Orientation="Vertical" Margin="3" Visibility="{Binding SimilarDecksVisibility}">
+						<TextBlock FontWeight="Bold" HorizontalAlignment="Left" TextDecorations="Underline">
+							Alternate Configurations
+						</TextBlock>
+
+						<ItemsControl x:Name="SimilarDecksItemsControl" ItemsSource="{Binding SimilarDecks}">
+							<ItemsControl.ItemsPanel>
+								<ItemsPanelTemplate>
+									<StackPanel Orientation="Vertical" />
+								</ItemsPanelTemplate>
+							</ItemsControl.ItemsPanel>
+							<ItemsControl.ItemTemplate>
+								<DataTemplate>
+									<StackPanel Orientation="Horizontal">
+										<TextBlock>
+											<Hyperlink Click="SimilarDeck_Click">
+												<Run Text="{Binding Name, Mode=OneWay}" />
+											</Hyperlink>
+										</TextBlock>
+
+										<TextBlock HorizontalAlignment="Left" Text=" ["/>
+										<TextBlock HorizontalAlignment="Left" Text="{Binding BoosterCost, StringFormat={}{0:0.00}}"/>
+										<TextBlock HorizontalAlignment="Left" Text="{Binding BoosterCostAfterWC, StringFormat={} ({0:0.00})}"/>
+										<TextBlock HorizontalAlignment="Left" Text="]"/>
+									</StackPanel>
+								</DataTemplate>
+							</ItemsControl.ItemTemplate>
+						</ItemsControl>
+					</StackPanel>
+
+					<TextBlock Visibility="{Binding ParentVisibility}">
+						<Hyperlink Click="ParentDeck_Click">
+							<Run Text="Back to Main Deck" />
+						</Hyperlink>
+					</TextBlock>
 				</StackPanel>
 			</ScrollViewer>
 		</DataTemplate>

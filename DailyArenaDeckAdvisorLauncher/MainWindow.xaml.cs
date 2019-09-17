@@ -19,8 +19,14 @@ namespace DailyArenaDeckAdvisorLauncher
 	/// </summary>
 	public partial class MainWindow : Window
 	{
+		/// <summary>
+		/// The logger for the launcher app.
+		/// </summary>
 		ILogger _logger;
 
+		/// <summary>
+		/// Default constructer, saves a reference to the application logger and initializes the GUI components.
+		/// </summary>
 		public MainWindow()
 		{
 			App application = (App)Application.Current;
@@ -30,12 +36,22 @@ namespace DailyArenaDeckAdvisorLauncher
 			InitializeComponent();
 		}
 
+		/// <summary>
+		/// Event handler that is called when the window closes. Shuts down the executable.
+		/// </summary>
+		/// <param name="sender">The Window.</param>
+		/// <param name="e">The event arguments.</param>
 		private void Window_Closed(object sender, EventArgs e)
 		{
 			_logger.Debug("Window Closed, Shutting Down - {0}", "Launcher");
 			Application.Current.Shutdown();
 		}
 
+		/// <summary>
+		/// Event handler that is called when the window is loaded. Fires off launcher activities.
+		/// </summary>
+		/// <param name="sender">The Window.</param>
+		/// <param name="e">The routed event arguments.</param>
 		private void Window_Loaded(object sender, RoutedEventArgs e)
 		{
 			_logger.Debug("Main Window Loaded - {0}", "Launcher");
