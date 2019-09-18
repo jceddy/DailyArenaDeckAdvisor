@@ -277,6 +277,7 @@ namespace DailyArena.DeckAdvisor
 			bool loadDecksFromServer = true;
 			if(File.Exists($"{mappedFormat}_decks.json"))
 			{
+				_logger.Debug("Cached decks file exists ({mappedFormat}_decks.json)", mappedFormat);
 				string content = File.ReadAllText($"{mappedFormat}_decks.json");
 				using (StringReader contentStringReader = new StringReader(content))
 				using (JsonTextReader contentJsonReader = new JsonTextReader(contentStringReader) { DateParseHandling = DateParseHandling.None })
@@ -286,6 +287,7 @@ namespace DailyArena.DeckAdvisor
 					if (!(serverTimestamp == null || string.Compare(serverTimestamp, decksTimestamp) > 0))
 					{
 						// use cached decks
+						_logger.Debug("Cached decks file is up to date, use cached deck data (skip server download)");
 						decksJson = json["Decks"];
 						loadDecksFromServer = false;
 					}
@@ -293,6 +295,7 @@ namespace DailyArena.DeckAdvisor
 			}
 			if (loadDecksFromServer)
 			{
+				_logger.Debug("Loading deck data from server");
 				var archetypesUrl = $"https://clans.dailyarena.net/{mappedFormat}_decks.json?_c={Guid.NewGuid()}";
 				var archetypesRequest = WebRequest.Create(archetypesUrl);
 				archetypesRequest.Method = "GET";
@@ -309,6 +312,7 @@ namespace DailyArena.DeckAdvisor
 							using (JsonTextReader resultJsonReader = new JsonTextReader(resultStringReader) { DateParseHandling = DateParseHandling.None })
 							{
 								decksJson = JToken.ReadFrom(resultJsonReader);
+								_logger.Debug("Writing file {mappedFormat}_decks.json", mappedFormat);
 								File.WriteAllText($"{mappedFormat}_decks.json", JsonConvert.SerializeObject(
 									new
 									{
@@ -320,7 +324,10 @@ namespace DailyArena.DeckAdvisor
 						}
 					}
 				}
-				catch (WebException) { /* if we didn't find the file, ignore it */ }
+				catch (WebException e)
+				{
+					_logger.Error(e, "Web Exception while downloading decks file for {mappedFormat}", mappedFormat);
+				}
 			}
 
 			_logger.Debug("Parsing decksJson");
@@ -328,18 +335,22 @@ namespace DailyArena.DeckAdvisor
 			{
 				bool badDeckDefinition = false;
 				string name = archetype["deck_name"];
+				_logger.Debug("Deck Name: {name}", name);
 				Dictionary<string, int> mainDeck = new Dictionary<string, int>();
 				Dictionary<string, int> sideboard = new Dictionary<string, int>();
 				if(RotationProof.Value)
 				{
 					// check whether there are any cards in the deck that aren't rotation-proof...if so, ignore this deck
+					_logger.Debug(@"Doing ""rotation-proof"" check...");
 					bool ignoreDeck = false;
 					foreach (dynamic card in archetype["deck_list"])
 					{
 						string cardName = (string)card["name"];
+						_logger.Debug("Checking main deck card: {cardName}", cardName);
 
-						if(cardsByName[cardName].Count(x => x.Set.RotationSafe) == 0)
+						if (cardsByName[cardName].Count(x => x.Set.RotationSafe) == 0)
 						{
+							_logger.Debug("{cardName} is rotating soon, ignore this deck", cardName);
 							ignoreDeck = true;
 							break;
 						}
@@ -351,8 +362,11 @@ namespace DailyArena.DeckAdvisor
 						{
 							string cardName = (string)card["name"];
 
+							_logger.Debug("Checking sideboard card: {cardName}", cardName);
+
 							if (cardsByName[cardName].Count(x => x.Set.RotationSafe) == 0)
 							{
+								_logger.Debug("{cardName} is rotating soon, ignore this deck", cardName);
 								ignoreDeck = true;
 								break;
 							}
@@ -369,6 +383,7 @@ namespace DailyArena.DeckAdvisor
 					string cardName = (string)card["name"];
 					int cardQuantity = (int)card["quantity"];
 
+					_logger.Debug("Processing main deck card: {cardName}, {cardQuantity}", cardName, cardQuantity);
 					foreach (Card archetypeCard in cardsByName[cardName])
 					{
 						CardStats stats = _cardStats[archetypeCard];
@@ -383,6 +398,7 @@ namespace DailyArena.DeckAdvisor
 					// entry twice...we'll just ignore those decks here
 					if (mainDeck.ContainsKey(cardName))
 					{
+						_logger.Debug("Bad deck, definition, skipping");
 						badDeckDefinition = true;
 						break;
 					}
@@ -397,6 +413,7 @@ namespace DailyArena.DeckAdvisor
 					string cardName = (string)card["name"];
 					int cardQuantity = (int)card["quantity"];
 
+					_logger.Debug("Processing sideboard card: {cardName}, {cardQuantity}", cardName, cardQuantity);
 					foreach (Card archetypeCard in cardsByName[cardName])
 					{
 						CardStats stats = _cardStats[archetypeCard];
@@ -423,7 +440,8 @@ namespace DailyArena.DeckAdvisor
 				List<Archetype> similarDecks = new List<Archetype>();
 				if(archetype["similar_decks"] != null)
 				{
-					foreach(dynamic similarDeck in archetype["similar_decks"])
+					_logger.Debug("Alternate deck confiuration found, processing...");
+					foreach (dynamic similarDeck in archetype["similar_decks"])
 					{
 						Dictionary<string, int> similarMainDeck = new Dictionary<string, int>();
 						Dictionary<string, int> similarSideboard = new Dictionary<string, int>();
@@ -432,11 +450,15 @@ namespace DailyArena.DeckAdvisor
 						{
 							string cardName = (string)card["name"];
 							int cardQuantity = (int)card["quantity"];
+							_logger.Debug("Processing alternate main deck card: {cardName}, {cardQuantity}", cardName, cardQuantity);
 
 							foreach (Card archetypeCard in cardsByName[cardName])
 							{
 								CardStats stats = _cardStats[archetypeCard];
-								stats.DeckCount++;
+								if (!similarMainDeck.ContainsKey(cardName))
+								{
+									stats.DeckCount++;
+								}
 								stats.TotalCopies += cardQuantity;
 							}
 
@@ -446,6 +468,7 @@ namespace DailyArena.DeckAdvisor
 						{
 							string cardName = (string)card["name"];
 							int cardQuantity = (int)card["quantity"];
+							_logger.Debug("Processing alternate sideboard card: {cardName}, {cardQuantity}", cardName, cardQuantity);
 
 							foreach (Card archetypeCard in cardsByName[cardName])
 							{
