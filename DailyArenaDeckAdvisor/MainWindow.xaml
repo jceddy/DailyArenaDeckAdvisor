@@ -4,10 +4,11 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 		xmlns:local="clr-namespace:DailyArena.DeckAdvisor"
+		xmlns:converters="clr-namespace:DailyArena.Common.Converters;assembly=DailyArena.Common"
         mc:Ignorable="d"
         Title="Daily Arena Deck Advisor" Height="880" Width="1270" Loaded="Window_Loaded" FontSize="{Binding SelectedFontSize.Value}">
 	<Window.Resources>
-		<local:NullImageConverter x:Key="NullImageConverter" />
+		<converters:NullImageConverter x:Key="NullImageConverter" />
 		<local:TabTemplateSelector x:Key="TabTemplateSelector" />
 		<local:ContentTemplateSelector x:Key="ContentTemplateSelector" />
 		<DataTemplate x:Key="ArchetypeTabTemplate" DataType="{x:Type local:Archetype}">

@@ -18,7 +18,7 @@ Project("{930C7802-8A8C-48F9-8165-68863BCCD9DD}") = "DailyArenaDeckAdvisorSetup"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "libraries", "libraries", "{DB7BDEFC-DD2B-4083-8B63-4A777E490E5C}"
 	ProjectSection(SolutionItems) = preProject
-		libraries\DailyArena.Database.dll = libraries\DailyArena.Database.dll
+		libraries\DailyArena.Common.dll = libraries\DailyArena.Common.dll
 	EndProjectSection
 EndProject
 Global

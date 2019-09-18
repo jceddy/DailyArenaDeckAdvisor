@@ -1,4 +1,6 @@
-﻿using Newtonsoft.Json;
+﻿using DailyArena.Common;
+using DailyArena.Common.Extensions;
+using Newtonsoft.Json;
 using Serilog;
 using Serilog.Debugging;
 using Serilog.Formatting.Compact;
@@ -13,7 +15,7 @@ namespace DailyArena.DeckAdvisor
 	/// <summary>
 	/// Interaction logic for App.xaml
 	/// </summary>
-	public partial class App : Application
+	public partial class App : Application, IApp
 	{
 		/// <summary>
 		/// The application's Cached State.

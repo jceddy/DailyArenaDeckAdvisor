@@ -1,4 +1,5 @@
-﻿using DailyArena.Database;
+﻿using DailyArena.Common.Bindable;
+using DailyArena.Common.Database;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Serilog;
@@ -83,7 +84,7 @@ namespace DailyArena.DeckAdvisor
 		/// <summary>
 		/// The selected format being viewed.
 		/// </summary>
-		public BindableString Format { get; private set; } = new BindableString();
+		public Bindable<string> Format { get; private set; } = new Bindable<string>();
 
 		/// <summary>
 		/// The state of the "Rotation" toggle button.
@@ -93,7 +94,7 @@ namespace DailyArena.DeckAdvisor
 		/// <summary>
 		/// The selected font size for the display.
 		/// </summary>
-		public BindableInt SelectedFontSize { get; private set; } = new BindableInt() { Value = 12 };
+		public Bindable<int> SelectedFontSize { get; private set; } = new Bindable<int>() { Value = 12 };
 
 		/// <summary>
 		/// The Bitmap Scaling Mode (can be overridden in App.config for users with funky video card/driver combinations that cause crashing under high-quality scaling.

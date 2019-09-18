@@ -1,4 +1,4 @@
-﻿using DailyArena.Database;
+﻿using DailyArena.Common.Database;
 using System.Collections.Generic;
 using System.Linq;
 

@@ -15,9 +15,7 @@
 		<?define DailyArenaDeckAdvisorLauncherExeSourcePath = "$(var.ProjectDir)..\DailyArenaDeckAdvisorLauncher\x64\Release\DailyArenaDeckAdvisorLauncher.exe" ?>
 		<?define DailyArenaDeckAdvisorUpdaterExeSourcePath = "$(var.ProjectDir)..\DailyArenaDeckAdvisorUpdater\x64\Release\DailyArenaDeckAdvisorUpdater.exe" ?>
 		<?define DailyArenaDeckAdvisorConfigSourcePath = "$(var.ProjectDir)..\DailyArenaDeckAdvisor\x64\Release\DailyArenaDeckAdvisor.exe.config" ?>
-		<?define DailyArenaDatabaseDllSourcePath = "$(var.ProjectDir)..\DailyArenaDeckAdvisor\x64\Release\DailyArena.Database.dll" ?>
-		<?define SystemSecurityPrincipalWindowsDllSourcePath = "$(var.ProjectDir)..\DailyArenaDeckAdvisor\x64\Release\System.Security.Principal.Windows.dll" ?>
-		<?define netstandardDllSourcePath = "$(var.ProjectDir)..\DailyArenaDeckAdvisor\x64\Release\netstandard.dll" ?>
+		<?define DailyArenaCommonDllSourcePath = "$(var.ProjectDir)..\DailyArenaDeckAdvisor\x64\Release\DailyArena.Common.dll" ?>
 	<?else ?>
 		<?define Win64 = "no" ?>
 		<?define PlatformProgramFilesFolder = "ProgramFilesFolder" ?>
@@ -29,9 +27,7 @@
 		<?define DailyArenaDeckAdvisorLauncherExeSourcePath = "$(var.ProjectDir)..\DailyArenaDeckAdvisorLauncher\x86\Release\DailyArenaDeckAdvisorLauncher.exe" ?>
 		<?define DailyArenaDeckAdvisorUpdaterExeSourcePath = "$(var.ProjectDir)..\DailyArenaDeckAdvisorUpdater\x86\Release\DailyArenaDeckAdvisorUpdater.exe" ?>
 		<?define DailyArenaDeckAdvisorConfigSourcePath = "$(var.ProjectDir)..\DailyArenaDeckAdvisor\x86\Release\DailyArenaDeckAdvisor.exe.config" ?>
-		<?define DailyArenaDatabaseDllSourcePath = "$(var.ProjectDir)..\DailyArenaDeckAdvisor\x86\Release\DailyArena.Database.dll" ?>
-		<?define SystemSecurityPrincipalWindowsDllSourcePath = "$(var.ProjectDir)..\DailyArenaDeckAdvisor\x86\Release\System.Security.Principal.Windows.dll" ?>
-		<?define netstandardDllSourcePath = "$(var.ProjectDir)..\DailyArenaDeckAdvisor\x86\Release\netstandard.dll" ?>
+		<?define DailyArenaCommonDllSourcePath = "$(var.ProjectDir)..\DailyArenaDeckAdvisor\x86\Release\DailyArena.Common.dll" ?>
 	<?endif ?>
 
 	<Product Id="*" Name="!(loc.ApplicationName)" Language="!(loc.Language)" Version="$(var.VersionNumber)" Manufacturer="!(loc.ManufacturerFullName)" UpgradeCode="$(var.UpgradeCode)">
@@ -131,14 +127,8 @@
 						<Component Id="DailyArenaDeckAdvisor.exe.config_comp" Guid="0d4c4d74-501d-42fd-966b-e9cd4a2b74d2" Win64="$(var.Win64)">
 							<File Source="$(var.DailyArenaDeckAdvisorConfigSourcePath)" Id="DailyArenaDeckAdvisorConfig" KeyPath="yes" />
 						</Component>
-						<Component Id="DailyArena.Database.dll_comp" Guid="ad54aca0-265d-41f1-a9e8-002be99f6c6b" Win64="$(var.Win64)">
-							<File Source="$(var.DailyArenaDatabaseDllSourcePath)" Id="DailyArenaDatabaseDll" KeyPath="yes" />
-						</Component>
-						<Component Id="System.Security.Principal.Windows.dll_comp" Guid="e0178192-7d20-4957-b11b-9094d55350c0" Win64="$(var.Win64)">
-							<File Source="$(var.SystemSecurityPrincipalWindowsDllSourcePath)" Id="SystemSecurityPrincipalWindowsDll" KeyPath="yes" />
-						</Component>
-						<Component Id="netstandard.dll_comp" Guid="d1751b14-7c7c-475c-b006-9fb6268db0e2" Win64="$(var.Win64)">
-							<File Source="$(var.netstandardDllSourcePath)" Id="netstandardDll" KeyPath="yes" />
+						<Component Id="DailyArena.Common.dll_comp" Guid="6f52a1fc-e8f4-4396-ac4d-4479cf383087" Win64="$(var.Win64)">
+							<File Source="$(var.DailyArenaCommonDllSourcePath)" Id="DailyArenaCommonDll" KeyPath="yes" />
 						</Component>
 					</Directory>
 				</Directory>
@@ -169,9 +159,7 @@
 				<ComponentRef Id="DailyArenaDeckAdvisorLauncher.exe_comp" />
 				<ComponentRef Id="DailyArenaDeckAdvisorUpdater.exe_comp" />
 				<ComponentRef Id="DailyArenaDeckAdvisor.exe.config_comp" />
-				<ComponentRef Id="DailyArena.Database.dll_comp" />
-				<ComponentRef Id="System.Security.Principal.Windows.dll_comp" />
-				<ComponentRef Id="netstandard.dll_comp" />
+				<ComponentRef Id="DailyArena.Common.dll_comp" />
 
 				<!-- Registry entries -->
 				<ComponentRef Id="RegValInstallLocation_comp" />
