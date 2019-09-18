@@ -17,6 +17,7 @@ https://github.com/jceddy/DailyArenaDeckAdvisor/wiki/Getting-Started:-Developing
 # Dependent Libraries
 Libraries used by this project:  
 https://github.com/jceddy/DailyArenaDatabase
+https://github.com/jceddy/DailyArenaCommon
 
 # Release 1.0.3.2 Changes
 - Replacement Suggestion Improvements
