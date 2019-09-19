@@ -1358,7 +1358,15 @@ namespace DailyArena.DeckAdvisor
 			}
 
 			_logger.Debug("Sorting Archetypes and generating Meta Report");
-			_orderedArchetypes = _archetypes.OrderBy(x => x.BoosterCostAfterWC).ThenBy(x => x.BoosterCost);
+			if (Format == "Arena Standard")
+			{
+				// for Arena Standard, use slightly different ordering, favoring win rate over estimated booster cost
+				_orderedArchetypes = _archetypes.OrderBy(x => x.BoosterCost == 0 ? 0 : (x.BoosterCostAfterWC == 0 ? 1 : 2)).ThenByDescending(x => x.WinRate).ThenBy(x => x.BoosterCostAfterWC).ThenBy(x => x.BoosterCost);
+			}
+			else
+			{
+				_orderedArchetypes = _archetypes.OrderBy(x => x.BoosterCostAfterWC).ThenBy(x => x.BoosterCost);
+			}
 			MetaReport report = new MetaReport(cardsByName, _cardStats, cardsById, _playerInventoryCounts, _archetypes, RotationProof.Value);
 
 			Dispatcher.Invoke(() =>

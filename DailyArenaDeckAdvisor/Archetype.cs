@@ -93,6 +93,11 @@ namespace DailyArena.DeckAdvisor
 		public int Loss { get; private set; }
 
 		/// <summary>
+		/// Gets or sets the win rate percentage for this archetype.
+		/// </summary>
+		public double WinRate { get; private set; }
+
+		/// <summary>
 		/// A string version of the win/loss information for this deck, for Xaml binding.
 		/// </summary>
 		public string WinLossView { get; private set; }
@@ -257,15 +262,16 @@ namespace DailyArena.DeckAdvisor
 			RotationProof = rotationProof;
 			Win = win;
 			Loss = loss;
-			
-			if(win == -1 || loss == -1)
+			WinRate = (double)win / (win + loss);
+
+			if (win == -1 || loss == -1)
 			{
 				WinLossView = string.Empty;
 				WinLossVisibility = Visibility.Collapsed;
 			}
 			else
 			{
-				WinLossView = $"Win: {win}, Loss: {loss}, Total: {win + loss} ({(double)win/(win+loss):P})";
+				WinLossView = $"Win: {win}, Loss: {loss}, Total: {win + loss} ({WinRate:P})";
 				WinLossVisibility = Visibility.Visible;
 			}
 
