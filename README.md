@@ -22,11 +22,11 @@ https://github.com/jceddy/DailyArenaCommon
 - Alternate Deck Configurations (for Standard)
 - Default Deck Ordering Tweak for Arena Standard
 - Minor and Under-the-Hood Changes
- - Default window size increased
- - Max number of cards shown on Meta Report increased to 98 (from 70)
- - Additional logging added in the code that loads the deck library, to help with debuggind issues related to that code in the future
- - Some basic functionality has been broken out into a separate "Common" library that can be used in other applications
- - .NET Framework version increased from 4.6.1 to 4.6.2
+  - Default window size increased
+  - Max number of cards shown on Meta Report increased to 98 (from 70)
+  - Additional logging added in the code that loads the deck library, to help with debuggind issues related to that code in the future
+  - Some basic functionality has been broken out into a separate "Common" library that can be used in other applications
+  - .NET Framework version increased from 4.6.1 to 4.6.2
 
 # Release 1.0.3.2 Changes
 - Replacement Suggestion Improvements
