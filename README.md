@@ -2,7 +2,7 @@
 A Deck Advisor companion App for Magic Arena.
 
 Visit our Patreon: https://www.patreon.com/DailyArena  
-View the blog here: https://www.dailyarena.net
+Visit MTG Arena Zone: https://mtgazone.com
 
 # Installer Links
 64-bit Windows: https://clans.dailyarena.net/download/advisor/x64/DailyArenaDeckAdvisorSetup.msi  
