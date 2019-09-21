@@ -5,7 +5,7 @@ Visit our Patreon: https://www.patreon.com/DailyArena
 Visit MTG Arena Zone: https://mtgazone.com  
 Visit Daily Arena: https://www.dailyarena.net
 
-# Installer Links an User Guide
+# Installer Links and User Guide
 https://mtgazone.com/deck-advisor
 
 # Developer Guide
