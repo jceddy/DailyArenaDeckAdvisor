@@ -2,7 +2,7 @@
 A Deck Advisor companion App for Magic Arena.
 
 Visit our Patreon: https://www.patreon.com/DailyArena  
-Visit MTG Arena Zone: https://mtgazone.com
+Visit MTG Arena Zone: https://mtgazone.com  
 Visit Daily Arena: https://www.dailyarena.net
 
 # Installer Links an User Guide
