@@ -3,13 +3,10 @@ A Deck Advisor companion App for Magic Arena.
 
 Visit our Patreon: https://www.patreon.com/DailyArena  
 Visit MTG Arena Zone: https://mtgazone.com
+Visit Daily Arena: https://www.dailyarena.net
 
-# Installer Links
-64-bit Windows: https://clans.dailyarena.net/download/advisor/x64/DailyArenaDeckAdvisorSetup.msi  
-32-bit Windows: https://clans.dailyarena.net/download/advisor/x86/DailyArenaDeckAdvisorSetup.msi
-
-# User Guide
-https://github.com/jceddy/DailyArenaDeckAdvisor/wiki/User-Guide
+# Installer Links an User Guide
+https://mtgazone.com/deck-advisor
 
 # Developer Guide
 https://github.com/jceddy/DailyArenaDeckAdvisor/wiki/Getting-Started:-Developing-DADA
