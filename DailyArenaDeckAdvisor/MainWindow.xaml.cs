@@ -697,6 +697,47 @@ namespace DailyArena.DeckAdvisor
 										}
 									}
 
+									if (RotationProof.Value)
+									{
+										// check whether there are any cards in the deck that aren't rotation-proof...if so, ignore this deck
+										_logger.Debug(@"Doing ""rotation-proof"" check...");
+										bool ignoreDeck = false;
+										foreach (var card in mainDeckByName)
+										{
+											string cardName = card.Key;
+											_logger.Debug("Checking main deck card: {cardName}", cardName);
+
+											if (cardsByName[cardName].Count(x => x.Set.RotationSafe) == 0)
+											{
+												_logger.Debug("{cardName} is rotating soon, ignore this deck", cardName);
+												ignoreDeck = true;
+												break;
+											}
+										}
+
+										if (!ignoreDeck)
+										{
+											foreach (var card in sideboardByName)
+											{
+												string cardName = card.Key;
+
+												_logger.Debug("Checking sideboard card: {cardName}", cardName);
+
+												if (cardsByName[cardName].Count(x => x.Set.RotationSafe) == 0)
+												{
+													_logger.Debug("{cardName} is rotating soon, ignore this deck", cardName);
+													ignoreDeck = true;
+													break;
+												}
+											}
+										}
+
+										if (ignoreDeck)
+										{
+											continue;
+										}
+									}
+
 									_playerDecks.Add(id, new Archetype(name, mainDeckByName, sideboardByName, RotationProof.Value, isBrawl: Format == "Brawl", isPlayerDeck: true));
 								}
 							}
@@ -776,6 +817,47 @@ namespace DailyArena.DeckAdvisor
 									else
 									{
 										sideboardByName.Add(cardName, cardQuantity);
+									}
+								}
+
+								if (RotationProof.Value)
+								{
+									// check whether there are any cards in the deck that aren't rotation-proof...if so, ignore this deck
+									_logger.Debug(@"Doing ""rotation-proof"" check...");
+									bool ignoreDeck = false;
+									foreach (var card in mainDeckByName)
+									{
+										string cardName = card.Key;
+										_logger.Debug("Checking main deck card: {cardName}", cardName);
+
+										if (cardsByName[cardName].Count(x => x.Set.RotationSafe) == 0)
+										{
+											_logger.Debug("{cardName} is rotating soon, ignore this deck", cardName);
+											ignoreDeck = true;
+											break;
+										}
+									}
+
+									if (!ignoreDeck)
+									{
+										foreach (var card in sideboardByName)
+										{
+											string cardName = card.Key;
+
+											_logger.Debug("Checking sideboard card: {cardName}", cardName);
+
+											if (cardsByName[cardName].Count(x => x.Set.RotationSafe) == 0)
+											{
+												_logger.Debug("{cardName} is rotating soon, ignore this deck", cardName);
+												ignoreDeck = true;
+												break;
+											}
+										}
+									}
+
+									if (ignoreDeck)
+									{
+										continue;
 									}
 								}
 
