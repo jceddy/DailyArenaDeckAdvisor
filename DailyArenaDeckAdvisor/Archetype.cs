@@ -326,8 +326,8 @@ namespace DailyArena.DeckAdvisor
 				if(_boosterCost < 0 && _mainDeckToCollect != null && _sideboardToCollect != null)
 				{
 					ReadOnlyDictionary<int, Card> cardsById = Card.CardsById;
-					_boosterCost = _mainDeckToCollect.Sum(x => cardsById[x.Key].BoosterCost * x.Value) +
-						_sideboardToCollect.Sum(x => cardsById[x.Key].BoosterCost * x.Value);
+					_boosterCost = _mainDeckToCollect.Sum(x => cardsById[x.Key].BoosterCost * Math.Min(x.Value, 4)) +
+						_sideboardToCollect.Sum(x => cardsById[x.Key].BoosterCost * Math.Min(x.Value, 4));
 				}
 				return _boosterCost;
 			}
@@ -348,8 +348,8 @@ namespace DailyArena.DeckAdvisor
 				if (_boosterCostAfterWC < 0 && _mainDeckToCollect != null && _sideboardToCollect != null && _wildcardsOwned != null)
 				{
 					ReadOnlyDictionary<int, Card> cardsById = Card.CardsById;
-					var cardsToSelect = _mainDeckToCollect.Select(x => new { cardsById[x.Key].Rarity, Card = cardsById[x.Key], Count = x.Value }).
-						Concat(_sideboardToCollect.Select(x => new { cardsById[x.Key].Rarity, Card = cardsById[x.Key], Count = x.Value })).
+					var cardsToSelect = _mainDeckToCollect.Select(x => new { cardsById[x.Key].Rarity, Card = cardsById[x.Key], Count = Math.Min(x.Value, 4) }).
+						Concat(_sideboardToCollect.Select(x => new { cardsById[x.Key].Rarity, Card = cardsById[x.Key], Count = Math.Min(x.Value, 4) })).
 						GroupBy(x => x.Rarity).
 						Select(x => new { Rarity = x.Key, Cards = x.SelectMany(y => Enumerable.Repeat(y.Card, y.Count)).OrderBy(z => z.BoosterCost).ToList() }).
 						ToDictionary(x => x.Rarity, y => y.Cards);
