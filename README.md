@@ -2,14 +2,11 @@
 A Deck Advisor companion App for Magic Arena.
 
 Visit our Patreon: https://www.patreon.com/DailyArena  
-View the blog here: https://www.dailyarena.net
+Visit MTG Arena Zone: https://mtgazone.com  
+Visit Daily Arena: https://www.dailyarena.net
 
-# Installer Links
-64-bit Windows: https://clans.dailyarena.net/download/advisor/x64/DailyArenaDeckAdvisorSetup.msi  
-32-bit Windows: https://clans.dailyarena.net/download/advisor/x86/DailyArenaDeckAdvisorSetup.msi
-
-# User Guide
-https://github.com/jceddy/DailyArenaDeckAdvisor/wiki/User-Guide
+# Installer Links and User Guide
+https://mtgazone.com/deck-advisor
 
 # Developer Guide
 https://github.com/jceddy/DailyArenaDeckAdvisor/wiki/Getting-Started:-Developing-DADA
@@ -17,6 +14,16 @@ https://github.com/jceddy/DailyArenaDeckAdvisor/wiki/Getting-Started:-Developing
 # Dependent Libraries
 Libraries used by this project:  
 https://github.com/jceddy/DailyArenaCommon
+
+# Release 1.0.3.3 Changes
+- Alternate Deck Configurations (for Standard)
+- Default Deck Ordering Tweak for Arena Standard
+- Minor and Under-the-Hood Changes
+  - Default window size increased
+  - Max number of cards shown on Meta Report increased to 98 (from 70)
+  - Additional logging added in the code that loads the deck library, to help with debuggind issues related to that code in the future
+  - Some basic functionality has been broken out into a separate "Common" library that can be used in other applications
+  - .NET Framework version increased from 4.6.1 to 4.6.2
 
 # Release 1.0.3.2 Changes
 - Replacement Suggestion Improvements
