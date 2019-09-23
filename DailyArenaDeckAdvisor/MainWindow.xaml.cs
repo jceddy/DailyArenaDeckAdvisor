@@ -13,6 +13,7 @@ using System.Linq;
 using System.Net;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -50,6 +51,11 @@ namespace DailyArena.DeckAdvisor
 		/// Dictionary containing counts of wildcards the player owns, keyed by rarity.
 		/// </summary>
 		Dictionary<CardRarity, int> _wildcardsOwned = new Dictionary<CardRarity, int>();
+
+		/// <summary>
+		/// List of decks in the player inventory.
+		/// </summary>
+		Dictionary<Guid, Archetype> _playerDecks = new Dictionary<Guid, Archetype>();
 
 		/// <summary>
 		/// List of objects that will be shown in the Tab control on the GUI.
@@ -241,6 +247,7 @@ namespace DailyArena.DeckAdvisor
 
 			_archetypes.Clear();
 			_playerInventory.Clear();
+			_playerDecks.Clear();
 			_basicLands.Clear();
 			_wildcardsOwned.Clear();
 			_cardStats.Clear();
@@ -612,6 +619,167 @@ namespace DailyArena.DeckAdvisor
 									}
 								}
 								line = reader.ReadLine();
+							}
+						}
+						else if (line.Contains("Deck.GetDeckListsV3"))
+						{
+							_playerDecks.Clear();
+							StringBuilder deckListJson = new StringBuilder();
+							line = reader.ReadLine();
+							while (line != "]")
+							{
+								if (line.Contains("jsonrpc") || line.Contains("params"))
+								{
+									break;
+								}
+								deckListJson.AppendLine(line);
+								line = reader.ReadLine();
+							}
+							if (line == "]")
+							{
+								deckListJson.AppendLine(line);
+								dynamic json = JToken.Parse(deckListJson.ToString());
+								foreach (dynamic deck in json)
+								{
+									string name = deck["name"];
+									int commanderId = deck["commandZoneGRPId"];
+									int[] mainDeck = deck["mainDeck"].ToObject<int[]>();
+									int[] sideboard = deck["sideboard"].ToObject<int[]>();
+									Guid id = Guid.Parse((string)deck["id"]);
+									Dictionary<string, int> mainDeckByName = new Dictionary<string, int>();
+									Dictionary<string, int> sideboardByName = new Dictionary<string, int>();
+
+									if (commanderId != 0)
+									{
+										name = cardsById[commanderId].Name;
+										if (Format != "Brawl")
+										{
+											continue;
+										}
+									}
+									else if (Format == "Brawl")
+									{
+										continue;
+									}
+									else if(Format == "Standard" && sideboard.Length == 0)
+									{
+										continue;
+									}
+									else if(Format == "Arena Standard" && sideboard.Length > 0)
+									{
+										continue;
+									}
+
+									for (int i = 0; i < mainDeck.Length; i += 2)
+									{
+										string cardName = cardsById[mainDeck[i]].Name;
+										int cardQuantity = mainDeck[i + 1];
+										if (mainDeckByName.ContainsKey(cardName))
+										{
+											mainDeckByName[cardName] += cardQuantity;
+										}
+										else
+										{
+											mainDeckByName.Add(cardName, cardQuantity);
+										}
+									}
+									for (int i = 0; i < sideboard.Length; i += 2)
+									{
+										string cardName = cardsById[sideboard[i]].Name;
+										int cardQuantity = sideboard[i + 1];
+										if (sideboardByName.ContainsKey(cardName))
+										{
+											sideboardByName[cardName] += cardQuantity;
+										}
+										else
+										{
+											sideboardByName.Add(cardName, cardQuantity);
+										}
+									}
+
+									_playerDecks.Add(id, new Archetype(name, mainDeckByName, sideboardByName, RotationProof.Value, isBrawl: Format == "Brawl", isPlayerDeck: true));
+								}
+							}
+						}
+						else if(line.Contains("Deck.CreateDeckV3") || line.Contains("Deck.UpdateDeckV3"))
+						{
+							StringBuilder deckListJson = new StringBuilder();
+							line = reader.ReadLine();
+							while (line != "}")
+							{
+								if (line.Contains("jsonrpc") || line.Contains("params"))
+								{
+									break;
+								}
+								deckListJson.AppendLine(line);
+								line = reader.ReadLine();
+							}
+							if (line == "}")
+							{
+								deckListJson.AppendLine(line);
+								dynamic deck = JToken.Parse(deckListJson.ToString());
+
+								string name = deck["name"];
+								int commanderId = deck["commandZoneGRPId"];
+								int[] mainDeck = deck["mainDeck"].ToObject<int[]>();
+								int[] sideboard = deck["sideboard"].ToObject<int[]>();
+								Guid id = Guid.Parse((string)deck["id"]);
+								if(_playerDecks.ContainsKey(id))
+								{
+									_playerDecks.Remove(id);
+								}
+								Dictionary<string, int> mainDeckByName = new Dictionary<string, int>();
+								Dictionary<string, int> sideboardByName = new Dictionary<string, int>();
+
+								if (commanderId != 0)
+								{
+									name = cardsById[commanderId].Name;
+									if (Format != "Brawl")
+									{
+										continue;
+									}
+								}
+								else if (Format == "Brawl")
+								{
+									continue;
+								}
+								else if (Format == "Standard" && sideboard.Length == 0)
+								{
+									continue;
+								}
+								else if (Format == "Arena Standard" && sideboard.Length > 0)
+								{
+									continue;
+								}
+
+								for (int i = 0; i < mainDeck.Length; i += 2)
+								{
+									string cardName = cardsById[mainDeck[i]].Name;
+									int cardQuantity = mainDeck[i + 1];
+									if (mainDeckByName.ContainsKey(cardName))
+									{
+										mainDeckByName[cardName] += cardQuantity;
+									}
+									else
+									{
+										mainDeckByName.Add(cardName, cardQuantity);
+									}
+								}
+								for (int i = 0; i < sideboard.Length; i += 2)
+								{
+									string cardName = cardsById[sideboard[i]].Name;
+									int cardQuantity = sideboard[i + 1];
+									if (sideboardByName.ContainsKey(cardName))
+									{
+										sideboardByName[cardName] += cardQuantity;
+									}
+									else
+									{
+										sideboardByName.Add(cardName, cardQuantity);
+									}
+								}
+
+								_playerDecks.Add(id, new Archetype(name, mainDeckByName, sideboardByName, RotationProof.Value, isBrawl: Format == "Brawl", isPlayerDeck: true));
 							}
 						}
 					}
@@ -1357,15 +1525,383 @@ namespace DailyArena.DeckAdvisor
 				}
 			}
 
+			_logger.Debug("Handling player inventory decks");
+			foreach (Archetype playerDeck in _playerDecks.Values)
+			{
+				_logger.Debug("Processing Player Deck {0}", playerDeck.Name);
+				Dictionary<string, int> haveCards = new Dictionary<string, int>();
+				Dictionary<int, int> mainDeckCards = new Dictionary<int, int>();
+				Dictionary<int, int> sideboardCards = new Dictionary<int, int>();
+				Dictionary<int, int> mainDeckToCollect = new Dictionary<int, int>();
+				Dictionary<int, int> sideboardToCollect = new Dictionary<int, int>();
+
+				var leftJoin =
+					from main in playerDeck.MainDeck
+					join side in playerDeck.Sideboard on main.Key equals side.Key into temp
+					from side in temp.DefaultIfEmpty()
+					select new
+					{
+						Name = main.Key,
+						Quantity = main.Value + side.Value
+					};
+
+				var rightJoin =
+					from side in playerDeck.Sideboard
+					join main in playerDeck.MainDeck on side.Key equals main.Key into temp
+					from main in temp.DefaultIfEmpty()
+					select new
+					{
+						Name = side.Key,
+						Quantity = side.Value + main.Value
+					};
+
+				var cardsNeededForArchetype = leftJoin.Union(rightJoin);
+
+				Dictionary<int, int> playerInventory = new Dictionary<int, int>(_playerInventory.Select(x => new { Id = x.Key, Count = x.Value }).ToDictionary(x => x.Id, y => y.Count));
+
+				_logger.Debug("Comparing deck list to inventory to determine which cards are still needed");
+				foreach (var neededCard in cardsNeededForArchetype)
+				{
+					int neededForMain = playerDeck.MainDeck.ContainsKey(neededCard.Name) ? playerDeck.MainDeck[neededCard.Name] : 0;
+					int neededForSideboard = playerDeck.Sideboard.ContainsKey(neededCard.Name) ? playerDeck.Sideboard[neededCard.Name] : 0;
+
+					int neededCards = neededCard.Quantity;
+					if (_anyNumber.Contains(neededCard.Name))
+					{
+						neededCards = Math.Min(neededCards, 4);
+					}
+					haveCards.Add(neededCard.Name, 0);
+					List<Card> printings = cardsByName[neededCard.Name];
+					if (neededCards > 0)
+					{
+						CardRarity rarity = CardRarity.MythicRare;
+						foreach (Card printing in printings)
+						{
+							rarity = LowestRarity(rarity, printing.Rarity);
+							int playerOwns = playerInventory.ContainsKey(printing.ArenaId) ? playerInventory[printing.ArenaId] : 0;
+							if (printing.Rarity == CardRarity.BasicLand && playerOwns > 0)
+							{
+								if (neededForMain > 0)
+								{
+									mainDeckCards.Add(printing.ArenaId, neededForMain);
+								}
+								if (neededForSideboard > 0)
+								{
+									sideboardCards.Add(printing.ArenaId, neededForSideboard);
+								}
+								haveCards[printing.Name] += neededCards;
+								neededCards = 0;
+								neededForMain = 0;
+								neededForSideboard = 0;
+							}
+							else if (playerOwns >= neededCards)
+							{
+								if (neededForMain > 0)
+								{
+									mainDeckCards.Add(printing.ArenaId, neededForMain);
+								}
+								if (neededForSideboard > 0)
+								{
+									sideboardCards.Add(printing.ArenaId, neededForSideboard);
+								}
+								haveCards[printing.Name] += neededCards;
+								playerInventory[printing.ArenaId] -= neededCards;
+								neededCards = 0;
+								neededForMain = 0;
+								neededForSideboard = 0;
+							}
+							else if (playerOwns > 0)
+							{
+								int owned = playerOwns;
+								if (neededForMain > 0)
+								{
+									mainDeckCards.Add(printing.ArenaId, 1);
+									owned--;
+									neededForMain--;
+									while (owned > 0 && neededForMain > 0)
+									{
+										mainDeckCards[printing.ArenaId]++;
+										owned--;
+										neededForMain--;
+									}
+								}
+								if (owned > 0 && neededForSideboard > 0)
+								{
+									sideboardCards.Add(printing.ArenaId, 1);
+									owned--;
+									neededForSideboard--;
+									while (owned > 0 && neededForSideboard > 0)
+									{
+										sideboardCards[printing.ArenaId]++;
+										owned--;
+										neededForSideboard--;
+									}
+								}
+								haveCards[printing.Name] += playerOwns;
+								neededCards -= playerOwns;
+								playerInventory[printing.ArenaId] = 0;
+							}
+							if (neededCards == 0) { break; }
+						}
+						if (neededForMain > 0)
+						{
+							foreach (Card printing in printings)
+							{
+								if (printing.Rarity == rarity)
+								{
+									mainDeckToCollect.Add(printing.ArenaId, neededForMain);
+									break;
+								}
+							}
+						}
+						if (neededForSideboard > 0)
+						{
+							foreach (Card printing in printings)
+							{
+								if (printing.Rarity == rarity)
+								{
+									sideboardToCollect.Add(printing.ArenaId, neededForSideboard);
+									break;
+								}
+							}
+						}
+					}
+				}
+
+				_logger.Debug("Generating replacement suggestions for missing cards");
+				List<Tuple<int, int, int>> suggestedReplacements = new List<Tuple<int, int, int>>();
+				CardColors identity = null;
+				if (Format.Value == "Brawl")
+				{
+					identity = cardsByName[playerDeck.CommanderName].First().ColorIdentity;
+				}
+				var replacementsToFind = mainDeckToCollect.Concat(sideboardToCollect).GroupBy(x => x.Key).Select(x => new { Id = x.Key, Count = x.Sum(y => y.Value) });
+				foreach (var find in replacementsToFind)
+				{
+					_logger.Debug("Generating replacements suggestions for card with Arena Id: {0} (need {1})", find.Id, find.Count);
+					var cardToReplace = cardsById[find.Id];
+					var replacementsNeeded = find.Count;
+
+					if (cardToReplace.Type.Contains("Land"))
+					{
+						_logger.Debug("Processing Candidates based on Color");
+						var candidates = playerInventory.Select(x => new { Card = cardsById[x.Key], Quantity = x.Value }).
+							Where(x => x.Quantity > 0 && x.Card.Type == cardToReplace.Type && _colorsByLand[x.Card.Name] == _colorsByLand[cardToReplace.Name] && (identity == null || identity.Contains(x.Card.ColorIdentity))).
+							OrderByDescending(x => x.Card.Rank + CardStats.GetAssociationModifier(cardToReplace.Name, x.Card.Name, _cardStats));
+
+						foreach (var candidate in candidates)
+						{
+							if (replacementsNeeded == 0) { break; }
+							if (candidate.Quantity > replacementsNeeded)
+							{
+								suggestedReplacements.Add(new Tuple<int, int, int>(cardToReplace.ArenaId, candidate.Card.ArenaId, replacementsNeeded));
+								playerInventory[candidate.Card.ArenaId] -= replacementsNeeded;
+								replacementsNeeded = 0;
+							}
+							else
+							{
+								suggestedReplacements.Add(new Tuple<int, int, int>(cardToReplace.ArenaId, candidate.Card.ArenaId, candidate.Quantity));
+								playerInventory[candidate.Card.ArenaId] = 0;
+								replacementsNeeded -= candidate.Quantity;
+							}
+						}
+
+						if (replacementsNeeded > 0)
+						{
+							_logger.Debug("Insufficient Candidates Found, suggesting basic land replacements");
+							Random r = new Random();
+							// randomizing colors here so we don't always favor colors in WUBRG order
+							string[] colors = cardToReplace.Colors.ColorString.Select(x => new { Sort = r.Next(), Value = x.ToString() }).
+								OrderBy(y => y.Sort).Select(z => z.Value).ToArray();
+							Dictionary<string, int> _colorReplacements = new Dictionary<string, int>();
+							if (colors.Length > 0)
+							{
+								int colorIndex = 0;
+								while (replacementsNeeded > 0)
+								{
+									if (!_colorReplacements.ContainsKey(colors[colorIndex]))
+									{
+										_colorReplacements[colors[colorIndex]] = 0;
+									}
+									_colorReplacements[colors[colorIndex]]++;
+									replacementsNeeded--;
+									colorIndex = (colorIndex + 1) % colors.Length;
+								}
+								suggestedReplacements.AddRange(
+									_colorReplacements.Select(x => new Tuple<int, int, int>(cardToReplace.ArenaId, _basicLands[x.Key].ArenaId, x.Value))
+								);
+							}
+						}
+
+						if (replacementsNeeded > 0)
+						{
+							_logger.Debug("Insufficient Candidates Found, done looking");
+						}
+					}
+					else
+					{
+						_logger.Debug("Processing Candidates based on Type and Cost");
+						var candidates = playerInventory.Select(x => new { Card = cardsById[x.Key], Quantity = x.Value }).
+								Where(x => x.Quantity > 0 && x.Card.Type == cardToReplace.Type && x.Card.Cost == cardToReplace.Cost && (identity == null || identity.Contains(x.Card.ColorIdentity))).
+								OrderByDescending(x => x.Card.Rank + CardStats.GetAssociationModifier(cardToReplace.Name, x.Card.Name, _cardStats));
+
+						foreach (var candidate in candidates)
+						{
+							if (replacementsNeeded == 0) { break; }
+							if (candidate.Quantity > replacementsNeeded)
+							{
+								suggestedReplacements.Add(new Tuple<int, int, int>(cardToReplace.ArenaId, candidate.Card.ArenaId, replacementsNeeded));
+								playerInventory[candidate.Card.ArenaId] -= replacementsNeeded;
+								replacementsNeeded = 0;
+							}
+							else
+							{
+								suggestedReplacements.Add(new Tuple<int, int, int>(cardToReplace.ArenaId, candidate.Card.ArenaId, candidate.Quantity));
+								playerInventory[candidate.Card.ArenaId] = 0;
+								replacementsNeeded -= candidate.Quantity;
+							}
+						}
+
+						if (replacementsNeeded > 0)
+						{
+							_logger.Debug("Insufficient Candidates Found, Getting Candidates by Cost");
+							candidates = playerInventory.Select(x => new { Card = cardsById[x.Key], Quantity = x.Value }).
+								Where(x => x.Quantity > 0 && x.Card.Cost == cardToReplace.Cost && (identity == null || identity.Contains(x.Card.ColorIdentity))).
+								OrderByDescending(x => x.Card.Rank + CardStats.GetAssociationModifier(cardToReplace.Name, x.Card.Name, _cardStats));
+
+							foreach (var candidate in candidates)
+							{
+								if (replacementsNeeded == 0) { break; }
+								if (candidate.Quantity > replacementsNeeded)
+								{
+									suggestedReplacements.Add(new Tuple<int, int, int>(cardToReplace.ArenaId, candidate.Card.ArenaId, replacementsNeeded));
+									playerInventory[candidate.Card.ArenaId] -= replacementsNeeded;
+									replacementsNeeded = 0;
+								}
+								else
+								{
+									suggestedReplacements.Add(new Tuple<int, int, int>(cardToReplace.ArenaId, candidate.Card.ArenaId, candidate.Quantity));
+									playerInventory[candidate.Card.ArenaId] = 0;
+									replacementsNeeded -= candidate.Quantity;
+								}
+							}
+						}
+
+						if (replacementsNeeded > 0)
+						{
+							_logger.Debug("Insufficient Candidates Found, Getting Candidates by Cmc and Color");
+							candidates = playerInventory.Select(x => new { Card = cardsById[x.Key], Quantity = x.Value }).
+								Where(x => x.Quantity > 0 && x.Card.Cmc == cardToReplace.Cmc && x.Card.Colors == cardToReplace.Colors && (identity == null || identity.Contains(x.Card.ColorIdentity))).
+								OrderByDescending(x => x.Card.Rank + CardStats.GetAssociationModifier(cardToReplace.Name, x.Card.Name, _cardStats));
+
+							foreach (var candidate in candidates)
+							{
+								if (replacementsNeeded == 0) { break; }
+								if (candidate.Quantity > replacementsNeeded)
+								{
+									suggestedReplacements.Add(new Tuple<int, int, int>(cardToReplace.ArenaId, candidate.Card.ArenaId, replacementsNeeded));
+									playerInventory[candidate.Card.ArenaId] -= replacementsNeeded;
+									replacementsNeeded = 0;
+								}
+								else
+								{
+									suggestedReplacements.Add(new Tuple<int, int, int>(cardToReplace.ArenaId, candidate.Card.ArenaId, candidate.Quantity));
+									playerInventory[candidate.Card.ArenaId] = 0;
+									replacementsNeeded -= candidate.Quantity;
+								}
+							}
+						}
+
+						if (replacementsNeeded > 0)
+						{
+							_logger.Debug("Insufficient Candidates Found, Getting Candidates, looking for candidates with lower Cmc");
+							int cmcToTest = cardToReplace.Cmc - 1;
+							while (replacementsNeeded > 0 && cmcToTest > 0)
+							{
+								candidates = playerInventory.Select(x => new { Card = cardsById[x.Key], Quantity = x.Value }).
+									Where(x => x.Quantity > 0 && x.Card.Cmc == cmcToTest && x.Card.Colors == cardToReplace.Colors && (identity == null || identity.Contains(x.Card.ColorIdentity))).
+									OrderByDescending(x => x.Card.Rank + CardStats.GetAssociationModifier(cardToReplace.Name, x.Card.Name, _cardStats));
+
+								foreach (var candidate in candidates)
+								{
+									if (replacementsNeeded == 0) { break; }
+									if (candidate.Quantity > replacementsNeeded)
+									{
+										suggestedReplacements.Add(new Tuple<int, int, int>(cardToReplace.ArenaId, candidate.Card.ArenaId, replacementsNeeded));
+										playerInventory[candidate.Card.ArenaId] -= replacementsNeeded;
+										replacementsNeeded = 0;
+									}
+									else
+									{
+										suggestedReplacements.Add(new Tuple<int, int, int>(cardToReplace.ArenaId, candidate.Card.ArenaId, candidate.Quantity));
+										playerInventory[candidate.Card.ArenaId] = 0;
+										replacementsNeeded -= candidate.Quantity;
+									}
+								}
+								cmcToTest--;
+							}
+						}
+
+						if (replacementsNeeded > 0)
+						{
+							_logger.Debug("Insufficient Candidates Found, Getting Candidates, relaxing color requirments and looping through Cmc <= {0}", cardToReplace.Cmc);
+							int cmcToTest = cardToReplace.Cmc;
+							while (replacementsNeeded > 0 && cmcToTest > 0)
+							{
+								candidates = playerInventory.Select(x => new { Card = cardsById[x.Key], Quantity = x.Value }).
+									Where(x => x.Quantity > 0 && x.Card.Cmc == cmcToTest && cardToReplace.Colors.Contains(x.Card.Colors) && (identity == null || identity.Contains(x.Card.ColorIdentity))).
+									OrderByDescending(x => x.Card.Rank + CardStats.GetAssociationModifier(cardToReplace.Name, x.Card.Name, _cardStats));
+
+								foreach (var candidate in candidates)
+								{
+									if (replacementsNeeded == 0) { break; }
+									if (candidate.Quantity > replacementsNeeded)
+									{
+										suggestedReplacements.Add(new Tuple<int, int, int>(cardToReplace.ArenaId, candidate.Card.ArenaId, replacementsNeeded));
+										playerInventory[candidate.Card.ArenaId] -= replacementsNeeded;
+										replacementsNeeded = 0;
+									}
+									else
+									{
+										suggestedReplacements.Add(new Tuple<int, int, int>(cardToReplace.ArenaId, candidate.Card.ArenaId, candidate.Quantity));
+										playerInventory[candidate.Card.ArenaId] = 0;
+										replacementsNeeded -= candidate.Quantity;
+									}
+								}
+								cmcToTest--;
+							}
+						}
+
+						if (replacementsNeeded > 0)
+						{
+							_logger.Debug("Insufficient Candidates Found, done looking");
+						}
+					}
+				}
+
+				_logger.Debug("Updating Player Deck objects with suggestions");
+				playerDeck.SuggestedMainDeck = new ReadOnlyDictionary<int, int>(mainDeckCards);
+				playerDeck.SuggestedSideboard = new ReadOnlyDictionary<int, int>(sideboardCards);
+				playerDeck.MainDeckToCollect = new ReadOnlyDictionary<int, int>(mainDeckToCollect);
+				playerDeck.SideboardToCollect = new ReadOnlyDictionary<int, int>(sideboardToCollect);
+				playerDeck.SuggestedReplacements = suggestedReplacements.AsReadOnly();
+
+				if(playerDeck.BoosterCost > 0)
+				{
+					// if the player doesn't own all the cards for this deck, add it to the list
+					_archetypes.Add(playerDeck);
+				}
+			}
+
 			_logger.Debug("Sorting Archetypes and generating Meta Report");
 			if (Format == "Arena Standard")
 			{
 				// for Arena Standard, use slightly different ordering, favoring win rate over estimated booster cost
-				_orderedArchetypes = _archetypes.OrderBy(x => x.BoosterCost == 0 ? 0 : (x.BoosterCostAfterWC == 0 ? 1 : 2)).ThenByDescending(x => x.WinRate).ThenBy(x => x.BoosterCostAfterWC).ThenBy(x => x.BoosterCost);
+				_orderedArchetypes = _archetypes.OrderBy(x => x.IsPlayerDeck ? 0 : 1).ThenBy(x => x.BoosterCost == 0 ? 0 : (x.BoosterCostAfterWC == 0 ? 1 : 2)).ThenByDescending(x => x.BoosterCostAfterWC == 0 ? x.WinRate : x.BoosterCostAfterWC).ThenBy(x => x.BoosterCostAfterWC).ThenBy(x => x.BoosterCost);
 			}
 			else
 			{
-				_orderedArchetypes = _archetypes.OrderBy(x => x.BoosterCostAfterWC).ThenBy(x => x.BoosterCost);
+				_orderedArchetypes = _archetypes.OrderBy(x => x.IsPlayerDeck ? 0 : 1).ThenBy(x => x.BoosterCostAfterWC).ThenBy(x => x.BoosterCost);
 			}
 			MetaReport report = new MetaReport(cardsByName, _cardStats, cardsById, _playerInventoryCounts, _archetypes, RotationProof.Value);
 

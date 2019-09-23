@@ -238,6 +238,11 @@ namespace DailyArena.DeckAdvisor
 		}
 
 		/// <summary>
+		/// Gets a boolean indicating whether this deck was imported from the player's inventory.
+		/// </summary>
+		public bool IsPlayerDeck { get; private set; }
+
+		/// <summary>
 		/// Regex used to parse commander name out of archetype name for Brawl.
 		/// </summary>
 		private Regex _nonAlphaRegex = new Regex("^([-a-z ,']+)(.*)", RegexOptions.IgnoreCase);
@@ -253,8 +258,9 @@ namespace DailyArena.DeckAdvisor
 		/// <param name="loss">The number of recorded losses for this archetype (if available).</param>
 		/// <param name="isBrawl">Whether the selected format is Brawl.</param>
 		/// <param name="similarDecks">List of alternate deck configurations for this archetype.</param>
+		/// <param name="isPlayerDeck">Boolean indicating whether this is a deck that was imported from the player inventory.</param>
 		public Archetype(string name, Dictionary<string, int> mainDeck, Dictionary<string, int> sideboard, bool rotationProof, int win = -1, int loss = -1, bool isBrawl = false,
-			List<Archetype> similarDecks = null)
+			List<Archetype> similarDecks = null, bool isPlayerDeck = false)
 		{
 			Name = name;
 			MainDeck = new ReadOnlyDictionary<string, int>(mainDeck);
@@ -301,6 +307,8 @@ namespace DailyArena.DeckAdvisor
 				SimilarDecks = similarDecks.AsReadOnly();
 				SimilarDecksVisibility = Visibility.Visible;
 			}
+
+			IsPlayerDeck = isPlayerDeck;
 		}
 
 		/// <summary>

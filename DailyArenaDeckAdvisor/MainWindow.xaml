@@ -12,7 +12,25 @@
 		<local:TabTemplateSelector x:Key="TabTemplateSelector" />
 		<local:ContentTemplateSelector x:Key="ContentTemplateSelector" />
 		<DataTemplate x:Key="ArchetypeTabTemplate" DataType="{x:Type local:Archetype}">
-			<TextBlock x:Name="TabHeader" Text="{Binding Name, Mode=OneWay}" FlowDirection="LeftToRight" />
+			<Border x:Name="TabBorder">
+				<Border.BorderBrush>
+					<DrawingBrush Viewport="0,0,8,8" ViewportUnits="Absolute" TileMode="Tile">
+						<DrawingBrush.Drawing>
+							<DrawingGroup>
+								<GeometryDrawing Brush="Black">
+									<GeometryDrawing.Geometry>
+										<GeometryGroup>
+											<RectangleGeometry Rect="0,0,50,50" />
+											<RectangleGeometry Rect="50,50,50,50" />
+										</GeometryGroup>
+									</GeometryDrawing.Geometry>
+								</GeometryDrawing>
+							</DrawingGroup>
+						</DrawingBrush.Drawing>
+					</DrawingBrush>
+				</Border.BorderBrush>
+				<TextBlock x:Name="TabHeader" Text="{Binding Name, Mode=OneWay}" Padding="3,0,3,0" FlowDirection="LeftToRight" />
+			</Border>
 			<DataTemplate.Triggers>
 				<DataTrigger Binding="{Binding TotalWildcardsNeeded}" Value="0">
 					<Setter Property="Foreground" TargetName="TabHeader" Value="Blue" />
@@ -22,6 +40,10 @@
 					<Setter Property="Foreground" TargetName="TabHeader" Value="Green" />
 					<Setter Property="FontWeight" TargetName="TabHeader" Value="Bold" />
 					<Setter Property="FontStyle" TargetName="TabHeader" Value="Italic" />
+				</DataTrigger>
+				<DataTrigger Binding="{Binding IsPlayerDeck}" Value="true">
+					<Setter Property="Background" TargetName="TabBorder" Value="Yellow" />
+					<Setter Property="BorderThickness" TargetName="TabBorder" Value="1" />
 				</DataTrigger>
 			</DataTemplate.Triggers>
 		</DataTemplate>

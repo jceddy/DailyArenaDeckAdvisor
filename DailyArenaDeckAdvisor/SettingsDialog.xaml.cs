@@ -64,6 +64,16 @@ namespace DailyArena.DeckAdvisor
 		}
 
 		/// <summary>
+		/// Handle clicks of the MTGAZone Button.
+		/// </summary>
+		/// <param name="sender">The button that was clicked.</param>
+		/// <param name="e">The routed event arguments.</param>
+		private void MTGAZoneButton_Click(object sender, RoutedEventArgs e)
+		{
+			Process.Start("https://mtgazone.com");
+		}
+
+		/// <summary>
 		/// Handle clicks of the Close Button.
 		/// </summary>
 		/// <param name="sender">The button that was clicked.</param>

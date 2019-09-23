@@ -14,6 +14,7 @@
 				<RowDefinition Height="Auto" />
 				<RowDefinition Height="Auto" />
 				<RowDefinition Height="Auto" />
+				<RowDefinition Height="Auto" />
 			</Grid.RowDefinitions>
 
 			<Grid.ColumnDefinitions>
@@ -31,8 +32,9 @@
 			<Button Grid.Row="2" Grid.Column="0" x:Name="Code" Margin="3" Padding="3" Content="Code" ToolTip="View the Code on Github" Click="GithubButton_Click" />
 			<Button Grid.Row="2" Grid.Column="1" x:Name="Issues" Margin="3" Padding="3" Content="Issues" ToolTip="View Issues on Github" Click="IssuesButton_Click" />
 			<Button Grid.Row="2" Grid.Column="2" x:Name="Wiki" Margin="3" Padding="3" Content="Wiki" ToolTip="View the Wiki on Github" Click="WikiButton_Click" />
-			<Button Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="3" x:Name="PatreonButton" Margin="3" Padding="3" ToolTip="Visit the Daily Arena Patreon Page" Content="Patreon" Click="PatreonButton_Click" />
-			<Button Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="3" Margin="3" Padding="3" Click="Close_Click">Close</Button>
+			<Button Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="3" x:Name="MTGAZoneButton" Margin="3" Padding="3" ToolTip="Visit the MTG Arena Zone" Content="MTG Arena Zone" Click="MTGAZoneButton_Click" />
+			<Button Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="3" x:Name="PatreonButton" Margin="3" Padding="3" ToolTip="Visit the Daily Arena Patreon Page" Content="Patreon" Click="PatreonButton_Click" />
+			<Button Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="3" Margin="3" Padding="3" Click="Close_Click">Close</Button>
 		</Grid>
 	</Grid>
 </Window>
