@@ -102,6 +102,11 @@ namespace DailyArena.DeckAdvisor
 			{
 				string stateJson = File.ReadAllText("state.json");
 				State = JsonConvert.DeserializeObject<CachedState>(stateJson);
+				if(State.Fingerprint == Guid.Empty)
+				{
+					State.Fingerprint = Guid.NewGuid();
+					SaveState();
+				}
 			}
 			else
 			{

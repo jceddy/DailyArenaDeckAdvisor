@@ -1,4 +1,6 @@
-﻿namespace DailyArena.DeckAdvisor
+﻿using System;
+
+namespace DailyArena.DeckAdvisor
 {
 	/// <summary>
 	/// Class to Cache state information for the application.
@@ -19,5 +21,10 @@
 		/// The selected font size for the application.
 		/// </summary>
 		public int FontSize { get; set; }
+
+		/// <summary>
+		/// Fingerprint for usage stats.
+		/// </summary>
+		public Guid Fingerprint { get; set; } = Guid.NewGuid();
 	}
 }

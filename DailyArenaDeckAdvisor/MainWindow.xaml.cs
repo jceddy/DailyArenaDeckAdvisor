@@ -6,6 +6,7 @@ using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Configuration;
 using System.IO;
@@ -120,6 +121,39 @@ namespace DailyArena.DeckAdvisor
 
 			InitializeComponent();
 			DataContext = this;
+
+			new Task(() => { SendUsageStats(); }).Start();
+		}
+
+		/// <summary>
+		/// Send usage stats to server.
+		/// </summary>
+		private void SendUsageStats()
+		{
+			using (WebClient wc = new WebClient())
+			{
+				try
+				{
+					AssemblyName assemblyName = Assembly.GetExecutingAssembly().GetName();
+					string assemblyVersion = assemblyName.Version.ToString();
+					string assemblyArchitecture = assemblyName.ProcessorArchitecture.ToString();
+
+					NameValueCollection inputs = new NameValueCollection
+					{
+						{ "application", "DailyArenaDeckAdvisor" },
+						{ "fingerprint", ((App)Application.Current).State.Fingerprint.ToString() },
+						{ "version", assemblyVersion },
+						{ "architecture", assemblyArchitecture }
+					};
+
+					string response = Encoding.UTF8.GetString(wc.UploadValues("https://clans.dailyarena.net/usage_stats.php", "POST", inputs));
+					_logger.Debug("Usage Statistics Response: {response}", response);
+				}
+				catch (WebException e)
+				{
+					_logger.Error(e, "Exception in SendUsageStats(), ignoring");
+				}
+			}
 		}
 
 		/// <summary>
