@@ -104,6 +104,16 @@ namespace DailyArena.DeckAdvisor
 		public Bindable<int> SelectedFontSize { get; private set; } = new Bindable<int>() { Value = 12 };
 
 		/// <summary>
+		/// The message to show on the loading screen.
+		/// </summary>
+		public Bindable<string> LoadingText { get; private set; } = new Bindable<string>() { Value = "Loading card database..." };
+
+		/// <summary>
+		/// The value for the loading progress bar.
+		/// </summary>
+		public Bindable<int> LoadingValue { get; private set; } = new Bindable<int>();
+
+		/// <summary>
 		/// The Bitmap Scaling Mode (can be overridden in App.config for users with funky video card/driver combinations that cause crashing under high-quality scaling.
 		/// </summary>
 		public BitmapScalingMode BitmapScalingMode { get; private set; }
@@ -279,6 +289,8 @@ namespace DailyArena.DeckAdvisor
 
 			Dispatcher.Invoke(() => { _tabObjects.Clear(); });
 
+			LoadingValue.Value = 60;
+
 			_archetypes.Clear();
 			_playerInventory.Clear();
 			_playerDecks.Clear();
@@ -287,7 +299,11 @@ namespace DailyArena.DeckAdvisor
 			_cardStats.Clear();
 			_orderedArchetypes = null;
 
+			LoadingValue.Value = 70;
+
 			int maxInventoryCount = Format.Value == "Brawl" ? 1 : 4;
+
+			LoadingValue.Value = 80;
 
 			Archetype.ClearWildcardsOwned();
 			Archetype.ClearCardStats();
@@ -296,6 +312,8 @@ namespace DailyArena.DeckAdvisor
 				Archetype.AnyNumber = _anyNumber.AsReadOnly();
 			}
 
+			LoadingValue.Value = 90;
+
 			foreach (Card card in Card.AllCards)
 			{
 				_cardStats.Add(card, new CardStats() { Card = card });
@@ -303,15 +321,16 @@ namespace DailyArena.DeckAdvisor
 			ReadOnlyDictionary<string, List<Card>> cardsByName = Card.CardsByName;
 			ReadOnlyDictionary<int, Card> cardsById = Card.CardsById;
 
+			LoadingValue.Value = 100;
+
 			_logger.Debug("Card Database Loaded with {0} Cards", cardsById.Count);
 
-			Dispatcher.Invoke(() =>
-			{
-				LoadingDatabase.Visibility = Visibility.Collapsed;
-				LoadingArchetypes.Visibility = Visibility.Visible;
-			});
+			LoadingText.Value = "Loading deck archetypes...";
+			LoadingValue.Value = 0;
 
 			_logger.Debug("Loading Archetype Data");
+
+			LoadingValue.Value = 25;
 
 			string mappedFormat = _formatMappings[Format.Value];
 			JToken decksJson = null;
@@ -371,6 +390,8 @@ namespace DailyArena.DeckAdvisor
 					_logger.Error(e, "Web Exception while downloading decks file for {mappedFormat}", mappedFormat);
 				}
 			}
+
+			LoadingValue.Value = 50;
 
 			_logger.Debug("Parsing decksJson");
 			foreach (dynamic archetype in decksJson)
@@ -535,6 +556,8 @@ namespace DailyArena.DeckAdvisor
 				_archetypes.Add(newArchetype);
 			}
 
+			LoadingValue.Value = 75;
+
 			_logger.Debug("Initializing Card Stats Objects");
 			foreach (Card card in cardsById.Values)
 			{
@@ -543,13 +566,12 @@ namespace DailyArena.DeckAdvisor
 			}
 			Archetype.CardStats = new ReadOnlyDictionary<Card, CardStats>(_cardStats);
 
+			LoadingValue.Value = 100;
+
 			_logger.Debug("{0} Deck Archetypes Loaded", _archetypes.Count);
 
-			Dispatcher.Invoke(() =>
-			{
-				LoadingArchetypes.Visibility = Visibility.Collapsed;
-				ProcessingCollection.Visibility = Visibility.Visible;
-			});
+			LoadingText.Value = "Processing collection from log...";
+			LoadingValue.Value = 0;
 
 			_logger.Debug("Processing Player Collection");
 
@@ -612,6 +634,11 @@ namespace DailyArena.DeckAdvisor
 								}
 								line = reader.ReadLine();
 							}
+
+							if (!(line.Contains("jsonrpc") || line.Contains("params")))
+							{
+								LoadingValue.Value = Math.Max(LoadingValue.Value, 40);
+							}
 						}
 						else if (line.Contains("PlayerInventory.GetPlayerInventory"))
 						{
@@ -653,6 +680,11 @@ namespace DailyArena.DeckAdvisor
 									}
 								}
 								line = reader.ReadLine();
+							}
+
+							if (!(line.Contains("jsonrpc") || line.Contains("params")))
+							{
+								LoadingValue.Value = Math.Max(LoadingValue.Value, 60);
 							}
 						}
 						else if (line.Contains("Deck.GetDeckListsV3"))
@@ -774,6 +806,11 @@ namespace DailyArena.DeckAdvisor
 
 									_playerDecks.Add(id, new Archetype(name, mainDeckByName, sideboardByName, RotationProof.Value, isBrawl: Format == "Brawl", isPlayerDeck: true));
 								}
+							}
+
+							if (!(line.Contains("jsonrpc") || line.Contains("params")))
+							{
+								LoadingValue.Value = Math.Max(LoadingValue.Value, 20);
 							}
 						}
 						else if(line.Contains("Deck.CreateDeckV3") || line.Contains("Deck.UpdateDeckV3"))
@@ -897,19 +934,23 @@ namespace DailyArena.DeckAdvisor
 
 								_playerDecks.Add(id, new Archetype(name, mainDeckByName, sideboardByName, RotationProof.Value, isBrawl: Format == "Brawl", isPlayerDeck: true));
 							}
+
+							if (!(line.Contains("jsonrpc") || line.Contains("params")))
+							{
+								LoadingValue.Value = Math.Max(LoadingValue.Value, 80);
+							}
 						}
 					}
 				}
 			}
 			Archetype.WildcardsOwned = new ReadOnlyDictionary<CardRarity, int>(_wildcardsOwned);
 
+			LoadingValue.Value = 100;
+
 			_logger.Debug("Player Collection Loaded with {0} Cards", _playerInventory.Count);
 
-			Dispatcher.Invoke(() =>
-			{
-				ProcessingCollection.Visibility = Visibility.Collapsed;
-				ComputingSuggestions.Visibility = Visibility.Visible;
-			});
+			LoadingText.Value = "Computing deck suggestions...";
+			LoadingValue.Value = 0;
 
 			_logger.Debug("Computing Suggestions");
 
@@ -1641,6 +1682,8 @@ namespace DailyArena.DeckAdvisor
 				}
 			}
 
+			LoadingValue.Value = 50;
+
 			_logger.Debug("Handling player inventory decks");
 			foreach (Archetype playerDeck in _playerDecks.Values)
 			{
@@ -2009,6 +2052,8 @@ namespace DailyArena.DeckAdvisor
 				}
 			}
 
+			LoadingValue.Value = 75;
+
 			_logger.Debug("Sorting Archetypes and generating Meta Report");
 			if (Format == "Arena Standard")
 			{
@@ -2021,6 +2066,8 @@ namespace DailyArena.DeckAdvisor
 			}
 			MetaReport report = new MetaReport(cardsByName, _cardStats, cardsById, _playerInventoryCounts, _archetypes, RotationProof.Value);
 
+			LoadingValue.Value = 90;
+
 			Dispatcher.Invoke(() =>
 			{
 				_tabObjects.Add(report);
@@ -2030,11 +2077,13 @@ namespace DailyArena.DeckAdvisor
 				}
 			});
 
+			LoadingValue.Value = 100;
+
 			_logger.Debug("Finished Computing Suggestions, Updating GUI");
 
 			Dispatcher.Invoke(() =>
 			{
-				ComputingSuggestions.Visibility = Visibility.Collapsed;
+				LoadingScreen.Visibility = Visibility.Collapsed;
 				FilterPanel.Visibility = Visibility.Visible;
 				DeckTabs.Visibility = Visibility.Visible;
 				DeckTabs.ItemsSource = _tabObjects;
@@ -2088,8 +2137,10 @@ namespace DailyArena.DeckAdvisor
 			Task loadTask = new Task(() => {
 				_logger.Debug("Initializing Card Database");
 				CardDatabase.Initialize(false);
+				LoadingValue.Value = 25;
 
 				PopulateColorsByLand();
+				LoadingValue.Value = 50;
 
 				ReloadAndCrunchAllData();
 			});
@@ -2118,16 +2169,22 @@ namespace DailyArena.DeckAdvisor
 			application.State.LastFormat = Format.Value;
 			application.SaveState();
 
+			LoadingText.Value = "Loading card database...";
+			LoadingValue.Value = 0;
+
 			Dispatcher.Invoke(() =>
 			{
 				FilterPanel.Visibility = Visibility.Collapsed;
 				DeckTabs.Visibility = Visibility.Collapsed;
 				DeckTabs.ItemsSource = null;
-				LoadingDatabase.Visibility = Visibility.Visible;
+				LoadingScreen.Visibility = Visibility.Visible;
 			});
 
-			Task loadTask = new Task(() => { ReloadAndCrunchAllData(); });
-				loadTask.ContinueWith(t =>
+			Task loadTask = new Task(() => {
+				LoadingValue.Value = 50;
+				ReloadAndCrunchAllData();
+			});
+			loadTask.ContinueWith(t =>
 				{
 					if (t.Exception != null)
 					{
@@ -2154,15 +2211,21 @@ namespace DailyArena.DeckAdvisor
 				application.State.RotationProof = RotationProof.Value;
 				application.SaveState();
 
+				LoadingText.Value = "Loading card database...";
+				LoadingValue.Value = 0;
+
 				Dispatcher.Invoke(() =>
 				{
 					FilterPanel.Visibility = Visibility.Collapsed;
 					DeckTabs.Visibility = Visibility.Collapsed;
 					DeckTabs.ItemsSource = null;
-					LoadingDatabase.Visibility = Visibility.Visible;
+					LoadingScreen.Visibility = Visibility.Visible;
 				});
 
-				Task loadTask = new Task(() => { ReloadAndCrunchAllData(); });
+				Task loadTask = new Task(() => {
+					LoadingValue.Value = 50;
+					ReloadAndCrunchAllData();
+				});
 				loadTask.ContinueWith(t =>
 					{
 						if (t.Exception != null)
@@ -2302,15 +2365,21 @@ namespace DailyArena.DeckAdvisor
 		{
 			_logger.Debug("Refresh Clicked");
 
+			LoadingText.Value = "Loading card database...";
+			LoadingValue.Value = 0;
+
 			Dispatcher.Invoke(() =>
 			{
 				FilterPanel.Visibility = Visibility.Collapsed;
 				DeckTabs.Visibility = Visibility.Collapsed;
 				DeckTabs.ItemsSource = null;
-				LoadingDatabase.Visibility = Visibility.Visible;
+				LoadingScreen.Visibility = Visibility.Visible;
 			});
 
-			Task loadTask = new Task(() => { ReloadAndCrunchAllData(); });
+			Task loadTask = new Task(() => {
+				LoadingValue.Value = 50;
+				ReloadAndCrunchAllData();
+			});
 			loadTask.ContinueWith(t =>
 				{
 					if (t.Exception != null)
@@ -2332,19 +2401,24 @@ namespace DailyArena.DeckAdvisor
 		{
 			_logger.Debug("Hard Refresh Clicked");
 
+			LoadingText.Value = "Loading card database...";
+			LoadingValue.Value = 0;
+
 			Dispatcher.Invoke(() =>
 			{
 				FilterPanel.Visibility = Visibility.Collapsed;
 				DeckTabs.Visibility = Visibility.Collapsed;
 				DeckTabs.ItemsSource = null;
-				LoadingDatabase.Visibility = Visibility.Visible;
+				LoadingScreen.Visibility = Visibility.Visible;
 			});
 
 			Task loadTask = new Task(() => {
 				_logger.Debug("Initializing Card Database");
 				CardDatabase.Initialize(false);
+				LoadingValue.Value = 25;
 
 				PopulateColorsByLand();
+				LoadingValue.Value = 50;
 
 				ReloadAndCrunchAllData();
 			});

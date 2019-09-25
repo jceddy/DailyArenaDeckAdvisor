@@ -438,11 +438,16 @@
 			<RowDefinition Height="Auto" />
 			<RowDefinition Height="*" />
 		</Grid.RowDefinitions>
-		
-		<TextBlock x:Name="LoadingDatabase" Grid.RowSpan="2">Loading card database...</TextBlock>
-		<TextBlock x:Name="LoadingArchetypes" Grid.RowSpan="2" Visibility="Collapsed">Loading deck archetypes...</TextBlock>
-		<TextBlock x:Name="ProcessingCollection" Grid.RowSpan="2" Visibility="Collapsed">Processing collection from log...</TextBlock>
-		<TextBlock x:Name="ComputingSuggestions" Grid.RowSpan="2" Visibility="Collapsed">Computing deck suggestions...</TextBlock>
+
+		<Grid x:Name="LoadingScreen" Grid.RowSpan="2">
+			<Grid.RowDefinitions>
+				<RowDefinition Height="*" />
+				<RowDefinition Height="*" />
+			</Grid.RowDefinitions>
+
+			<TextBlock Grid.Row="0" Grid.Column="0" FontSize="24" Margin="3" FontWeight="Bold" VerticalAlignment="Bottom" HorizontalAlignment="Center" Text="{Binding LoadingText.Value, Mode=OneWay}" />
+			<ProgressBar VerticalAlignment="Top" HorizontalAlignment="Center" Margin="3" Height="30" Grid.Row="1" Grid.Column="0" Width="300" Value="{Binding LoadingValue.Value, Mode=OneWay}"/>
+		</Grid>
 		<Border Grid.Row="0" x:Name="FilterPanel" Visibility="Collapsed" BorderThickness="0,0,0,1" BorderBrush="Gray">
 			<Grid>
 				<Grid.RowDefinitions>
