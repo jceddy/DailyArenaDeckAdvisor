@@ -11,7 +11,7 @@ https://mtgazone.com/deck-advisor
 In case the link above is broken...
 
 # Installer Links
-64-bit Version: https://clans.dailyarena.net/download/advisor/x64/DailyArenaDeckAdvisorSetup.msi
+64-bit Version: https://clans.dailyarena.net/download/advisor/x64/DailyArenaDeckAdvisorSetup.msi  
 32-bit Version: https://clans.dailyarena.net/download/advisor/x86/DailyArenaDeckAdvisorSetup.msi
 
 # User Guide
