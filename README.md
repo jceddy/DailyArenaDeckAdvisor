@@ -8,6 +8,15 @@ Visit Daily Arena: https://www.dailyarena.net
 # Installer Links and User Guide
 https://mtgazone.com/deck-advisor
 
+In case the link above is broken...
+
+# Installer Links
+64-bit Version: https://clans.dailyarena.net/download/advisor/x64/DailyArenaDeckAdvisorSetup.msi
+32-bit Version: https://clans.dailyarena.net/download/advisor/x86/DailyArenaDeckAdvisorSetup.msi
+
+# User Guide
+https://github.com/jceddy/DailyArenaDeckAdvisor/wiki/User-Guide
+
 # Developer Guide
 https://github.com/jceddy/DailyArenaDeckAdvisor/wiki/Getting-Started:-Developing-DADA
 
