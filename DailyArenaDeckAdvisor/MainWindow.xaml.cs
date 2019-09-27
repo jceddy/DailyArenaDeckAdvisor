@@ -79,9 +79,21 @@ namespace DailyArena.DeckAdvisor
 		List<string> _anyNumber = new List<string>() { "Persistent Petitioners", "Rat Colony" };
 
 		/// <summary>
-		/// A list mapping basic land names to a Card of that type the player owns.
+		/// A dictionary mapping basic land names to a Card of that type the player owns.
 		/// </summary>
 		Dictionary<string, Card> _basicLands = new Dictionary<string, Card>();
+
+		/// <summary>
+		/// A dictionary mapping basic land names to color strings.
+		/// </summary>
+		Dictionary<string, string> _basicLandColors = new Dictionary<string, string>()
+		{
+			{ "Plains", "W" },
+			{ "Island", "U" },
+			{ "Swamp", "B" },
+			{ "Mountain", "R" },
+			{ "Forest", "G" }
+		};
 
 		/// <summary>
 		/// A reference to the application logger.
@@ -503,7 +515,7 @@ namespace DailyArena.DeckAdvisor
 				List<Archetype> similarDecks = new List<Archetype>();
 				if(archetype["similar_decks"] != null)
 				{
-					_logger.Debug("Alternate deck confiuration found, processing...");
+					_logger.Debug("Alternate deck configuration found, processing...");
 					foreach (dynamic similarDeck in archetype["similar_decks"])
 					{
 						Dictionary<string, int> similarMainDeck = new Dictionary<string, int>();
@@ -611,9 +623,9 @@ namespace DailyArena.DeckAdvisor
 									if (RotationProof.NotValue || card.RotationSafe)
 									{
 										string name = card.Name;
-										if (card.Rarity == CardRarity.BasicLand && !_basicLands.ContainsKey(card.Colors.ColorString))
+										if (card.Rarity == CardRarity.BasicLand && !_basicLands.ContainsKey(_basicLandColors[card.Name]))
 										{
-											_basicLands[card.Colors.ColorString] = card;
+											_basicLands[_basicLandColors[card.Name]] = card;
 										}
 										if (!_playerInventoryCounts.ContainsKey(name))
 										{
@@ -1139,7 +1151,7 @@ namespace DailyArena.DeckAdvisor
 							_logger.Debug("Insufficient Candidates Found, suggesting basic land replacements");
 							Random r = new Random();
 							// randomizing colors here so we don't always favor colors in WUBRG order
-							string[] colors = cardToReplace.Colors.ColorString.Select(x => new { Sort = r.Next(), Value = x.ToString() }).
+							string[] colors = _colorsByLand[cardToReplace.Name].ColorString.Select(x => new { Sort = r.Next(), Value = x.ToString() }).
 								OrderBy(y => y.Sort).Select(z => z.Value).ToArray();
 							Dictionary<string, int> _colorReplacements = new Dictionary<string, int>();
 							if (colors.Length > 0)
@@ -1502,7 +1514,7 @@ namespace DailyArena.DeckAdvisor
 									_logger.Debug("Insufficient Candidates Found, suggesting basic land replacements");
 									Random r = new Random();
 									// randomizing colors here so we don't always favor colors in WUBRG order
-									string[] colors = cardToReplace.Colors.ColorString.Select(x => new { Sort = r.Next(), Value = x.ToString() }).
+									string[] colors = _colorsByLand[cardToReplace.Name].ColorString.Select(x => new { Sort = r.Next(), Value = x.ToString() }).
 										OrderBy(y => y.Sort).Select(z => z.Value).ToArray();
 									Dictionary<string, int> _colorReplacements = new Dictionary<string, int>();
 									if (colors.Length > 0)
@@ -1870,7 +1882,7 @@ namespace DailyArena.DeckAdvisor
 							_logger.Debug("Insufficient Candidates Found, suggesting basic land replacements");
 							Random r = new Random();
 							// randomizing colors here so we don't always favor colors in WUBRG order
-							string[] colors = cardToReplace.Colors.ColorString.Select(x => new { Sort = r.Next(), Value = x.ToString() }).
+							string[] colors = _colorsByLand[cardToReplace.Name].ColorString.Select(x => new { Sort = r.Next(), Value = x.ToString() }).
 								OrderBy(y => y.Sort).Select(z => z.Value).ToArray();
 							Dictionary<string, int> _colorReplacements = new Dictionary<string, int>();
 							if (colors.Length > 0)
