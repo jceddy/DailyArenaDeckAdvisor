@@ -15,6 +15,14 @@ https://github.com/jceddy/DailyArenaDeckAdvisor/wiki/Getting-Started:-Developing
 Libraries used by this project:  
 https://github.com/jceddy/DailyArenaCommon
 
+# Release 1.0.3.5 Changes
+- Suggestions for Imported Decks
+- Additional Default Deck Ordering Tweak for Arena Standard
+- Minor and Under-the-Hood Changes
+  - Fixed a server-side issue that broke the application after rotation.
+  - Fixed an issue that was casing basic land replacement suggestions for nonbasic lands not to work correctly.
+  - Improved the “loading” screens, added progress bars.
+
 # Release 1.0.3.3 Changes
 - Alternate Deck Configurations (for Standard)
 - Default Deck Ordering Tweak for Arena Standard
