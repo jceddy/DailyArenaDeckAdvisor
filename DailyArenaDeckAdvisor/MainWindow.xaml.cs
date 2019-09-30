@@ -15,6 +15,7 @@ using System.Net;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -423,11 +424,25 @@ namespace DailyArena.DeckAdvisor
 						string cardName = (string)card["name"];
 						_logger.Debug("Checking main deck card: {cardName}", cardName);
 
-						if (cardsByName[cardName].Count(x => x.Set.RotationSafe) == 0)
+						try
 						{
-							_logger.Debug("{cardName} is rotating soon, ignore this deck", cardName);
-							ignoreDeck = true;
-							break;
+							if (cardsByName[cardName].Count(x => x.Set.RotationSafe) == 0)
+							{
+								_logger.Debug("{cardName} is rotating soon, ignore this deck", cardName);
+								ignoreDeck = true;
+								break;
+							}
+						}
+						catch(KeyNotFoundException e)
+						{
+							Log.Error(e, "Card not found: {cardName}", cardName);
+							cardName = Regex.Split(cardName, " // ")[0];
+							if (cardsByName[cardName].Count(x => x.Set.RotationSafe) == 0)
+							{
+								_logger.Debug("{cardName} is rotating soon, ignore this deck", cardName);
+								ignoreDeck = true;
+								break;
+							}
 						}
 					}
 
@@ -459,14 +474,34 @@ namespace DailyArena.DeckAdvisor
 					int cardQuantity = (int)card["quantity"];
 
 					_logger.Debug("Processing main deck card: {cardName}, {cardQuantity}", cardName, cardQuantity);
-					foreach (Card archetypeCard in cardsByName[cardName])
+					try
 					{
-						CardStats stats = _cardStats[archetypeCard];
-						if (!mainDeck.ContainsKey(cardName))
+						foreach (Card archetypeCard in cardsByName[cardName])
 						{
-							stats.DeckCount++;
+							CardStats stats = _cardStats[archetypeCard];
+							if (!mainDeck.ContainsKey(cardName))
+							{
+								stats.DeckCount++;
+							}
+							stats.TotalCopies += cardQuantity;
 						}
-						stats.TotalCopies += cardQuantity;
+					}
+					catch (KeyNotFoundException e)
+					{
+						_logger.Error(e, "Card name not found in cardsByName: {cardName}", cardName);
+						if (cardName.Contains("//"))
+						{
+							cardName = Regex.Split(cardName, " // ")[0];
+							foreach (Card archetypeCard in cardsByName[cardName])
+							{
+								CardStats stats = _cardStats[archetypeCard];
+								if (!mainDeck.ContainsKey(cardName))
+								{
+									stats.DeckCount++;
+								}
+								stats.TotalCopies += cardQuantity;
+							}
+						}
 					}
 
 					// found some brawl decks on mtggoldfish that illegally have the same
