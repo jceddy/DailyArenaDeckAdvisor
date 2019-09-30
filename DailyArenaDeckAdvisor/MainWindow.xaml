@@ -471,6 +471,8 @@
 						<ComboBoxItem>Standard</ComboBoxItem>
 						<ComboBoxItem>Arena Standard</ComboBoxItem>
 						<ComboBoxItem>Brawl</ComboBoxItem>
+						<ComboBoxItem>Historic (Bo1)</ComboBoxItem>
+						<ComboBoxItem>Historic (Bo3)</ComboBoxItem>
 					</ComboBox>
 					<ToggleButton HorizontalAlignment="Center" Margin="3" Padding="3" FontWeight="Bold" IsChecked="{Binding RotationProof.Value, Mode=TwoWay}">
 						<ToggleButton.Style>

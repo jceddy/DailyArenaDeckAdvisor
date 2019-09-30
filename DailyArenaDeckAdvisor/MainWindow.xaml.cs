@@ -290,7 +290,9 @@ namespace DailyArena.DeckAdvisor
 		{
 			{ "Standard", "standard" },
 			{ "Arena Standard", "arena_standard" },
-			{ "Brawl", "brawl" }
+			{ "Brawl", "brawl" },
+			{ "Historic (Bo3)", "historic_bo3" },
+			{ "Historic (Bo1)", "historic_bo1" }
 		};
 
 		/// <summary>
@@ -347,7 +349,7 @@ namespace DailyArena.DeckAdvisor
 
 			string mappedFormat = _formatMappings[Format.Value];
 			JToken decksJson = null;
-			string serverTimestamp = CardDatabase.GetServerTimestamp($"{Format.Value.Replace(" ", string.Empty)}Decks");
+			string serverTimestamp = CardDatabase.GetServerTimestamp($"{Regex.Replace(Format.Value.Replace(" ", string.Empty), @"\(.*\)", "")}Decks");
 			bool loadDecksFromServer = true;
 			if(File.Exists($"{mappedFormat}_decks.json"))
 			{
@@ -774,11 +776,11 @@ namespace DailyArena.DeckAdvisor
 									{
 										continue;
 									}
-									else if(Format == "Standard" && sideboard.Length == 0)
+									else if((Format == "Standard" || Format == "Historic (Bo3)") && sideboard.Length == 0)
 									{
 										continue;
 									}
-									else if(Format == "Arena Standard" && sideboard.Length > 0)
+									else if((Format == "Arena Standard" || Format == "Historic (Bo1)") && sideboard.Length > 0)
 									{
 										continue;
 									}
