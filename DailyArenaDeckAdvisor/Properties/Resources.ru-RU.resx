@@ -118,11 +118,11 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="Button_Close" xml:space="preserve">
-    <value>Close</value>
+    <value>закрывать</value>
     <comment>String for the Close button on the settings dialog.</comment>
   </data>
   <data name="Button_Code" xml:space="preserve">
-    <value>Code</value>
+    <value>Код</value>
     <comment>String for the Code button on the settings dialog.</comment>
   </data>
   <data name="Button_Export" xml:space="preserve">
@@ -134,15 +134,15 @@
     <comment>Export w/Replacements button for Deck Details view.</comment>
   </data>
   <data name="Button_Issues" xml:space="preserve">
-    <value>Issues</value>
+    <value>вопросы</value>
     <comment>String for the Issues button on the settings dialog.</comment>
   </data>
   <data name="Button_RotationAgnostic" xml:space="preserve">
-    <value>Rotation Agnostic</value>
+    <value>Вращение Агностик</value>
     <comment>The string for the Rotation Agnostic button.</comment>
   </data>
   <data name="Button_RotationProof" xml:space="preserve">
-    <value>Rotation Proof</value>
+    <value>Доказательство вращения</value>
     <comment>The string for the Rotation Proof button.</comment>
   </data>
   <data name="Deck_AlternateConfigurations" xml:space="preserve">
@@ -182,59 +182,59 @@
     <comment>Win/Loss Record header for Deck Details view.</comment>
   </data>
   <data name="Item_ArenaStandard" xml:space="preserve">
-    <value>Arena Standard</value>
+    <value>Арена Стандарт</value>
     <comment>The string for Arena Standard in the Format ComboBox.</comment>
   </data>
   <data name="Item_Brawl" xml:space="preserve">
-    <value>Brawl</value>
+    <value>скандалить</value>
     <comment>The string for Brawl in the Format ComboBox.</comment>
   </data>
   <data name="Item_Historic_Bo1" xml:space="preserve">
-    <value>Historic (Bo1)</value>
+    <value>Исторический (Bo1)</value>
     <comment>The string for Historic (Bo1) in the Format ComboBox.</comment>
   </data>
   <data name="Item_Historic_Bo3" xml:space="preserve">
-    <value>Historic (Bo3)</value>
+    <value>Исторический (Bo3)</value>
     <comment>The string for Historic (Bo3) in the Format ComboBox.</comment>
   </data>
   <data name="Item_Standard" xml:space="preserve">
-    <value>Standard</value>
+    <value>стандарт</value>
     <comment>The string for Standard in the Format ComboBox.</comment>
   </data>
   <data name="Label_FontSize" xml:space="preserve">
-    <value>Font Size:</value>
+    <value>Размер шрифта:</value>
     <comment>Font size label for the settings dialog.</comment>
   </data>
   <data name="Label_Format" xml:space="preserve">
-    <value>Format:</value>
+    <value>Формат:</value>
     <comment>The string for the Format label.</comment>
   </data>
   <data name="Loading_ComputingDeckSuggestions" xml:space="preserve">
-    <value>Computing deck suggestions...</value>
+    <value>Компьютерная колода предложений ...</value>
     <comment>The "computing deck suggestions" string for the loading screen.</comment>
   </data>
   <data name="Loading_LoadingCardDatabase" xml:space="preserve">
-    <value>Loading card database...</value>
+    <value>Загрузка базы данных карт ...</value>
     <comment>The "loading card database" string for the loading screen.</comment>
   </data>
   <data name="Loading_LoadingDeckArchetypes" xml:space="preserve">
-    <value>Loading deck archetypes...</value>
+    <value>Загрузка колоды архетипов ...</value>
     <comment>The "loading deck archetypes" string for the loading screen.</comment>
   </data>
   <data name="Loading_ProcessingCollectionFromLog" xml:space="preserve">
-    <value>Processing collection from log...</value>
+    <value>Обработка коллекции из журнала ...</value>
     <comment>The "processing collection from log" string for the loading screen.</comment>
   </data>
   <data name="Meta_NextBooster" xml:space="preserve">
-    <value>Next Booster Set to Purchase</value>
+    <value>Следующий бустер установлен на покупку</value>
     <comment>Next Booster string for the Meta Report.</comment>
   </data>
   <data name="Meta_TopCards" xml:space="preserve">
-    <value>Top Cards to Collect/Craft</value>
+    <value>Лучшие карты для сбора / крафт</value>
     <comment>Top Cards string for the Meta Report.</comment>
   </data>
   <data name="Meta_TopDecks" xml:space="preserve">
-    <value>Top Decks to Build for Meta</value>
+    <value>Лучшие колоды для Мета</value>
     <comment>Top Decks string for the Meta Report.</comment>
   </data>
   <data name="Rarity_Common" xml:space="preserve">
@@ -254,49 +254,49 @@
     <comment>Uncommon card rarity.</comment>
   </data>
   <data name="Tab_MetaReport" xml:space="preserve">
-    <value>Meta Report</value>
+    <value>Мета-отчет</value>
     <comment>String for the Meta Report tab.</comment>
   </data>
   <data name="Tooltip_Code" xml:space="preserve">
-    <value>View the Code on Github</value>
+    <value>Посмотреть код на Github</value>
     <comment>String for Code tooltip on the settings dialog.</comment>
   </data>
   <data name="Tooltip_HardRefresh" xml:space="preserve">
-    <value>Refresh Player Inventory and Check Server for Changes, then Recalculate</value>
+    <value>Обновите инвентарь игрока и проверьте сервер на наличие изменений, затем пересчитайте</value>
     <comment>The string for the Hard Refresh tooltip.</comment>
   </data>
   <data name="Tooltip_Issues" xml:space="preserve">
-    <value>View Issues on Github</value>
+    <value>Просмотр вопросов на Github</value>
     <comment>String for the Issues tooltip on the settings dialog.</comment>
   </data>
   <data name="Tooltip_MTGAZone" xml:space="preserve">
-    <value>Visit MTG Arena Zone</value>
+    <value>Посещение MTG Arena Zone</value>
     <comment>String for the MTGAZone tooltip on the settings dialog.</comment>
   </data>
   <data name="Tooltip_Patreon" xml:space="preserve">
-    <value>Visit the Daily Arena Patreon Page</value>
+    <value>Посетите страницу Daily Arena Patreon</value>
     <comment>String for the Patreon tooltip on the settings dialog.</comment>
   </data>
   <data name="Tooltip_Refresh" xml:space="preserve">
-    <value>Refresh Player Inventory, then Recalculate</value>
+    <value>Обновить инвентарь игрока, затем пересчитать</value>
     <comment>The string for the Refresh tooltip.</comment>
   </data>
   <data name="Tooltip_RotationAgnostic" xml:space="preserve">
-    <value>Currently showing all cards, regardless of pending rotation.
-Click to toggle to "Rotation Proof"</value>
+    <value>В настоящее время отображаются все карты, независимо от ожидаемого вращения.
+Нажмите, чтобы переключиться на «Доказательство вращения»</value>
     <comment>The string for the Rotation Agnostic tooltip.</comment>
   </data>
   <data name="Tooltip_RotationProof" xml:space="preserve">
-    <value>Ignoring cards in collection that will rotate soon an suggesting replacements for them.
-Click to toggle to "Rotation Agnostic"</value>
+    <value>Игнорирование карточек в коллекции, которые скоро будут чередоваться, и их замена
+Нажмите, чтобы переключиться на «Вращение Агностик»</value>
     <comment>The string for the Rotation Proof tooltip.</comment>
   </data>
   <data name="Tooltip_Settings" xml:space="preserve">
-    <value>Settings</value>
+    <value>настройки</value>
     <comment>The string for the Settings tooltip.</comment>
   </data>
   <data name="Tooltip_Wiki" xml:space="preserve">
-    <value>View the Wiki on Github</value>
+    <value>Посмотреть Wiki на Github</value>
     <comment>String for the Wiki tooltip on the settings dialog.</comment>
   </data>
 </root>

@@ -9,6 +9,7 @@ using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Configuration;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -16,6 +17,7 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -119,7 +121,7 @@ namespace DailyArena.DeckAdvisor
 		/// <summary>
 		/// The message to show on the loading screen.
 		/// </summary>
-		public Bindable<string> LoadingText { get; private set; } = new Bindable<string>() { Value = "Loading card database..." };
+		public Bindable<string> LoadingText { get; private set; }
 
 		/// <summary>
 		/// The value for the loading progress bar.
@@ -139,6 +141,20 @@ namespace DailyArena.DeckAdvisor
 			App application = (App)Application.Current;
 			_logger = application.Logger;
 			_logger.Debug("Main Window Constructor Called - {0}", "Main Application");
+
+			SetCulture();
+
+			// these have to happen after SetCulture()
+			_formatMappings = new Dictionary<string, Tuple<string, string>>()
+			{
+				{ Properties.Resources.Item_Standard, new Tuple<string, string>("standard", "Standard") },
+				{ Properties.Resources.Item_ArenaStandard, new Tuple<string, string>("arena_standard", "ArenaStandard") },
+				{ Properties.Resources.Item_Brawl, new Tuple<string, string>("brawl", "Brawl") },
+				{ Properties.Resources.Item_Historic_Bo3, new Tuple<string, string>("historic_bo3", "Historic") },
+				{ Properties.Resources.Item_Historic_Bo1, new Tuple<string, string>("historic_bo1", "Historic") }
+			};
+
+			LoadingText = new Bindable<string>() { Value = Properties.Resources.Loading_LoadingCardDatabase };
 
 			BitmapScalingMode = GetBitmapScalingMode();
 
@@ -286,14 +302,7 @@ namespace DailyArena.DeckAdvisor
 		/// <summary>
 		/// A dictionary mapping the Format names shown on the GUI drop-down to the name to use when querying archetype data from the server.
 		/// </summary>
-		private Dictionary<string, string> _formatMappings = new Dictionary<string, string>()
-		{
-			{ "Standard", "standard" },
-			{ "Arena Standard", "arena_standard" },
-			{ "Brawl", "brawl" },
-			{ "Historic (Bo3)", "historic_bo3" },
-			{ "Historic (Bo1)", "historic_bo1" }
-		};
+		private Dictionary<string, Tuple<string, string>> _formatMappings;
 
 		/// <summary>
 		/// Reload all of the player data from the Arena real-time logs and recompute all of the app data.
@@ -316,7 +325,7 @@ namespace DailyArena.DeckAdvisor
 
 			LoadingValue.Value = 70;
 
-			int maxInventoryCount = Format.Value == "Brawl" ? 1 : 4;
+			int maxInventoryCount = Format.Value == Properties.Resources.Item_Brawl ? 1 : 4;
 
 			LoadingValue.Value = 80;
 
@@ -340,21 +349,21 @@ namespace DailyArena.DeckAdvisor
 
 			_logger.Debug("Card Database Loaded with {0} Cards", cardsById.Count);
 
-			LoadingText.Value = "Loading deck archetypes...";
+			LoadingText.Value = Properties.Resources.Loading_LoadingDeckArchetypes;
 			LoadingValue.Value = 0;
 
 			_logger.Debug("Loading Archetype Data");
 
 			LoadingValue.Value = 25;
 
-			string mappedFormat = _formatMappings[Format.Value];
+			Tuple<string, string> mappedFormat = _formatMappings[Format.Value];
 			JToken decksJson = null;
-			string serverTimestamp = CardDatabase.GetServerTimestamp($"{Regex.Replace(Format.Value.Replace(" ", string.Empty), @"\(.*\)", "")}Decks");
+			string serverTimestamp = CardDatabase.GetServerTimestamp($"{mappedFormat.Item2}Decks");
 			bool loadDecksFromServer = true;
-			if(File.Exists($"{mappedFormat}_decks.json"))
+			if(File.Exists($"{mappedFormat.Item1}_decks.json"))
 			{
-				_logger.Debug("Cached decks file exists ({mappedFormat}_decks.json)", mappedFormat);
-				string content = File.ReadAllText($"{mappedFormat}_decks.json");
+				_logger.Debug("Cached decks file exists ({mappedFormat}_decks.json)", mappedFormat.Item1);
+				string content = File.ReadAllText($"{mappedFormat.Item1}_decks.json");
 				using (StringReader contentStringReader = new StringReader(content))
 				using (JsonTextReader contentJsonReader = new JsonTextReader(contentStringReader) { DateParseHandling = DateParseHandling.None })
 				{
@@ -372,7 +381,7 @@ namespace DailyArena.DeckAdvisor
 			if (loadDecksFromServer)
 			{
 				_logger.Debug("Loading deck data from server");
-				var archetypesUrl = $"https://clans.dailyarena.net/{mappedFormat}_decks.json?_c={Guid.NewGuid()}";
+				var archetypesUrl = $"https://clans.dailyarena.net/{mappedFormat.Item1}_decks.json?_c={Guid.NewGuid()}";
 				var archetypesRequest = WebRequest.Create(archetypesUrl);
 				archetypesRequest.Method = "GET";
 
@@ -388,8 +397,8 @@ namespace DailyArena.DeckAdvisor
 							using (JsonTextReader resultJsonReader = new JsonTextReader(resultStringReader) { DateParseHandling = DateParseHandling.None })
 							{
 								decksJson = JToken.ReadFrom(resultJsonReader);
-								_logger.Debug("Writing file {mappedFormat}_decks.json", mappedFormat);
-								File.WriteAllText($"{mappedFormat}_decks.json", JsonConvert.SerializeObject(
+								_logger.Debug("Writing file {mappedFormat}_decks.json", mappedFormat.Item1);
+								File.WriteAllText($"{mappedFormat.Item1}_decks.json", JsonConvert.SerializeObject(
 									new
 									{
 										Timestamp = serverTimestamp,
@@ -402,7 +411,7 @@ namespace DailyArena.DeckAdvisor
 				}
 				catch (WebException e)
 				{
-					_logger.Error(e, "Web Exception while downloading decks file for {mappedFormat}", mappedFormat);
+					_logger.Error(e, "Web Exception while downloading decks file for {mappedFormat}", mappedFormat.Item1);
 				}
 			}
 
@@ -594,13 +603,13 @@ namespace DailyArena.DeckAdvisor
 
 							similarSideboard.Add(cardName, cardQuantity);
 						}
-						Archetype similarArchetype = new Archetype(name, similarMainDeck, similarSideboard, RotationProof.Value, win, loss, Format.Value == "Brawl", null);
+						Archetype similarArchetype = new Archetype(name, similarMainDeck, similarSideboard, RotationProof.Value, win, loss, Format.Value == Properties.Resources.Item_Brawl, null);
 						CardStats.UpdateDeckAssociations(similarArchetype);
 						similarDecks.Add(similarArchetype);
 					}
 				}
 
-				Archetype newArchetype = new Archetype(name, mainDeck, sideboard, RotationProof.Value, win, loss, Format.Value == "Brawl", similarDecks);
+				Archetype newArchetype = new Archetype(name, mainDeck, sideboard, RotationProof.Value, win, loss, Format.Value == Properties.Resources.Item_Brawl, similarDecks);
 				CardStats.UpdateDeckAssociations(newArchetype);
 				_archetypes.Add(newArchetype);
 			}
@@ -619,7 +628,7 @@ namespace DailyArena.DeckAdvisor
 
 			_logger.Debug("{0} Deck Archetypes Loaded", _archetypes.Count);
 
-			LoadingText.Value = "Processing collection from log...";
+			LoadingText.Value = Properties.Resources.Loading_ProcessingCollectionFromLog;
 			LoadingValue.Value = 0;
 
 			_logger.Debug("Processing Player Collection");
@@ -767,20 +776,20 @@ namespace DailyArena.DeckAdvisor
 									if (commanderId != 0)
 									{
 										name = cardsById[commanderId].Name;
-										if (Format != "Brawl")
+										if (Format != Properties.Resources.Item_Brawl)
 										{
 											continue;
 										}
 									}
-									else if (Format == "Brawl")
+									else if (Format == Properties.Resources.Item_Brawl)
 									{
 										continue;
 									}
-									else if((Format == "Standard" || Format == "Historic (Bo3)") && sideboard.Length == 0)
+									else if((Format == Properties.Resources.Item_Standard || Format == Properties.Resources.Item_Historic_Bo3) && sideboard.Length == 0)
 									{
 										continue;
 									}
-									else if((Format == "Arena Standard" || Format == "Historic (Bo1)") && sideboard.Length > 0)
+									else if((Format == Properties.Resources.Item_ArenaStandard || Format == Properties.Resources.Item_Historic_Bo1) && sideboard.Length > 0)
 									{
 										continue;
 									}
@@ -853,7 +862,7 @@ namespace DailyArena.DeckAdvisor
 										}
 									}
 
-									_playerDecks.Add(id, new Archetype(name, mainDeckByName, sideboardByName, RotationProof.Value, isBrawl: Format == "Brawl", isPlayerDeck: true));
+									_playerDecks.Add(id, new Archetype(name, mainDeckByName, sideboardByName, RotationProof.Value, isBrawl: Format == Properties.Resources.Item_Brawl, isPlayerDeck: true));
 								}
 							}
 
@@ -895,20 +904,20 @@ namespace DailyArena.DeckAdvisor
 								if (commanderId != 0)
 								{
 									name = cardsById[commanderId].Name;
-									if (Format != "Brawl")
+									if (Format != Properties.Resources.Item_Brawl)
 									{
 										continue;
 									}
 								}
-								else if (Format == "Brawl")
+								else if (Format == Properties.Resources.Item_Brawl)
 								{
 									continue;
 								}
-								else if (Format == "Standard" && sideboard.Length == 0)
+								else if ((Format == Properties.Resources.Item_Standard || Format == Properties.Resources.Item_Historic_Bo3) && sideboard.Length == 0)
 								{
 									continue;
 								}
-								else if (Format == "Arena Standard" && sideboard.Length > 0)
+								else if ((Format == Properties.Resources.Item_ArenaStandard || Format == Properties.Resources.Item_Historic_Bo1) && sideboard.Length > 0)
 								{
 									continue;
 								}
@@ -981,7 +990,7 @@ namespace DailyArena.DeckAdvisor
 									}
 								}
 
-								_playerDecks.Add(id, new Archetype(name, mainDeckByName, sideboardByName, RotationProof.Value, isBrawl: Format == "Brawl", isPlayerDeck: true));
+								_playerDecks.Add(id, new Archetype(name, mainDeckByName, sideboardByName, RotationProof.Value, isBrawl: Format == Properties.Resources.Item_Brawl, isPlayerDeck: true));
 							}
 
 							if (!(line.Contains("jsonrpc") || line.Contains("params")))
@@ -998,7 +1007,7 @@ namespace DailyArena.DeckAdvisor
 
 			_logger.Debug("Player Collection Loaded with {0} Cards", _playerInventory.Count);
 
-			LoadingText.Value = "Computing deck suggestions...";
+			LoadingText.Value = Properties.Resources.Loading_ComputingDeckSuggestions;
 			LoadingValue.Value = 0;
 
 			_logger.Debug("Computing Suggestions");
@@ -1148,7 +1157,7 @@ namespace DailyArena.DeckAdvisor
 				_logger.Debug("Generating replacement suggestions for missing cards");
 				List<Tuple<int, int, int>> suggestedReplacements = new List<Tuple<int, int, int>>();
 				CardColors identity = null;
-				if(Format.Value == "Brawl")
+				if(Format.Value == Properties.Resources.Item_Brawl)
 				{
 					identity = cardsByName[archetype.CommanderName].First().ColorIdentity;
 				}
@@ -1511,7 +1520,7 @@ namespace DailyArena.DeckAdvisor
 						_logger.Debug("Generating replacement suggestions for missing cards");
 						suggestedReplacements = new List<Tuple<int, int, int>>();
 						identity = null;
-						if (Format.Value == "Brawl")
+						if (Format.Value == Properties.Resources.Item_Brawl)
 						{
 							identity = cardsByName[similarArchetype.CommanderName].First().ColorIdentity;
 						}
@@ -1879,7 +1888,7 @@ namespace DailyArena.DeckAdvisor
 				_logger.Debug("Generating replacement suggestions for missing cards");
 				List<Tuple<int, int, int>> suggestedReplacements = new List<Tuple<int, int, int>>();
 				CardColors identity = null;
-				if (Format.Value == "Brawl")
+				if (Format.Value == Properties.Resources.Item_Brawl)
 				{
 					identity = cardsByName[playerDeck.CommanderName].First().ColorIdentity;
 				}
@@ -2104,7 +2113,7 @@ namespace DailyArena.DeckAdvisor
 			LoadingValue.Value = 75;
 
 			_logger.Debug("Sorting Archetypes and generating Meta Report");
-			if (Format == "Arena Standard")
+			if (Format == Properties.Resources.Item_ArenaStandard)
 			{
 				// for Arena Standard, use slightly different ordering, favoring win rate over estimated booster cost
 				_orderedArchetypes = _archetypes.OrderBy(x => x.IsPlayerDeck ? 0 : 1).ThenBy(x => x.BoosterCost == 0 ? 0 : (x.BoosterCostAfterWC == 0 ? 1 : 2)).ThenByDescending(x => x.BoosterCostAfterWC == 0 ? x.WinRate : x.BoosterCostAfterWC).ThenBy(x => x.BoosterCostAfterWC).ThenBy(x => x.BoosterCost);
@@ -2159,9 +2168,9 @@ namespace DailyArena.DeckAdvisor
 
 			App application = (App)Application.Current;
 			Format.Value = application.State.LastFormat;
-			if(string.IsNullOrWhiteSpace(Format.Value))
+			if(string.IsNullOrWhiteSpace(Format.Value) || !_formatMappings.ContainsKey(Format.Value))
 			{
-				Format.Value = "Standard";
+				Format.Value = Properties.Resources.Item_Standard;
 				application.State.LastFormat = Format.Value;
 				application.SaveState();
 			}
@@ -2218,7 +2227,7 @@ namespace DailyArena.DeckAdvisor
 			application.State.LastFormat = Format.Value;
 			application.SaveState();
 
-			LoadingText.Value = "Loading card database...";
+			LoadingText.Value = Properties.Resources.Loading_LoadingCardDatabase;
 			LoadingValue.Value = 0;
 
 			Dispatcher.Invoke(() =>
@@ -2260,7 +2269,7 @@ namespace DailyArena.DeckAdvisor
 				application.State.RotationProof = RotationProof.Value;
 				application.SaveState();
 
-				LoadingText.Value = "Loading card database...";
+				LoadingText.Value = Properties.Resources.Loading_LoadingCardDatabase;
 				LoadingValue.Value = 0;
 
 				Dispatcher.Invoke(() =>
@@ -2414,7 +2423,7 @@ namespace DailyArena.DeckAdvisor
 		{
 			_logger.Debug("Refresh Clicked");
 
-			LoadingText.Value = "Loading card database...";
+			LoadingText.Value = Properties.Resources.Loading_LoadingCardDatabase;
 			LoadingValue.Value = 0;
 
 			Dispatcher.Invoke(() =>
@@ -2450,7 +2459,7 @@ namespace DailyArena.DeckAdvisor
 		{
 			_logger.Debug("Hard Refresh Clicked");
 
-			LoadingText.Value = "Loading card database...";
+			LoadingText.Value = Properties.Resources.Loading_LoadingCardDatabase;
 			LoadingValue.Value = 0;
 
 			Dispatcher.Invoke(() =>
@@ -2569,6 +2578,39 @@ namespace DailyArena.DeckAdvisor
 
 			_logger.Debug("Using Log Folder Location: {0}", logFolder);
 			return logFolder;
+		}
+
+		/// <summary>
+		/// Sets the current UI culture from app.config if it's set there.
+		/// </summary>
+		private void SetCulture()
+		{
+			_logger.Debug("SetCulture() Called - {0}", "Main Application");
+
+			try
+			{
+				var appSettings = ConfigurationManager.AppSettings;
+				if (appSettings == null)
+				{
+					_logger.Debug("No AppSettings Found, Using Default UI Culture");
+				}
+				else {
+					string culture = appSettings["UICulture"];
+					if(culture != null)
+					{
+						_logger.Debug("Setting UI Culture to {culture}", culture);
+						Thread.CurrentThread.CurrentUICulture = new CultureInfo(culture);
+					}
+					else
+					{
+						_logger.Debug("UICulture not set in AppSettings, Using Default UI Culture");
+					}
+				}
+			}
+			catch (ConfigurationErrorsException e)
+			{
+				_logger.Error(e, "Exception in SetCulture(), Using Default UI Culture");
+			}
 		}
 	}
 }

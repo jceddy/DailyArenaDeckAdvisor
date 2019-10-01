@@ -22,7 +22,7 @@ namespace DailyArena.DeckAdvisor.Properties {
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "15.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    internal class Resources {
+    public class Resources {
         
         private static global::System.Resources.ResourceManager resourceMan;
         
@@ -36,7 +36,7 @@ namespace DailyArena.DeckAdvisor.Properties {
         ///   Returns the cached ResourceManager instance used by this class.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        internal static global::System.Resources.ResourceManager ResourceManager {
+        public static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
                     global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("DailyArena.DeckAdvisor.Properties.Resources", typeof(Resources).Assembly);
@@ -51,12 +51,419 @@ namespace DailyArena.DeckAdvisor.Properties {
         ///   resource lookups using this strongly typed resource class.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        internal static global::System.Globalization.CultureInfo Culture {
+        public static global::System.Globalization.CultureInfo Culture {
             get {
                 return resourceCulture;
             }
             set {
                 resourceCulture = value;
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Close.
+        /// </summary>
+        public static string Button_Close {
+            get {
+                return ResourceManager.GetString("Button_Close", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Code.
+        /// </summary>
+        public static string Button_Code {
+            get {
+                return ResourceManager.GetString("Button_Code", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Export Deck.
+        /// </summary>
+        public static string Button_Export {
+            get {
+                return ResourceManager.GetString("Button_Export", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Export w/Replacements.
+        /// </summary>
+        public static string Button_ExportReplacements {
+            get {
+                return ResourceManager.GetString("Button_ExportReplacements", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Issues.
+        /// </summary>
+        public static string Button_Issues {
+            get {
+                return ResourceManager.GetString("Button_Issues", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Rotation Agnostic.
+        /// </summary>
+        public static string Button_RotationAgnostic {
+            get {
+                return ResourceManager.GetString("Button_RotationAgnostic", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Rotation Proof.
+        /// </summary>
+        public static string Button_RotationProof {
+            get {
+                return ResourceManager.GetString("Button_RotationProof", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Alternate Configurations.
+        /// </summary>
+        public static string Deck_AlternateConfigurations {
+            get {
+                return ResourceManager.GetString("Deck_AlternateConfigurations", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Commander.
+        /// </summary>
+        public static string Deck_Commander {
+            get {
+                return ResourceManager.GetString("Deck_Commander", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Expected Booster Cost.
+        /// </summary>
+        public static string Deck_ExpectedCost {
+            get {
+                return ResourceManager.GetString("Deck_ExpectedCost", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Main Deck.
+        /// </summary>
+        public static string Deck_MainDeck {
+            get {
+                return ResourceManager.GetString("Deck_MainDeck", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Next Booster Set to Purchase.
+        /// </summary>
+        public static string Deck_NextBooster {
+            get {
+                return ResourceManager.GetString("Deck_NextBooster", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Sideboard.
+        /// </summary>
+        public static string Deck_Sideboard {
+            get {
+                return ResourceManager.GetString("Deck_Sideboard", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Suggested Replacements.
+        /// </summary>
+        public static string Deck_SuggestedReplacements {
+            get {
+                return ResourceManager.GetString("Deck_SuggestedReplacements", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Wildcards Needed.
+        /// </summary>
+        public static string Deck_WildcardsNeeded {
+            get {
+                return ResourceManager.GetString("Deck_WildcardsNeeded", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Win/Loss Record.
+        /// </summary>
+        public static string Deck_WinLoss {
+            get {
+                return ResourceManager.GetString("Deck_WinLoss", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Arena Standard.
+        /// </summary>
+        public static string Item_ArenaStandard {
+            get {
+                return ResourceManager.GetString("Item_ArenaStandard", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Brawl.
+        /// </summary>
+        public static string Item_Brawl {
+            get {
+                return ResourceManager.GetString("Item_Brawl", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Historic (Bo1).
+        /// </summary>
+        public static string Item_Historic_Bo1 {
+            get {
+                return ResourceManager.GetString("Item_Historic_Bo1", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Historic (Bo3).
+        /// </summary>
+        public static string Item_Historic_Bo3 {
+            get {
+                return ResourceManager.GetString("Item_Historic_Bo3", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Standard.
+        /// </summary>
+        public static string Item_Standard {
+            get {
+                return ResourceManager.GetString("Item_Standard", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Font Size:.
+        /// </summary>
+        public static string Label_FontSize {
+            get {
+                return ResourceManager.GetString("Label_FontSize", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Format:.
+        /// </summary>
+        public static string Label_Format {
+            get {
+                return ResourceManager.GetString("Label_Format", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Computing deck suggestions....
+        /// </summary>
+        public static string Loading_ComputingDeckSuggestions {
+            get {
+                return ResourceManager.GetString("Loading_ComputingDeckSuggestions", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Loading card database....
+        /// </summary>
+        public static string Loading_LoadingCardDatabase {
+            get {
+                return ResourceManager.GetString("Loading_LoadingCardDatabase", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Loading deck archetypes....
+        /// </summary>
+        public static string Loading_LoadingDeckArchetypes {
+            get {
+                return ResourceManager.GetString("Loading_LoadingDeckArchetypes", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Processing collection from log....
+        /// </summary>
+        public static string Loading_ProcessingCollectionFromLog {
+            get {
+                return ResourceManager.GetString("Loading_ProcessingCollectionFromLog", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Next Booster Set to Purchase.
+        /// </summary>
+        public static string Meta_NextBooster {
+            get {
+                return ResourceManager.GetString("Meta_NextBooster", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Top Cards to Collect/Craft.
+        /// </summary>
+        public static string Meta_TopCards {
+            get {
+                return ResourceManager.GetString("Meta_TopCards", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Top Decks to Build for Meta.
+        /// </summary>
+        public static string Meta_TopDecks {
+            get {
+                return ResourceManager.GetString("Meta_TopDecks", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Common.
+        /// </summary>
+        public static string Rarity_Common {
+            get {
+                return ResourceManager.GetString("Rarity_Common", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Mythic Rare.
+        /// </summary>
+        public static string Rarity_Mythic {
+            get {
+                return ResourceManager.GetString("Rarity_Mythic", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Rare.
+        /// </summary>
+        public static string Rarity_Rare {
+            get {
+                return ResourceManager.GetString("Rarity_Rare", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Uncommon.
+        /// </summary>
+        public static string Rarity_Uncommon {
+            get {
+                return ResourceManager.GetString("Rarity_Uncommon", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Meta Report.
+        /// </summary>
+        public static string Tab_MetaReport {
+            get {
+                return ResourceManager.GetString("Tab_MetaReport", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to View the Code on Github.
+        /// </summary>
+        public static string Tooltip_Code {
+            get {
+                return ResourceManager.GetString("Tooltip_Code", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Refresh Player Inventory and Check Server for Changes, then Recalculate.
+        /// </summary>
+        public static string Tooltip_HardRefresh {
+            get {
+                return ResourceManager.GetString("Tooltip_HardRefresh", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to View Issues on Github.
+        /// </summary>
+        public static string Tooltip_Issues {
+            get {
+                return ResourceManager.GetString("Tooltip_Issues", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Visit MTG Arena Zone.
+        /// </summary>
+        public static string Tooltip_MTGAZone {
+            get {
+                return ResourceManager.GetString("Tooltip_MTGAZone", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Visit the Daily Arena Patreon Page.
+        /// </summary>
+        public static string Tooltip_Patreon {
+            get {
+                return ResourceManager.GetString("Tooltip_Patreon", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Refresh Player Inventory, then Recalculate.
+        /// </summary>
+        public static string Tooltip_Refresh {
+            get {
+                return ResourceManager.GetString("Tooltip_Refresh", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Currently showing all cards, regardless of pending rotation.
+        ///Click to toggle to &quot;Rotation Proof&quot;.
+        /// </summary>
+        public static string Tooltip_RotationAgnostic {
+            get {
+                return ResourceManager.GetString("Tooltip_RotationAgnostic", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Ignoring cards in collection that will rotate soon an suggesting replacements for them.
+        ///Click to toggle to &quot;Rotation Agnostic&quot;.
+        /// </summary>
+        public static string Tooltip_RotationProof {
+            get {
+                return ResourceManager.GetString("Tooltip_RotationProof", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Settings.
+        /// </summary>
+        public static string Tooltip_Settings {
+            get {
+                return ResourceManager.GetString("Tooltip_Settings", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to View the Wiki on Github.
+        /// </summary>
+        public static string Tooltip_Wiki {
+            get {
+                return ResourceManager.GetString("Tooltip_Wiki", resourceCulture);
             }
         }
     }

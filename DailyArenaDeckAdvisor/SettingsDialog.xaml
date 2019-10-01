@@ -3,6 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+		xmlns:p="clr-namespace:DailyArena.DeckAdvisor.Properties"
         mc:Ignorable="d"
         Title="Daily Arena Deck Advisor - Settings" Height="225" Width="400"
 		WindowStyle="None" WindowStartupLocation="CenterOwner" ResizeMode="NoResize" BorderBrush="Black" BorderThickness="3" FontSize="{Binding Owner.SelectedFontSize.Value}">
@@ -23,18 +24,18 @@
 				<ColumnDefinition Width="Auto" />
 			</Grid.ColumnDefinitions>
 
-			<TextBlock Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" FontSize="24" Margin="3" FontWeight="Bold" VerticalAlignment="Bottom" HorizontalAlignment="Center" Text="Settings" />
+			<TextBlock Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" FontSize="24" Margin="3" FontWeight="Bold" VerticalAlignment="Bottom" HorizontalAlignment="Center" Text="{x:Static p:Resources.Tooltip_Settings}" />
 			<StackPanel Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" Orientation="Horizontal" HorizontalAlignment="Center">
-				<Label Margin="3" FontWeight="Bold" VerticalContentAlignment="Center">Font Size:</Label>
+				<Label Margin="3" FontWeight="Bold" VerticalContentAlignment="Center" Content="{x:Static p:Resources.Label_FontSize}" />
 				<ComboBox x:Name="FontSize" SelectedValue="{Binding Owner.SelectedFontSize.Value, Mode=TwoWay}"
 						  Margin="3" VerticalContentAlignment="Center" ItemsSource="{Binding FontSizes}" />
 			</StackPanel>
-			<Button Grid.Row="2" Grid.Column="0" x:Name="Code" Margin="3" Padding="3" Content="Code" ToolTip="View the Code on Github" Click="GithubButton_Click" />
-			<Button Grid.Row="2" Grid.Column="1" x:Name="Issues" Margin="3" Padding="3" Content="Issues" ToolTip="View Issues on Github" Click="IssuesButton_Click" />
-			<Button Grid.Row="2" Grid.Column="2" x:Name="Wiki" Margin="3" Padding="3" Content="Wiki" ToolTip="View the Wiki on Github" Click="WikiButton_Click" />
-			<Button Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="3" x:Name="MTGAZoneButton" Margin="3" Padding="3" ToolTip="Visit the MTG Arena Zone" Content="MTG Arena Zone" Click="MTGAZoneButton_Click" />
-			<Button Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="3" x:Name="PatreonButton" Margin="3" Padding="3" ToolTip="Visit the Daily Arena Patreon Page" Content="Patreon" Click="PatreonButton_Click" />
-			<Button Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="3" Margin="3" Padding="3" Click="Close_Click">Close</Button>
+			<Button Grid.Row="2" Grid.Column="0" x:Name="Code" Margin="3" Padding="3" Content="{x:Static p:Resources.Button_Code}" ToolTip="{x:Static p:Resources.Tooltip_Code}" Click="GithubButton_Click" />
+			<Button Grid.Row="2" Grid.Column="1" x:Name="Issues" Margin="3" Padding="3" Content="{x:Static p:Resources.Button_Issues}" ToolTip="{x:Static p:Resources.Tooltip_Issues}" Click="IssuesButton_Click" />
+			<Button Grid.Row="2" Grid.Column="2" x:Name="Wiki" Margin="3" Padding="3" Content="Wiki" ToolTip="{x:Static p:Resources.Tooltip_Wiki}" Click="WikiButton_Click" />
+			<Button Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="3" x:Name="MTGAZoneButton" Margin="3" Padding="3" ToolTip="{x:Static p:Resources.Tooltip_MTGAZone}" Content="MTG Arena Zone" Click="MTGAZoneButton_Click" />
+			<Button Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="3" x:Name="PatreonButton" Margin="3" Padding="3" ToolTip="{x:Static p:Resources.Tooltip_Patreon}" Content="Patreon" Click="PatreonButton_Click" />
+			<Button Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="3" Margin="3" Padding="3" Click="Close_Click" Content="{x:Static p:Resources.Button_Close}" />
 		</Grid>
 	</Grid>
 </Window>

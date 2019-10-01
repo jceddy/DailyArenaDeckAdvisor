@@ -5,6 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 		xmlns:local="clr-namespace:DailyArena.DeckAdvisor"
 		xmlns:converters="clr-namespace:DailyArena.Common.Converters;assembly=DailyArena.Common"
+		xmlns:p="clr-namespace:DailyArena.DeckAdvisor.Properties"
         mc:Ignorable="d"
         Title="Daily Arena Deck Advisor" Height="880" Width="1270" Loaded="Window_Loaded" FontSize="{Binding SelectedFontSize.Value}">
 	<Window.Resources>
@@ -355,7 +356,7 @@
 			</ScrollViewer>
 		</DataTemplate>
 		<DataTemplate x:Key="MetaReportTabTemplate" DataType="{x:Type local:MetaReport}">
-			<TextBlock x:Name="TabHeader" Text="Meta Report" FontWeight="Bold" Foreground="DarkOrange" />
+			<TextBlock x:Name="TabHeader" Text="{x:Static p:Resources.Tab_MetaReport}" FontWeight="Bold" Foreground="DarkOrange" />
 		</DataTemplate>
 		<DataTemplate x:Key="MetaReportContentTemplate" DataType="{x:Type local:MetaReport}">
 			<ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled">
@@ -369,7 +370,7 @@
 						<RowDefinition Height="*" />
 					</Grid.RowDefinitions>
 
-					<TextBlock Grid.Column="0" Grid.Row="0" FontWeight="Bold" HorizontalAlignment="Left" TextDecorations="Underline">Top Cards to Collect/Craft</TextBlock>
+					<TextBlock Grid.Column="0" Grid.Row="0" FontWeight="Bold" HorizontalAlignment="Left" TextDecorations="Underline" Text="{x:Static p:Resources.Meta_TopCards}" />
 					<ItemsControl Grid.Column="0" Grid.Row="1" ItemsSource="{Binding ReportEntries}">
 						<ItemsControl.ItemsPanel>
 							<ItemsPanelTemplate>
@@ -404,12 +405,12 @@
 					</ItemsControl>
 
 					<StackPanel Orientation="Vertical" Grid.Column="1" Grid.Row="0" Grid.RowSpan="2" Margin="3">
-						<TextBlock FontWeight="Bold" HorizontalAlignment="Left" TextDecorations="Underline">Next Booster Set to Purchase</TextBlock>
+						<TextBlock FontWeight="Bold" HorizontalAlignment="Left" TextDecorations="Underline" Text="{x:Static p:Resources.Meta_NextBooster}" />
 						<TextBlock HorizontalAlignment="Left" Text="{Binding NextBoosterSetToPurchase}"/>
 
 						<TextBlock Text="" />
 
-						<TextBlock FontWeight="Bold" HorizontalAlignment="Left" TextDecorations="Underline">Top Decks to Build for Meta</TextBlock>
+						<TextBlock FontWeight="Bold" HorizontalAlignment="Left" TextDecorations="Underline" Text="{x:Static p:Resources.Meta_TopDecks}" />
 						<ItemsControl Grid.Column="0" Grid.Row="1" ItemsSource="{Binding TopDecksToBuild}">
 							<ItemsControl.ItemsPanel>
 								<ItemsPanelTemplate>
@@ -459,41 +460,41 @@
 				</Grid.ColumnDefinitions>
 
 				<StackPanel Grid.Row="0" Grid.Column="0" Orientation="Horizontal" HorizontalAlignment="Left">
-					<Button Margin="3" Click="Settings_Click" ToolTip="Settings">
+					<Button Margin="3" Click="Settings_Click" ToolTip="{x:Static p:Resources.Tooltip_Settings}">
 						<Image Source="Resources/cog.png" Height="24" Width="24" RenderOptions.BitmapScalingMode="{Binding BitmapScalingMode}" />
 					</Button>
 				</StackPanel>
 
 				<StackPanel Grid.Row="0" Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right">
-					<Label Margin="3" FontWeight="Bold" VerticalContentAlignment="Center">Format:</Label>
+					<Label Margin="3" FontWeight="Bold" VerticalContentAlignment="Center" Content="{x:Static p:Resources.Label_Format}" />
 					<ComboBox x:Name="SelectedFormat" SelectedValue="{Binding Format.Value, Mode=TwoWay}" SelectedValuePath="Content"
 						  Margin="3" VerticalContentAlignment="Center">
-						<ComboBoxItem>Standard</ComboBoxItem>
-						<ComboBoxItem>Arena Standard</ComboBoxItem>
-						<ComboBoxItem>Brawl</ComboBoxItem>
-						<ComboBoxItem>Historic (Bo1)</ComboBoxItem>
-						<ComboBoxItem>Historic (Bo3)</ComboBoxItem>
+						<ComboBoxItem Content="{x:Static p:Resources.Item_Standard}" />
+						<ComboBoxItem Content="{x:Static p:Resources.Item_ArenaStandard}" />
+						<ComboBoxItem Content="{x:Static p:Resources.Item_Brawl}" />
+						<ComboBoxItem Content="{x:Static p:Resources.Item_Historic_Bo1}" />
+						<ComboBoxItem Content="{x:Static p:Resources.Item_Historic_Bo3}" />
 					</ComboBox>
 					<ToggleButton HorizontalAlignment="Center" Margin="3" Padding="3" FontWeight="Bold" IsChecked="{Binding RotationProof.Value, Mode=TwoWay}">
 						<ToggleButton.Style>
 							<Style TargetType="{x:Type ToggleButton}">
-								<Setter Property="Content" Value="Rotation Agnostic"/>
-								<Setter Property="ToolTip" Value="Currently showing all cards, regardless of pending rotation.&#x0a;Click to toggle to &quot;Rotation Proof&quot;"/>
+								<Setter Property="Content" Value="{x:Static p:Resources.Button_RotationAgnostic}"/>
+								<Setter Property="ToolTip" Value="{x:Static p:Resources.Tooltip_RotationAgnostic}"/>
 								<Setter Property="Foreground" Value="DarkGreen"/>
 								<Style.Triggers>
 									<Trigger Property="IsChecked" Value="True">
-										<Setter Property="Content" Value="Rotation Proof"/>
-										<Setter Property="ToolTip" Value="Ignoring cards in collection that will rotate soon an suggesting replacements for them.&#x0a;Click to toggle to &quot;Rotation Agnostic&quot;"/>
+										<Setter Property="Content" Value="{x:Static p:Resources.Button_RotationProof}"/>
+										<Setter Property="ToolTip" Value="{x:Static p:Resources.Tooltip_RotationProof}"/>
 										<Setter Property="Foreground" Value="Red"/>
 									</Trigger>
 								</Style.Triggers>
 							</Style>
 						</ToggleButton.Style>
 					</ToggleButton>
-					<Button Margin="3" Click="Refresh_Click" ToolTip="Refresh Player Inventory, then Recalculate">
+					<Button Margin="3" Click="Refresh_Click" ToolTip="{x:Static p:Resources.Tooltip_Refresh}">
 						<Image Source="Resources/refresh.png" Height="24" Width="24" RenderOptions.BitmapScalingMode="{Binding BitmapScalingMode}" />
 					</Button>
-					<Button Margin="3" Click="HardRefresh_Click" ToolTip="Refresh Player Inventory and Check Server for Changes, then Recalculate">
+					<Button Margin="3" Click="HardRefresh_Click" ToolTip="{x:Static p:Resources.Tooltip_HardRefresh}">
 						<Image Source="Resources/hard_refresh.png" Height="24" Width="24" RenderOptions.BitmapScalingMode="{Binding BitmapScalingMode}" />
 					</Button>
 				</StackPanel>
