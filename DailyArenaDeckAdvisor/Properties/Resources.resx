@@ -117,6 +117,18 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="Archetype_Loss" xml:space="preserve">
+    <value>Loss</value>
+    <comment>Loss string for Archetype.</comment>
+  </data>
+  <data name="Archetype_Total" xml:space="preserve">
+    <value>Total</value>
+    <comment>Total string for Archetype.</comment>
+  </data>
+  <data name="Archetype_Win" xml:space="preserve">
+    <value>Win</value>
+    <comment>Win string for Archetype.</comment>
+  </data>
   <data name="Button_Close" xml:space="preserve">
     <value>Close</value>
     <comment>String for the Close button on the settings dialog.</comment>
@@ -148,6 +160,10 @@
   <data name="Deck_AlternateConfigurations" xml:space="preserve">
     <value>Alternate Configurations</value>
     <comment>Alternate Configurations header for Deck Details view.</comment>
+  </data>
+  <data name="Deck_BackToMain" xml:space="preserve">
+    <value>Back to Main Deck</value>
+    <comment>Back to Main deck string for deck details view.</comment>
   </data>
   <data name="Deck_Commander" xml:space="preserve">
     <value>Commander</value>

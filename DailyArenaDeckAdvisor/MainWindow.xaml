@@ -52,7 +52,7 @@
 			<ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
 				<StackPanel Orientation="Horizontal" Margin="3">
 					<StackPanel Orientation="Vertical" Margin="3">
-						<TextBlock FontWeight="Bold" HorizontalAlignment="Left" TextDecorations="Underline" Visibility="{Binding CommanderVisibility}">Commander</TextBlock>
+						<TextBlock FontWeight="Bold" HorizontalAlignment="Left" TextDecorations="Underline" Visibility="{Binding CommanderVisibility}" Text="{x:Static p:Resources.Deck_Commander}" />
 						<StackPanel Orientation="Horizontal" Margin="3" Visibility="{Binding CommanderVisibility}">
 							<TextBlock FontWeight="Bold" Text="{Binding CommanderName}" ToolTipService.ShowDuration="600000">
 								<TextBlock.ToolTip>
@@ -89,7 +89,7 @@
 						</StackPanel>
 						<TextBlock FontWeight="Bold" HorizontalAlignment="Left" Visibility="{Binding CommanderVisibility}" />
 
-						<TextBlock FontWeight="Bold" HorizontalAlignment="Left" TextDecorations="Underline">Main Deck</TextBlock>
+						<TextBlock FontWeight="Bold" HorizontalAlignment="Left" TextDecorations="Underline" Text="{x:Static p:Resources.Deck_MainDeck}" />
 						<ItemsControl ItemsSource="{Binding MainDeckView}">
 							<ItemsControl.ItemsPanel>
 								<ItemsPanelTemplate>
@@ -147,7 +147,7 @@
 					</StackPanel>
 
 					<StackPanel Orientation="Vertical" Margin="3" Visibility="{Binding SideboardVisibility}">
-						<TextBlock FontWeight="Bold" HorizontalAlignment="Left" TextDecorations="Underline">Sideboard</TextBlock>
+						<TextBlock FontWeight="Bold" HorizontalAlignment="Left" TextDecorations="Underline" Text="{x:Static p:Resources.Deck_Sideboard}" />
 						<ItemsControl ItemsSource="{Binding SideboardView}">
 							<ItemsControl.ItemsPanel>
 								<ItemsPanelTemplate>
@@ -205,11 +205,11 @@
 					</StackPanel>
 
 					<StackPanel Orientation="Vertical" Margin="3">
-						<TextBlock FontWeight="Bold" HorizontalAlignment="Left" TextDecorations="Underline" Visibility="{Binding WinLossVisibility}">Win/Loss Record</TextBlock>
+						<TextBlock FontWeight="Bold" HorizontalAlignment="Left" TextDecorations="Underline" Visibility="{Binding WinLossVisibility}" Text="{x:Static p:Resources.Deck_WinLoss}" />
 						<TextBlock Text="{Binding WinLossView}" Visibility="{Binding WinLossVisibility}" />
 						<TextBlock Visibility="{Binding WinLossVisibility}" />
-						
-						<TextBlock FontWeight="Bold" HorizontalAlignment="Left" TextDecorations="Underline">Expected Booster Cost</TextBlock>
+
+						<TextBlock FontWeight="Bold" HorizontalAlignment="Left" TextDecorations="Underline" Text="{x:Static p:Resources.Deck_ExpectedCost}" />
 						<StackPanel Orientation="Horizontal">
 							<TextBlock HorizontalAlignment="Left" Text="{Binding BoosterCost, StringFormat={}{0:0.00}}"/>
 							<TextBlock HorizontalAlignment="Left" Text="{Binding BoosterCostAfterWC, StringFormat={} ({0:0.00})}"/>
@@ -217,9 +217,7 @@
 
 						<TextBlock HorizontalAlignment="Left" Visibility="{Binding CollectVisibility}" />
 
-						<TextBlock FontWeight="Bold" HorizontalAlignment="Left" TextDecorations="Underline" Visibility="{Binding CollectVisibility}">
-							Wildcards Needed
-						</TextBlock>
+						<TextBlock FontWeight="Bold" HorizontalAlignment="Left" TextDecorations="Underline" Visibility="{Binding CollectVisibility}" Text="{x:Static p:Resources.Deck_WildcardsNeeded}" />
 						<ItemsControl ItemsSource="{Binding WildcardsNeeded}" Visibility="{Binding CollectVisibility}">
 							<ItemsControl.ItemsPanel>
 								<ItemsPanelTemplate>
@@ -231,18 +229,25 @@
 									<StackPanel Orientation="Horizontal">
 										<TextBlock Text="{Binding Item2}" Width="15" TextAlignment="Right" />
 										<TextBlock Text="x " />
-										<TextBlock x:Name="RarityName" FontWeight="Bold" Text="{Binding Item1}" />
+										<TextBlock x:Name="RarityName" FontWeight="Bold" />
 										<TextBlock Text="{Binding Item3, StringFormat={} ({0})}" />
 									</StackPanel>
 									<DataTemplate.Triggers>
+										<DataTrigger Binding="{Binding Item1}" Value="common">
+											<Setter Property="Foreground" TargetName="RarityName" Value="Black" />
+											<Setter Property="Text" TargetName="RarityName" Value="{x:Static p:Resources.Rarity_Common}" />
+										</DataTrigger>
 										<DataTrigger Binding="{Binding Item1}" Value="uncommon">
 											<Setter Property="Foreground" TargetName="RarityName" Value="DarkGray" />
+											<Setter Property="Text" TargetName="RarityName" Value="{x:Static p:Resources.Rarity_Uncommon}" />
 										</DataTrigger>
 										<DataTrigger Binding="{Binding Item1}" Value="rare">
 											<Setter Property="Foreground" TargetName="RarityName" Value="DarkGoldenrod" />
+											<Setter Property="Text" TargetName="RarityName" Value="{x:Static p:Resources.Rarity_Rare}" />
 										</DataTrigger>
 										<DataTrigger Binding="{Binding Item1}" Value="mythic">
 											<Setter Property="Foreground" TargetName="RarityName" Value="DarkOrange" />
+											<Setter Property="Text" TargetName="RarityName" Value="{x:Static p:Resources.Rarity_Mythic}" />
 										</DataTrigger>
 									</DataTemplate.Triggers>
 								</DataTemplate>
@@ -251,20 +256,16 @@
 
 						<TextBlock HorizontalAlignment="Left" Visibility="{Binding CollectVisibility}" />
 
-						<TextBlock FontWeight="Bold" HorizontalAlignment="Left" TextDecorations="Underline" Visibility="{Binding PurchaseBoosterVisibility}">
-							Next Booster Set to Purchase
-						</TextBlock>
+						<TextBlock FontWeight="Bold" HorizontalAlignment="Left" TextDecorations="Underline" Visibility="{Binding PurchaseBoosterVisibility}" Text="{x:Static p:Resources.Deck_NextBooster}" />
 						<TextBlock HorizontalAlignment="Left" Text="{Binding NextBoosterSetToPurchase}" Visibility="{Binding PurchaseBoosterVisibility}"/>
 
 						<TextBlock HorizontalAlignment="Left" />
 
-						<Button Click="Export_Click">Export Deck</Button>
+						<Button Click="Export_Click" Content="{x:Static p:Resources.Button_Export}" />
 
 						<TextBlock HorizontalAlignment="Left" Visibility="{Binding CollectVisibility}" />
 
-						<TextBlock FontWeight="Bold" HorizontalAlignment="Left" TextDecorations="Underline" Visibility="{Binding CollectVisibility}">
-							Suggested Replacements
-						</TextBlock>
+						<TextBlock FontWeight="Bold" HorizontalAlignment="Left" TextDecorations="Underline" Visibility="{Binding CollectVisibility}" Text="{x:Static p:Resources.Deck_SuggestedReplacements}" />
 						<ItemsControl ItemsSource="{Binding SuggestedReplacementsView}" Visibility="{Binding CollectVisibility}">
 							<ItemsControl.ItemsPanel>
 								<ItemsPanelTemplate>
@@ -314,13 +315,11 @@
 
 						<TextBlock HorizontalAlignment="Left" Visibility="{Binding CollectVisibility}" />
 
-						<Button Click="ExportSuggested_Click" Visibility="{Binding CollectVisibility}">Export w/Replacements</Button>
+						<Button Click="ExportSuggested_Click" Visibility="{Binding CollectVisibility}" Content="{x:Static p:Resources.Button_ExportReplacements}" />
 					</StackPanel>
 
 					<StackPanel Orientation="Vertical" Margin="3" Visibility="{Binding SimilarDecksVisibility}">
-						<TextBlock FontWeight="Bold" HorizontalAlignment="Left" TextDecorations="Underline">
-							Alternate Configurations
-						</TextBlock>
+						<TextBlock FontWeight="Bold" HorizontalAlignment="Left" TextDecorations="Underline" Text="{x:Static p:Resources.Deck_AlternateConfigurations}" />
 
 						<ItemsControl x:Name="SimilarDecksItemsControl" ItemsSource="{Binding SimilarDecks}">
 							<ItemsControl.ItemsPanel>
@@ -349,7 +348,7 @@
 
 					<TextBlock Visibility="{Binding ParentVisibility}">
 						<Hyperlink Click="ParentDeck_Click">
-							<Run Text="Back to Main Deck" />
+							<Run Text="{x:Static p:Resources.Deck_BackToMain}" />
 						</Hyperlink>
 					</TextBlock>
 				</StackPanel>

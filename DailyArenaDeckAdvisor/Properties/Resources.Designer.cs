@@ -61,6 +61,33 @@ namespace DailyArena.DeckAdvisor.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Loss.
+        /// </summary>
+        public static string Archetype_Loss {
+            get {
+                return ResourceManager.GetString("Archetype_Loss", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Total.
+        /// </summary>
+        public static string Archetype_Total {
+            get {
+                return ResourceManager.GetString("Archetype_Total", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Win.
+        /// </summary>
+        public static string Archetype_Win {
+            get {
+                return ResourceManager.GetString("Archetype_Win", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Close.
         /// </summary>
         public static string Button_Close {
@@ -129,6 +156,15 @@ namespace DailyArena.DeckAdvisor.Properties {
         public static string Deck_AlternateConfigurations {
             get {
                 return ResourceManager.GetString("Deck_AlternateConfigurations", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Back to Main Deck.
+        /// </summary>
+        public static string Deck_BackToMain {
+            get {
+                return ResourceManager.GetString("Deck_BackToMain", resourceCulture);
             }
         }
         

@@ -277,7 +277,7 @@ namespace DailyArena.DeckAdvisor
 			}
 			else
 			{
-				WinLossView = $"Win: {win}, Loss: {loss}, Total: {win + loss} ({WinRate:P})";
+				WinLossView = $"{Properties.Resources.Archetype_Win}: {win}, {Properties.Resources.Archetype_Loss}: {loss}, {Properties.Resources.Archetype_Total}: {win + loss} ({WinRate:P})";
 				WinLossVisibility = Visibility.Visible;
 			}
 

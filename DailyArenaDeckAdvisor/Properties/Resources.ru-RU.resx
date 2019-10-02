@@ -117,6 +117,18 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="Archetype_Loss" xml:space="preserve">
+    <value>потеря</value>
+    <comment>Loss string for Archetype.</comment>
+  </data>
+  <data name="Archetype_Total" xml:space="preserve">
+    <value>итог</value>
+    <comment>Total string for Archetype.</comment>
+  </data>
+  <data name="Archetype_Win" xml:space="preserve">
+    <value>Уин</value>
+    <comment>Win string for Archetype.</comment>
+  </data>
   <data name="Button_Close" xml:space="preserve">
     <value>закрывать</value>
     <comment>String for the Close button on the settings dialog.</comment>
@@ -126,11 +138,11 @@
     <comment>String for the Code button on the settings dialog.</comment>
   </data>
   <data name="Button_Export" xml:space="preserve">
-    <value>Export Deck</value>
+    <value>Экспортная колода</value>
     <comment>Export Deck button for Deck Details view.</comment>
   </data>
   <data name="Button_ExportReplacements" xml:space="preserve">
-    <value>Export w/Replacements</value>
+    <value>Экспорт с заменами</value>
     <comment>Export w/Replacements button for Deck Details view.</comment>
   </data>
   <data name="Button_Issues" xml:space="preserve">
@@ -146,39 +158,43 @@
     <comment>The string for the Rotation Proof button.</comment>
   </data>
   <data name="Deck_AlternateConfigurations" xml:space="preserve">
-    <value>Alternate Configurations</value>
+    <value>Альтернативные конфигурации</value>
     <comment>Alternate Configurations header for Deck Details view.</comment>
   </data>
+  <data name="Deck_BackToMain" xml:space="preserve">
+    <value>Вернуться на главную палубу</value>
+    <comment>Back to Main deck string for deck details view.</comment>
+  </data>
   <data name="Deck_Commander" xml:space="preserve">
-    <value>Commander</value>
+    <value>командующий</value>
     <comment>Commander header for Deck Details view.</comment>
   </data>
   <data name="Deck_ExpectedCost" xml:space="preserve">
-    <value>Expected Booster Cost</value>
+    <value>Ожидаемая стоимость бустера</value>
     <comment>Expected Booster Cost header for Deck Details view.</comment>
   </data>
   <data name="Deck_MainDeck" xml:space="preserve">
-    <value>Main Deck</value>
+    <value>Главная палуба</value>
     <comment>Main Deck header for Deck Details view.</comment>
   </data>
   <data name="Deck_NextBooster" xml:space="preserve">
-    <value>Next Booster Set to Purchase</value>
+    <value>Следующий бустер установлен на покупку</value>
     <comment>Next Booster Set header for Deck Details view.</comment>
   </data>
   <data name="Deck_Sideboard" xml:space="preserve">
-    <value>Sideboard</value>
+    <value>сервант</value>
     <comment>Sideboard header for Deck Details view.</comment>
   </data>
   <data name="Deck_SuggestedReplacements" xml:space="preserve">
-    <value>Suggested Replacements</value>
+    <value>Предлагаемые замены</value>
     <comment>Suggested Replacements for Deck Details view.</comment>
   </data>
   <data name="Deck_WildcardsNeeded" xml:space="preserve">
-    <value>Wildcards Needed</value>
+    <value>Нужны подстановочные знаки</value>
     <comment>Wildcards Needed header for Deck Details view.</comment>
   </data>
   <data name="Deck_WinLoss" xml:space="preserve">
-    <value>Win/Loss Record</value>
+    <value>Запись выигрыша / проигрыша</value>
     <comment>Win/Loss Record header for Deck Details view.</comment>
   </data>
   <data name="Item_ArenaStandard" xml:space="preserve">
@@ -238,19 +254,19 @@
     <comment>Top Decks string for the Meta Report.</comment>
   </data>
   <data name="Rarity_Common" xml:space="preserve">
-    <value>Common</value>
+    <value>обыкновенный</value>
     <comment>Common card rarity.</comment>
   </data>
   <data name="Rarity_Mythic" xml:space="preserve">
-    <value>Mythic Rare</value>
+    <value>Мифический редкий</value>
     <comment>Mythic Rare card rarity.</comment>
   </data>
   <data name="Rarity_Rare" xml:space="preserve">
-    <value>Rare</value>
+    <value>редкий</value>
     <comment>Rare card rarity.</comment>
   </data>
   <data name="Rarity_Uncommon" xml:space="preserve">
-    <value>Uncommon</value>
+    <value>недюжинный</value>
     <comment>Uncommon card rarity.</comment>
   </data>
   <data name="Tab_MetaReport" xml:space="preserve">
