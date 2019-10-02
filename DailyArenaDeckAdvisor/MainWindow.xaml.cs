@@ -666,7 +666,7 @@ namespace DailyArena.DeckAdvisor
 									int count = int.Parse(lineInfo[1]);
 									Card card = cardsById[id];
 									Set set = card.Set;
-									if (RotationProof.NotValue || card.RotationSafe)
+									if ((RotationProof.NotValue || card.RotationSafe) && (card.StandardLegal || Format == Properties.Resources.Item_Historic_Bo1 || Format == Properties.Resources.Item_Historic_Bo3))
 									{
 										string name = card.Name;
 										if (card.Rarity == CardRarity.BasicLand && !_basicLands.ContainsKey(_basicLandColors[card.Name]))
