@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <root>
-  <!-- 
+	<!-- 
     Microsoft ResX Schema 
     
     Version 2.0
@@ -59,259 +59,259 @@
             : using a System.ComponentModel.TypeConverter
             : and then encoded with base64 encoding.
     -->
-  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
-    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
-    <xsd:element name="root" msdata:IsDataSet="true">
-      <xsd:complexType>
-        <xsd:choice maxOccurs="unbounded">
-          <xsd:element name="metadata">
-            <xsd:complexType>
-              <xsd:sequence>
-                <xsd:element name="value" type="xsd:string" minOccurs="0" />
-              </xsd:sequence>
-              <xsd:attribute name="name" use="required" type="xsd:string" />
-              <xsd:attribute name="type" type="xsd:string" />
-              <xsd:attribute name="mimetype" type="xsd:string" />
-              <xsd:attribute ref="xml:space" />
-            </xsd:complexType>
-          </xsd:element>
-          <xsd:element name="assembly">
-            <xsd:complexType>
-              <xsd:attribute name="alias" type="xsd:string" />
-              <xsd:attribute name="name" type="xsd:string" />
-            </xsd:complexType>
-          </xsd:element>
-          <xsd:element name="data">
-            <xsd:complexType>
-              <xsd:sequence>
-                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
-                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
-              </xsd:sequence>
-              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
-              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
-              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
-              <xsd:attribute ref="xml:space" />
-            </xsd:complexType>
-          </xsd:element>
-          <xsd:element name="resheader">
-            <xsd:complexType>
-              <xsd:sequence>
-                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
-              </xsd:sequence>
-              <xsd:attribute name="name" type="xsd:string" use="required" />
-            </xsd:complexType>
-          </xsd:element>
-        </xsd:choice>
-      </xsd:complexType>
-    </xsd:element>
-  </xsd:schema>
-  <resheader name="resmimetype">
-    <value>text/microsoft-resx</value>
-  </resheader>
-  <resheader name="version">
-    <value>2.0</value>
-  </resheader>
-  <resheader name="reader">
-    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </resheader>
-  <resheader name="writer">
-    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </resheader>
-  <data name="Archetype_Loss" xml:space="preserve">
-    <value>потеря</value>
+	<xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+		<xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+		<xsd:element name="root" msdata:IsDataSet="true">
+			<xsd:complexType>
+				<xsd:choice maxOccurs="unbounded">
+					<xsd:element name="metadata">
+						<xsd:complexType>
+							<xsd:sequence>
+								<xsd:element name="value" type="xsd:string" minOccurs="0" />
+							</xsd:sequence>
+							<xsd:attribute name="name" use="required" type="xsd:string" />
+							<xsd:attribute name="type" type="xsd:string" />
+							<xsd:attribute name="mimetype" type="xsd:string" />
+							<xsd:attribute ref="xml:space" />
+						</xsd:complexType>
+					</xsd:element>
+					<xsd:element name="assembly">
+						<xsd:complexType>
+							<xsd:attribute name="alias" type="xsd:string" />
+							<xsd:attribute name="name" type="xsd:string" />
+						</xsd:complexType>
+					</xsd:element>
+					<xsd:element name="data">
+						<xsd:complexType>
+							<xsd:sequence>
+								<xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+								<xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+							</xsd:sequence>
+							<xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+							<xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+							<xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+							<xsd:attribute ref="xml:space" />
+						</xsd:complexType>
+					</xsd:element>
+					<xsd:element name="resheader">
+						<xsd:complexType>
+							<xsd:sequence>
+								<xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+							</xsd:sequence>
+							<xsd:attribute name="name" type="xsd:string" use="required" />
+						</xsd:complexType>
+					</xsd:element>
+				</xsd:choice>
+			</xsd:complexType>
+		</xsd:element>
+	</xsd:schema>
+	<resheader name="resmimetype">
+		<value>text/microsoft-resx</value>
+	</resheader>
+	<resheader name="version">
+		<value>2.0</value>
+	</resheader>
+	<resheader name="reader">
+		<value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+	</resheader>
+	<resheader name="writer">
+		<value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+	</resheader>
+	<data name="Archetype_Loss" xml:space="preserve">
+    <value>Поражений</value>
     <comment>Loss string for Archetype.</comment>
   </data>
-  <data name="Archetype_Total" xml:space="preserve">
-    <value>итог</value>
+	<data name="Archetype_Total" xml:space="preserve">
+    <value>Всего</value>
     <comment>Total string for Archetype.</comment>
   </data>
-  <data name="Archetype_Win" xml:space="preserve">
-    <value>Уин</value>
+	<data name="Archetype_Win" xml:space="preserve">
+    <value>Побед</value>
     <comment>Win string for Archetype.</comment>
   </data>
-  <data name="Button_Close" xml:space="preserve">
-    <value>закрывать</value>
+	<data name="Button_Close" xml:space="preserve">
+    <value>Закрыть</value>
     <comment>String for the Close button on the settings dialog.</comment>
   </data>
-  <data name="Button_Code" xml:space="preserve">
-    <value>Код</value>
+	<data name="Button_Code" xml:space="preserve">
+    <value>Код ПО</value>
     <comment>String for the Code button on the settings dialog.</comment>
   </data>
-  <data name="Button_Export" xml:space="preserve">
-    <value>Экспортная колода</value>
+	<data name="Button_Export" xml:space="preserve">
+    <value>Экспортировать колоду</value>
     <comment>Export Deck button for Deck Details view.</comment>
   </data>
-  <data name="Button_ExportReplacements" xml:space="preserve">
-    <value>Экспорт с заменами</value>
+	<data name="Button_ExportReplacements" xml:space="preserve">
+    <value>Экспортировать с заменами</value>
     <comment>Export w/Replacements button for Deck Details view.</comment>
   </data>
-  <data name="Button_Issues" xml:space="preserve">
-    <value>вопросы</value>
+	<data name="Button_Issues" xml:space="preserve">
+    <value>Вопросы</value>
     <comment>String for the Issues button on the settings dialog.</comment>
   </data>
-  <data name="Button_RotationAgnostic" xml:space="preserve">
-    <value>Вращение Агностик</value>
+	<data name="Button_RotationAgnostic" xml:space="preserve">
+    <value>Без учета ротации</value>
     <comment>The string for the Rotation Agnostic button.</comment>
   </data>
-  <data name="Button_RotationProof" xml:space="preserve">
-    <value>Доказательство вращения</value>
+	<data name="Button_RotationProof" xml:space="preserve">
+    <value>Защита от ротации</value>
     <comment>The string for the Rotation Proof button.</comment>
   </data>
-  <data name="Deck_AlternateConfigurations" xml:space="preserve">
-    <value>Альтернативные конфигурации</value>
+	<data name="Deck_AlternateConfigurations" xml:space="preserve">
+    <value>Альтернативные варианты</value>
     <comment>Alternate Configurations header for Deck Details view.</comment>
   </data>
-  <data name="Deck_BackToMain" xml:space="preserve">
-    <value>Вернуться на главную палубу</value>
+	<data name="Deck_BackToMain" xml:space="preserve">
+    <value>Вернуться к основной колоде</value>
     <comment>Back to Main deck string for deck details view.</comment>
   </data>
-  <data name="Deck_Commander" xml:space="preserve">
-    <value>командующий</value>
+	<data name="Deck_Commander" xml:space="preserve">
+    <value>Командир</value>
     <comment>Commander header for Deck Details view.</comment>
   </data>
-  <data name="Deck_ExpectedCost" xml:space="preserve">
+	<data name="Deck_ExpectedCost" xml:space="preserve">
     <value>Ожидаемая стоимость бустера</value>
     <comment>Expected Booster Cost header for Deck Details view.</comment>
   </data>
-  <data name="Deck_MainDeck" xml:space="preserve">
-    <value>Главная палуба</value>
+	<data name="Deck_MainDeck" xml:space="preserve">
+    <value>Основная колода</value>
     <comment>Main Deck header for Deck Details view.</comment>
   </data>
-  <data name="Deck_NextBooster" xml:space="preserve">
-    <value>Следующий бустер установлен на покупку</value>
+	<data name="Deck_NextBooster" xml:space="preserve">
+    <value>Рекомендован к покупке бустер из выпускы</value>
     <comment>Next Booster Set header for Deck Details view.</comment>
   </data>
-  <data name="Deck_Sideboard" xml:space="preserve">
-    <value>сервант</value>
+	<data name="Deck_Sideboard" xml:space="preserve">
+    <value>Дополнительная колода</value>
     <comment>Sideboard header for Deck Details view.</comment>
   </data>
-  <data name="Deck_SuggestedReplacements" xml:space="preserve">
+	<data name="Deck_SuggestedReplacements" xml:space="preserve">
     <value>Предлагаемые замены</value>
     <comment>Suggested Replacements for Deck Details view.</comment>
   </data>
-  <data name="Deck_WildcardsNeeded" xml:space="preserve">
-    <value>Нужны подстановочные знаки</value>
+	<data name="Deck_WildcardsNeeded" xml:space="preserve">
+    <value>Необходимо Джокеров</value>
     <comment>Wildcards Needed header for Deck Details view.</comment>
   </data>
-  <data name="Deck_WinLoss" xml:space="preserve">
-    <value>Запись выигрыша / проигрыша</value>
+	<data name="Deck_WinLoss" xml:space="preserve">
+    <value>Статистика побед/поражений</value>
     <comment>Win/Loss Record header for Deck Details view.</comment>
   </data>
-  <data name="Item_ArenaStandard" xml:space="preserve">
+	<data name="Item_ArenaStandard" xml:space="preserve">
     <value>Арена Стандарт</value>
     <comment>The string for Arena Standard in the Format ComboBox.</comment>
   </data>
-  <data name="Item_Brawl" xml:space="preserve">
-    <value>скандалить</value>
+	<data name="Item_Brawl" xml:space="preserve">
+    <value>Бравл</value>
     <comment>The string for Brawl in the Format ComboBox.</comment>
   </data>
-  <data name="Item_Historic_Bo1" xml:space="preserve">
+	<data name="Item_Historic_Bo1" xml:space="preserve">
     <value>Исторический (Bo1)</value>
     <comment>The string for Historic (Bo1) in the Format ComboBox.</comment>
   </data>
-  <data name="Item_Historic_Bo3" xml:space="preserve">
+	<data name="Item_Historic_Bo3" xml:space="preserve">
     <value>Исторический (Bo3)</value>
     <comment>The string for Historic (Bo3) in the Format ComboBox.</comment>
   </data>
-  <data name="Item_Standard" xml:space="preserve">
-    <value>стандарт</value>
+	<data name="Item_Standard" xml:space="preserve">
+    <value>Стандарт</value>
     <comment>The string for Standard in the Format ComboBox.</comment>
   </data>
-  <data name="Label_FontSize" xml:space="preserve">
+	<data name="Label_FontSize" xml:space="preserve">
     <value>Размер шрифта:</value>
     <comment>Font size label for the settings dialog.</comment>
   </data>
-  <data name="Label_Format" xml:space="preserve">
+	<data name="Label_Format" xml:space="preserve">
     <value>Формат:</value>
     <comment>The string for the Format label.</comment>
   </data>
-  <data name="Loading_ComputingDeckSuggestions" xml:space="preserve">
-    <value>Компьютерная колода предложений ...</value>
+	<data name="Loading_ComputingDeckSuggestions" xml:space="preserve">
+    <value>Обновляем список колод...</value>
     <comment>The "computing deck suggestions" string for the loading screen.</comment>
   </data>
-  <data name="Loading_LoadingCardDatabase" xml:space="preserve">
-    <value>Загрузка базы данных карт ...</value>
+	<data name="Loading_LoadingCardDatabase" xml:space="preserve">
+    <value>Вспоминаем все карты...</value>
     <comment>The "loading card database" string for the loading screen.</comment>
   </data>
-  <data name="Loading_LoadingDeckArchetypes" xml:space="preserve">
-    <value>Загрузка колоды архетипов ...</value>
+	<data name="Loading_LoadingDeckArchetypes" xml:space="preserve">
+    <value>Разбираем колоды по архетипам...</value>
     <comment>The "loading deck archetypes" string for the loading screen.</comment>
   </data>
-  <data name="Loading_ProcessingCollectionFromLog" xml:space="preserve">
-    <value>Обработка коллекции из журнала ...</value>
+	<data name="Loading_ProcessingCollectionFromLog" xml:space="preserve">
+    <value>Смотрим карты в вашей коллекции...</value>
     <comment>The "processing collection from log" string for the loading screen.</comment>
   </data>
-  <data name="Meta_NextBooster" xml:space="preserve">
-    <value>Следующий бустер установлен на покупку</value>
+	<data name="Meta_NextBooster" xml:space="preserve">
+    <value>Рекомендован к покупке бустер из выпускы</value>
     <comment>Next Booster string for the Meta Report.</comment>
   </data>
-  <data name="Meta_TopCards" xml:space="preserve">
-    <value>Лучшие карты для сбора / крафт</value>
+	<data name="Meta_TopCards" xml:space="preserve">
+    <value>Лучшие карты для сбора/создания</value>
     <comment>Top Cards string for the Meta Report.</comment>
   </data>
-  <data name="Meta_TopDecks" xml:space="preserve">
-    <value>Лучшие колоды для Мета</value>
+	<data name="Meta_TopDecks" xml:space="preserve">
+    <value>Лучшие колоды для создания в текущей мете</value>
     <comment>Top Decks string for the Meta Report.</comment>
   </data>
-  <data name="Rarity_Common" xml:space="preserve">
-    <value>обыкновенный</value>
+	<data name="Rarity_Common" xml:space="preserve">
+    <value>Обычные</value>
     <comment>Common card rarity.</comment>
   </data>
-  <data name="Rarity_Mythic" xml:space="preserve">
-    <value>Мифический редкий</value>
+	<data name="Rarity_Mythic" xml:space="preserve">
+    <value>Раритетные</value>
     <comment>Mythic Rare card rarity.</comment>
   </data>
-  <data name="Rarity_Rare" xml:space="preserve">
-    <value>редкий</value>
+	<data name="Rarity_Rare" xml:space="preserve">
+    <value>Редкие</value>
     <comment>Rare card rarity.</comment>
   </data>
-  <data name="Rarity_Uncommon" xml:space="preserve">
-    <value>недюжинный</value>
+	<data name="Rarity_Uncommon" xml:space="preserve">
+    <value>Необычные</value>
     <comment>Uncommon card rarity.</comment>
   </data>
-  <data name="Tab_MetaReport" xml:space="preserve">
-    <value>Мета-отчет</value>
+	<data name="Tab_MetaReport" xml:space="preserve">
+    <value>Текущая мета</value>
     <comment>String for the Meta Report tab.</comment>
   </data>
-  <data name="Tooltip_Code" xml:space="preserve">
+	<data name="Tooltip_Code" xml:space="preserve">
     <value>Посмотреть код на Github</value>
     <comment>String for Code tooltip on the settings dialog.</comment>
   </data>
-  <data name="Tooltip_HardRefresh" xml:space="preserve">
-    <value>Обновите инвентарь игрока и проверьте сервер на наличие изменений, затем пересчитайте</value>
+	<data name="Tooltip_HardRefresh" xml:space="preserve">
+    <value>Обновить данные о коллекции карт, проверить наличие обновлений и перезапустить</value>
     <comment>The string for the Hard Refresh tooltip.</comment>
   </data>
-  <data name="Tooltip_Issues" xml:space="preserve">
+	<data name="Tooltip_Issues" xml:space="preserve">
     <value>Просмотр вопросов на Github</value>
     <comment>String for the Issues tooltip on the settings dialog.</comment>
   </data>
-  <data name="Tooltip_MTGAZone" xml:space="preserve">
-    <value>Посещение MTG Arena Zone</value>
+	<data name="Tooltip_MTGAZone" xml:space="preserve">
+    <value>Посетить MTG Arena Zone</value>
     <comment>String for the MTGAZone tooltip on the settings dialog.</comment>
   </data>
-  <data name="Tooltip_Patreon" xml:space="preserve">
-    <value>Посетите страницу Daily Arena Patreon</value>
+	<data name="Tooltip_Patreon" xml:space="preserve">
+    <value>Посетить страницу Daily Arena на Patreon</value>
     <comment>String for the Patreon tooltip on the settings dialog.</comment>
   </data>
-  <data name="Tooltip_Refresh" xml:space="preserve">
-    <value>Обновить инвентарь игрока, затем пересчитать</value>
+	<data name="Tooltip_Refresh" xml:space="preserve">
+    <value>Обновить данные о коллекции карт и перезапустить</value>
     <comment>The string for the Refresh tooltip.</comment>
   </data>
-  <data name="Tooltip_RotationAgnostic" xml:space="preserve">
-    <value>В настоящее время отображаются все карты, независимо от ожидаемого вращения.
-Нажмите, чтобы переключиться на «Доказательство вращения»</value>
+	<data name="Tooltip_RotationAgnostic" xml:space="preserve">
+    <value>Сейчас учитываются все карты, независимо от предстоящей ротации.
+Нажмите, чтобы переключиться в режим «Защита от ротации»</value>
     <comment>The string for the Rotation Agnostic tooltip.</comment>
   </data>
-  <data name="Tooltip_RotationProof" xml:space="preserve">
-    <value>Игнорирование карточек в коллекции, которые скоро будут чередоваться, и их замена
-Нажмите, чтобы переключиться на «Вращение Агностик»</value>
+	<data name="Tooltip_RotationProof" xml:space="preserve">
+    <value>Игнорируются карты в коллекции, которые скоро отротируются, вместо них предлагаются замены.
+Нажмите, чтобы переключиться в режим «Без учета ротации»</value>
     <comment>The string for the Rotation Proof tooltip.</comment>
   </data>
-  <data name="Tooltip_Settings" xml:space="preserve">
-    <value>настройки</value>
+	<data name="Tooltip_Settings" xml:space="preserve">
+    <value>Настройки</value>
     <comment>The string for the Settings tooltip.</comment>
   </data>
-  <data name="Tooltip_Wiki" xml:space="preserve">
+	<data name="Tooltip_Wiki" xml:space="preserve">
     <value>Посмотреть Wiki на Github</value>
     <comment>String for the Wiki tooltip on the settings dialog.</comment>
   </data>
