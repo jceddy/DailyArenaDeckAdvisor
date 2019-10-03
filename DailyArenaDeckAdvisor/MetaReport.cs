@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Threading;
 
 namespace DailyArena.DeckAdvisor
 {
@@ -79,12 +80,27 @@ namespace DailyArena.DeckAdvisor
 		public List<MetaReportEntry> ReportEntries { get; private set; }
 
 		/// <summary>
+		/// A dictionary containing set name translations for various languages.
+		/// </summary>
+		private Dictionary<string, Dictionary<string, string>> _setNameTranslations;
+
+		/// <summary>
+		/// The name of the next suggested set to purchase a booster for, for building toward the meta.
+		/// </summary>
+		private string _nextBoosterSetToPurchase;
+
+		/// <summary>
 		/// Gets the name of the next suggested set to purchase a booster for, for building toward the meta.
 		/// </summary>
 		public string NextBoosterSetToPurchase
 		{
 			get
 			{
+				if(_nextBoosterSetToPurchase != null)
+				{
+					return _nextBoosterSetToPurchase;
+				}
+
 				var orderedSets = ReportEntries.SelectMany(x =>
 						_cardsByName[x.Name].Select(y => new
 						{
@@ -99,7 +115,18 @@ namespace DailyArena.DeckAdvisor
 
 				if (orderedSets.Count() > 0)
 				{
-					return orderedSets.First().SetName;
+					string setName = orderedSets.First().SetName;
+					string currentCulture = Thread.CurrentThread.CurrentUICulture.TwoLetterISOLanguageName;
+					if(_setNameTranslations.ContainsKey(setName) && _setNameTranslations[setName].ContainsKey(currentCulture))
+					{
+						_nextBoosterSetToPurchase = _setNameTranslations[setName][currentCulture];
+						return _nextBoosterSetToPurchase;
+					}
+					else
+					{
+						_nextBoosterSetToPurchase = setName;
+						return _nextBoosterSetToPurchase;
+					}
 				}
 
 				return string.Empty;
@@ -135,8 +162,9 @@ namespace DailyArena.DeckAdvisor
 		/// <param name="playerInventoryCounts">A dictionary containing card counts from the player's inventory, keyed by card name.</param>
 		/// <param name="archetypes">A list of deck archetypes for the format being computed.</param>
 		/// <param name="rotationProof">A boolean determining whether the user has the "Rotation" toggle turned on.</param>
+		/// <param name="setNameTranslations">A dictionary containing set name translations for various languages.</param>
 		public MetaReport(ReadOnlyDictionary<string, List<Card>> cardsByName, Dictionary<Card, CardStats> cardStats, ReadOnlyDictionary<int, Card> cardsById,
-			Dictionary<string, int> playerInventoryCounts, List<Archetype> archetypes, bool rotationProof)
+			Dictionary<string, int> playerInventoryCounts, List<Archetype> archetypes, bool rotationProof, Dictionary<string, Dictionary<string, string>> setNameTranslations)
 		{
 			_cardsByName = cardsByName;
 			_cardStats = cardStats;
@@ -162,6 +190,8 @@ namespace DailyArena.DeckAdvisor
 						Sum(y => _allReportEntries.Where(z => z.Name == cardsById[y.Key].Name).FirstOrDefault().Dominance * y.Value)
 				}).OrderByDescending(x => x.Dominance).Select(x => x.Archetype).Take(10)
 			);
+
+			_setNameTranslations = setNameTranslations;
 		}
 	}
 }

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Windows;
 
 namespace DailyArena.DeckAdvisor
@@ -259,8 +260,9 @@ namespace DailyArena.DeckAdvisor
 		/// <param name="isBrawl">Whether the selected format is Brawl.</param>
 		/// <param name="similarDecks">List of alternate deck configurations for this archetype.</param>
 		/// <param name="isPlayerDeck">Boolean indicating whether this is a deck that was imported from the player inventory.</param>
+		/// <param name="setNameTranslations">A dictionary containing set name translations for various languages.</param>
 		public Archetype(string name, Dictionary<string, int> mainDeck, Dictionary<string, int> sideboard, bool rotationProof, int win = -1, int loss = -1, bool isBrawl = false,
-			List<Archetype> similarDecks = null, bool isPlayerDeck = false)
+			List<Archetype> similarDecks = null, bool isPlayerDeck = false, Dictionary<string, Dictionary<string, string>> setNameTranslations = null)
 		{
 			Name = name;
 			MainDeck = new ReadOnlyDictionary<string, int>(mainDeck);
@@ -309,6 +311,7 @@ namespace DailyArena.DeckAdvisor
 			}
 
 			IsPlayerDeck = isPlayerDeck;
+			_setNameTranslations = setNameTranslations;
 		}
 
 		/// <summary>
@@ -762,6 +765,11 @@ namespace DailyArena.DeckAdvisor
 		}
 
 		/// <summary>
+		/// A dictionary containing set name translations for various languages.
+		/// </summary>
+		private Dictionary<string, Dictionary<string, string>> _setNameTranslations;
+
+		/// <summary>
 		/// The name of the next suggested set to purchase a booster from to complete the deck.
 		/// </summary>
 		private string _nextBoosterSetToPurchase = null;
@@ -791,6 +799,12 @@ namespace DailyArena.DeckAdvisor
 					else
 					{
 						_nextBoosterSetToPurchase = string.Empty;
+					}
+
+					string currentCulture = Thread.CurrentThread.CurrentUICulture.TwoLetterISOLanguageName;
+					if (_setNameTranslations.ContainsKey(_nextBoosterSetToPurchase) && _setNameTranslations[_nextBoosterSetToPurchase].ContainsKey(currentCulture))
+					{
+						_nextBoosterSetToPurchase = _setNameTranslations[_nextBoosterSetToPurchase][currentCulture];
 					}
 				}
 				return _nextBoosterSetToPurchase;

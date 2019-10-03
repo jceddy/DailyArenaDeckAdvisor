@@ -52,6 +52,11 @@ namespace DailyArena.DeckAdvisor
 		Dictionary<string, CardColors> _colorsByLand = new Dictionary<string, CardColors>();
 
 		/// <summary>
+		/// Dictionary that stores set name translations for other languages.
+		/// </summary>
+		Dictionary<string, Dictionary<string, string>> _setNameTranslations = new Dictionary<string, Dictionary<string, string>>();
+
+		/// <summary>
 		/// Dictionary containing counts of wildcards the player owns, keyed by rarity.
 		/// </summary>
 		Dictionary<CardRarity, int> _wildcardsOwned = new Dictionary<CardRarity, int>();
@@ -297,6 +302,92 @@ namespace DailyArena.DeckAdvisor
 				catch (WebException) { /* if we didn't find the file, ignore it */ }
 			}
 			_logger.Debug("PopulateColorsByLand() Finished");
+		}
+
+		/// <summary>
+		/// Loads a dictionary of set name translations, using the local cached if it's up to date, otherwise refreshing the local cache from the server.
+		/// </summary>
+		/// <returns>The updated cache timestamp in a sortable string format.</returns>
+		private string LoadSetTranslations()
+		{
+			_logger.Debug("LoadSetTranslations() Called");
+			string cacheTimestamp = "1970-01-01T00:00:00Z";
+
+			if (File.Exists("set_name_translations.json"))
+			{
+				string json = File.ReadAllText("set_name_translations.json");
+				dynamic data = JsonConvert.DeserializeObject(json);
+
+				try
+				{
+					_setNameTranslations = data.Translations.ToObject<Dictionary<string, Dictionary<string, string>>>();
+
+					// set cache timestamp after loading colors object to force a re-download if an exception happens
+					cacheTimestamp = data.LastUpdate;
+				}
+				catch (Exception e)
+				{
+					_logger.Error(e, "Exception in LoadSetTranslations() - need to re-download");
+				}
+			}
+
+			_logger.Debug("LoadSetTranslations() Finished - cacheTimestamp={0)", cacheTimestamp);
+			return cacheTimestamp;
+		}
+
+		/// <summary>
+		/// Save the set name translation dictionary to the local cache file.
+		/// </summary>
+		/// <param name="lastUpdate">The latest timestamp for the set name translation file that was pulled from the server.</param>
+		public void SaveSetTranslations(string lastUpdate)
+		{
+			_logger.Debug("SaveSetTranslations() Called - lastUpdate={0}", lastUpdate);
+			var data = new
+			{
+				LastUpdate = lastUpdate,
+				Translations = _setNameTranslations
+			};
+
+			string json = JsonConvert.SerializeObject(data);
+			File.WriteAllText("set_name_translations.json", json);
+			_logger.Debug("SaveSetTranslations() Finished");
+		}
+
+		/// <summary>
+		/// Populate the _setNameTranslations dictionary.
+		/// </summary>
+		private void PopulateSetTranslations()
+		{
+			_logger.Debug("PopulateSetTranslations() Called");
+			string serverUpdateTime = CardDatabase.GetServerTimestamp("SetTranslations");
+			string cacheTimestamp = LoadSetTranslations();
+
+			if (string.Compare(serverUpdateTime, cacheTimestamp) > 0)
+			{
+				var setTranslationsUrl = $"https://clans.dailyarena.net/set_name_translations.json?_c={Guid.NewGuid()}";
+				var setTranslationsRequest = WebRequest.Create(setTranslationsUrl);
+				setTranslationsRequest.Method = "GET";
+
+				try
+				{
+					using (var setTranslationsResponse = setTranslationsRequest.GetResponse())
+					{
+						_setNameTranslations.Clear();
+
+						using (Stream setTranslationsResponseStream = setTranslationsResponse.GetResponseStream())
+						using (StreamReader setTranslationsResponseReader = new StreamReader(setTranslationsResponseStream))
+						{
+							var result = setTranslationsResponseReader.ReadToEnd();
+							dynamic json = JToken.Parse(result.ToString());
+							_setNameTranslations = json.ToObject<Dictionary<string, Dictionary<string, string>>>();
+						}
+					}
+
+					SaveSetTranslations(serverUpdateTime);
+				}
+				catch (WebException) { /* if we didn't find the file, ignore it */ }
+			}
+			_logger.Debug("PopulateSetTranslations() Finished");
 		}
 
 		/// <summary>
@@ -603,13 +694,15 @@ namespace DailyArena.DeckAdvisor
 
 							similarSideboard.Add(cardName, cardQuantity);
 						}
-						Archetype similarArchetype = new Archetype(name, similarMainDeck, similarSideboard, RotationProof.Value, win, loss, Format.Value == Properties.Resources.Item_Brawl, null);
+						Archetype similarArchetype = new Archetype(name, similarMainDeck, similarSideboard, RotationProof.Value, win, loss,
+							Format.Value == Properties.Resources.Item_Brawl, null, setNameTranslations: _setNameTranslations);
 						CardStats.UpdateDeckAssociations(similarArchetype);
 						similarDecks.Add(similarArchetype);
 					}
 				}
 
-				Archetype newArchetype = new Archetype(name, mainDeck, sideboard, RotationProof.Value, win, loss, Format.Value == Properties.Resources.Item_Brawl, similarDecks);
+				Archetype newArchetype = new Archetype(name, mainDeck, sideboard, RotationProof.Value, win, loss, Format.Value == Properties.Resources.Item_Brawl, similarDecks,
+					setNameTranslations: _setNameTranslations);
 				CardStats.UpdateDeckAssociations(newArchetype);
 				_archetypes.Add(newArchetype);
 			}
@@ -862,7 +955,8 @@ namespace DailyArena.DeckAdvisor
 										}
 									}
 
-									_playerDecks.Add(id, new Archetype(name, mainDeckByName, sideboardByName, RotationProof.Value, isBrawl: Format == Properties.Resources.Item_Brawl, isPlayerDeck: true));
+									_playerDecks.Add(id, new Archetype(name, mainDeckByName, sideboardByName, RotationProof.Value, 
+										isBrawl: Format == Properties.Resources.Item_Brawl, isPlayerDeck: true, setNameTranslations: _setNameTranslations));
 								}
 							}
 
@@ -990,7 +1084,8 @@ namespace DailyArena.DeckAdvisor
 									}
 								}
 
-								_playerDecks.Add(id, new Archetype(name, mainDeckByName, sideboardByName, RotationProof.Value, isBrawl: Format == Properties.Resources.Item_Brawl, isPlayerDeck: true));
+								_playerDecks.Add(id, new Archetype(name, mainDeckByName, sideboardByName, RotationProof.Value, isBrawl: Format == Properties.Resources.Item_Brawl,
+									isPlayerDeck: true, setNameTranslations: _setNameTranslations));
 							}
 
 							if (!(line.Contains("jsonrpc") || line.Contains("params")))
@@ -2122,7 +2217,7 @@ namespace DailyArena.DeckAdvisor
 			{
 				_orderedArchetypes = _archetypes.OrderBy(x => x.IsPlayerDeck ? 0 : 1).ThenBy(x => x.BoosterCostAfterWC).ThenBy(x => x.BoosterCost);
 			}
-			MetaReport report = new MetaReport(cardsByName, _cardStats, cardsById, _playerInventoryCounts, _archetypes, RotationProof.Value);
+			MetaReport report = new MetaReport(cardsByName, _cardStats, cardsById, _playerInventoryCounts, _archetypes, RotationProof.Value, _setNameTranslations);
 
 			LoadingValue.Value = 90;
 
@@ -2195,9 +2290,12 @@ namespace DailyArena.DeckAdvisor
 			Task loadTask = new Task(() => {
 				_logger.Debug("Initializing Card Database");
 				CardDatabase.Initialize(false);
-				LoadingValue.Value = 25;
+				LoadingValue.Value = 20;
 
 				PopulateColorsByLand();
+				LoadingValue.Value = 35;
+
+				PopulateSetTranslations();
 				LoadingValue.Value = 50;
 
 				ReloadAndCrunchAllData();
@@ -2473,7 +2571,10 @@ namespace DailyArena.DeckAdvisor
 			Task loadTask = new Task(() => {
 				_logger.Debug("Initializing Card Database");
 				CardDatabase.Initialize(false);
-				LoadingValue.Value = 25;
+				LoadingValue.Value = 20;
+
+				PopulateColorsByLand();
+				LoadingValue.Value = 35;
 
 				PopulateColorsByLand();
 				LoadingValue.Value = 50;
