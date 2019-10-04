@@ -16,6 +16,8 @@
 		<?define DailyArenaDeckAdvisorUpdaterExeSourcePath = "$(var.ProjectDir)..\DailyArenaDeckAdvisorUpdater\x64\Release\DailyArenaDeckAdvisorUpdater.exe" ?>
 		<?define DailyArenaDeckAdvisorConfigSourcePath = "$(var.ProjectDir)..\DailyArenaDeckAdvisor\x64\Release\DailyArenaDeckAdvisor.exe.config" ?>
 		<?define DailyArenaCommonDllSourcePath = "$(var.ProjectDir)..\DailyArenaDeckAdvisor\x64\Release\DailyArena.Common.dll" ?>
+		<?define DailyArenaEnResourceDllPath = "$(var.ProjectDir)..\DailyArenaDeckAdvisor\x64\Release\en\DailyArenaDeckAdvisor.resources.dll" ?>
+		<?define DailyArenaRuResourceDllPath = "$(var.ProjectDir)..\DailyArenaDeckAdvisor\x64\Release\ru-RU\DailyArenaDeckAdvisor.resources.dll" ?>
 	<?else ?>
 		<?define Win64 = "no" ?>
 		<?define PlatformProgramFilesFolder = "ProgramFilesFolder" ?>
@@ -28,6 +30,8 @@
 		<?define DailyArenaDeckAdvisorUpdaterExeSourcePath = "$(var.ProjectDir)..\DailyArenaDeckAdvisorUpdater\x86\Release\DailyArenaDeckAdvisorUpdater.exe" ?>
 		<?define DailyArenaDeckAdvisorConfigSourcePath = "$(var.ProjectDir)..\DailyArenaDeckAdvisor\x86\Release\DailyArenaDeckAdvisor.exe.config" ?>
 		<?define DailyArenaCommonDllSourcePath = "$(var.ProjectDir)..\DailyArenaDeckAdvisor\x86\Release\DailyArena.Common.dll" ?>
+		<?define DailyArenaEnResourceDllPath = "$(var.ProjectDir)..\DailyArenaDeckAdvisor\x86\Release\en\DailyArenaDeckAdvisor.resources.dll" ?>
+		<?define DailyArenaRuResourceDllPath = "$(var.ProjectDir)..\DailyArenaDeckAdvisor\x86\Release\ru-RU\DailyArenaDeckAdvisor.resources.dll" ?>
 	<?endif ?>
 
 	<Product Id="*" Name="!(loc.ApplicationName)" Language="!(loc.Language)" Version="$(var.VersionNumber)" Manufacturer="!(loc.ManufacturerFullName)" UpgradeCode="$(var.UpgradeCode)">
@@ -130,6 +134,18 @@
 						<Component Id="DailyArena.Common.dll_comp" Guid="6f52a1fc-e8f4-4396-ac4d-4479cf383087" Win64="$(var.Win64)">
 							<File Source="$(var.DailyArenaCommonDllSourcePath)" Id="DailyArenaCommonDll" KeyPath="yes" />
 						</Component>
+						
+						<!-- language resource files that go in subfolders -->
+						<Directory Id="enResourceFolder" Name="en">
+							<Component Id="en_DailyArenaDeckAdvisor.resource.dll_comp" Guid="d16f81d1-15e8-4b8a-9244-139a27b27f16" Win64="$(var.Win64)">
+								<File Source="$(var.DailyArenaEnResourceDllPath)" Id="DailyArenaEnResourceDll" KeyPath="yes" />
+							</Component>
+						</Directory>
+						<Directory Id="ruResourceFolder" Name="ru-RU">
+							<Component Id="ru_RU_DailyArenaDeckAdvisor.resource.dll_comp" Guid="40cf52c8-7f77-4fe4-b0be-1e7175ff9d68" Win64="$(var.Win64)">
+								<File Source="$(var.DailyArenaRuResourceDllPath)" Id="DailyArenaRuResourceDll" KeyPath="yes" />
+							</Component>
+						</Directory>
 					</Directory>
 				</Directory>
 			</Directory>
@@ -160,6 +176,8 @@
 				<ComponentRef Id="DailyArenaDeckAdvisorUpdater.exe_comp" />
 				<ComponentRef Id="DailyArenaDeckAdvisor.exe.config_comp" />
 				<ComponentRef Id="DailyArena.Common.dll_comp" />
+				<ComponentRef Id="en_DailyArenaDeckAdvisor.resource.dll_comp" />
+				<ComponentRef Id="ru_RU_DailyArenaDeckAdvisor.resource.dll_comp" />
 
 				<!-- Registry entries -->
 				<ComponentRef Id="RegValInstallLocation_comp" />
