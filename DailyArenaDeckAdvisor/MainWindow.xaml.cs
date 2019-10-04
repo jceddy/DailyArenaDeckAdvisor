@@ -954,6 +954,46 @@ namespace DailyArena.DeckAdvisor
 											continue;
 										}
 									}
+									else if (Format != Properties.Resources.Item_Historic_Bo1 && Format != Properties.Resources.Item_Historic_Bo3)
+									{
+										// check whether there are any cards in the deck that aren't in standard...if so, ignore this deck
+										_logger.Debug(@"Doing Standard legality check...");
+										bool ignoreDeck = false;
+										foreach (var card in mainDeckByName)
+										{
+											string cardName = card.Key;
+											_logger.Debug("Checking main deck card: {cardName}", cardName);
+
+											if (cardsByName[cardName].Count(x => x.Set.StandardLegal) == 0)
+											{
+												_logger.Debug("{cardName} is not standard legal, ignore this deck", cardName);
+												ignoreDeck = true;
+												break;
+											}
+										}
+
+										if (!ignoreDeck)
+										{
+											foreach (var card in sideboardByName)
+											{
+												string cardName = card.Key;
+
+												_logger.Debug("Checking sideboard card: {cardName}", cardName);
+
+												if (cardsByName[cardName].Count(x => x.Set.StandardLegal) == 0)
+												{
+													_logger.Debug("{cardName} is not standard legal, ignore this deck", cardName);
+													ignoreDeck = true;
+													break;
+												}
+											}
+										}
+
+										if (ignoreDeck)
+										{
+											continue;
+										}
+									}
 
 									_playerDecks.Add(id, new Archetype(name, mainDeckByName, sideboardByName, RotationProof.Value, 
 										isBrawl: Format == Properties.Resources.Item_Brawl, isPlayerDeck: true, setNameTranslations: _setNameTranslations));
@@ -1072,6 +1112,46 @@ namespace DailyArena.DeckAdvisor
 											if (cardsByName[cardName].Count(x => x.Set.RotationSafe) == 0)
 											{
 												_logger.Debug("{cardName} is rotating soon, ignore this deck", cardName);
+												ignoreDeck = true;
+												break;
+											}
+										}
+									}
+
+									if (ignoreDeck)
+									{
+										continue;
+									}
+								}
+								else if (Format != Properties.Resources.Item_Historic_Bo1 && Format != Properties.Resources.Item_Historic_Bo3)
+								{
+									// check whether there are any cards in the deck that aren't in standard...if so, ignore this deck
+									_logger.Debug(@"Doing Standard legality check...");
+									bool ignoreDeck = false;
+									foreach (var card in mainDeckByName)
+									{
+										string cardName = card.Key;
+										_logger.Debug("Checking main deck card: {cardName}", cardName);
+
+										if (cardsByName[cardName].Count(x => x.Set.StandardLegal) == 0)
+										{
+											_logger.Debug("{cardName} is not standard legal, ignore this deck", cardName);
+											ignoreDeck = true;
+											break;
+										}
+									}
+
+									if (!ignoreDeck)
+									{
+										foreach (var card in sideboardByName)
+										{
+											string cardName = card.Key;
+
+											_logger.Debug("Checking sideboard card: {cardName}", cardName);
+
+											if (cardsByName[cardName].Count(x => x.Set.StandardLegal) == 0)
+											{
+												_logger.Debug("{cardName} is not standard legal, ignore this deck", cardName);
 												ignoreDeck = true;
 												break;
 											}
