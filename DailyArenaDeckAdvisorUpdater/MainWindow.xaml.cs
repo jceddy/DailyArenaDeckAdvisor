@@ -75,7 +75,14 @@ namespace DailyArenaDeckAdvisorUpdater
 							var entries = archive.Entries.Where(x => x.Name != "DailyArenaDeckAdvisorUpdater.exe");
 							foreach (var entry in entries)
 							{
-								entry.ExtractToFile(entry.Name, true);
+								if (entry.FullName.EndsWith("/"))
+								{
+									Directory.CreateDirectory(entry.FullName);
+								}
+								else
+								{
+									entry.ExtractToFile(entry.FullName, true);
+								}
 							}
 						}
 					}
