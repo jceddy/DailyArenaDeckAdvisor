@@ -635,7 +635,14 @@ namespace DailyArena.DeckAdvisor
 						}
 						stats.TotalCopies += cardQuantity;
 					}
-					sideboard.Add(cardName, cardQuantity);
+					if (sideboard.ContainsKey(cardName))
+					{
+						sideboard[cardName] += cardQuantity;
+					}
+					else
+					{
+						sideboard.Add(cardName, cardQuantity);
+					}
 				}
 				var combinedCounts = mainDeck.Concat(sideboard).GroupBy(x => x.Key).Select(x => new { Name = x.Key, Count = x.Sum(y => y.Value) });
 				foreach (var cardCount in combinedCounts)
