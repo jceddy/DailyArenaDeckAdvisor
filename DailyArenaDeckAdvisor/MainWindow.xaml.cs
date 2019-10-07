@@ -570,6 +570,60 @@ namespace DailyArena.DeckAdvisor
 						continue;
 					}
 				}
+				else if (Format != Properties.Resources.Item_Historic_Bo1 && Format != Properties.Resources.Item_Historic_Bo3)
+				{
+					// check whether there are any cards in the deck that aren't in standard...if so, ignore this deck
+					_logger.Debug(@"Doing Standard legality check...");
+					bool ignoreDeck = false;
+					foreach (dynamic card in archetype["deck_list"])
+					{
+						string cardName = (string)card["name"];
+						_logger.Debug("Checking main deck card: {cardName}", cardName);
+
+						try
+						{
+							if (cardsByName[cardName].Count(x => x.Set.StandardLegal) == 0)
+							{
+								_logger.Debug("{cardName} is not standard legal, ignore this deck", cardName);
+								ignoreDeck = true;
+								break;
+							}
+						}
+						catch (KeyNotFoundException e)
+						{
+							Log.Error(e, "Card not found: {cardName}", cardName);
+							cardName = Regex.Split(cardName, " // ")[0];
+							if (cardsByName[cardName].Count(x => x.Set.StandardLegal) == 0)
+							{
+								_logger.Debug("{cardName} is not standard legal, ignore this deck", cardName);
+								ignoreDeck = true;
+								break;
+							}
+						}
+					}
+
+					if (!ignoreDeck)
+					{
+						foreach (dynamic card in archetype["sideboard"])
+						{
+							string cardName = (string)card["name"];
+
+							_logger.Debug("Checking sideboard card: {cardName}", cardName);
+
+							if (cardsByName[cardName].Count(x => x.Set.StandardLegal) == 0)
+							{
+								_logger.Debug("{cardName} is not standard legal, ignore this deck", cardName);
+								ignoreDeck = true;
+								break;
+							}
+						}
+					}
+
+					if (ignoreDeck)
+					{
+						continue;
+					}
+				}
 				foreach (dynamic card in archetype["deck_list"])
 				{
 					string cardName = (string)card["name"];
