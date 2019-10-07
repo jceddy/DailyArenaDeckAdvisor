@@ -901,7 +901,6 @@ namespace DailyArena.DeckAdvisor
 						}
 						else if (line.Contains("Deck.GetDeckListsV3"))
 						{
-							//_playerDecks.Clear();
 							StringBuilder deckListJson = new StringBuilder();
 							line = reader.ReadLine();
 							while (line != "]")
