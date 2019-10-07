@@ -901,7 +901,7 @@ namespace DailyArena.DeckAdvisor
 						}
 						else if (line.Contains("Deck.GetDeckListsV3"))
 						{
-							_playerDecks.Clear();
+							//_playerDecks.Clear();
 							StringBuilder deckListJson = new StringBuilder();
 							line = reader.ReadLine();
 							while (line != "]")
@@ -924,6 +924,10 @@ namespace DailyArena.DeckAdvisor
 									int[] mainDeck = deck["mainDeck"].ToObject<int[]>();
 									int[] sideboard = deck["sideboard"].ToObject<int[]>();
 									Guid id = Guid.Parse((string)deck["id"]);
+									if (_playerDecks.ContainsKey(id))
+									{
+										_playerDecks.Remove(id);
+									}
 									Dictionary<string, int> mainDeckByName = new Dictionary<string, int>();
 									Dictionary<string, int> sideboardByName = new Dictionary<string, int>();
 
@@ -1232,6 +1236,29 @@ namespace DailyArena.DeckAdvisor
 							if (!(line.Contains("jsonrpc") || line.Contains("params")))
 							{
 								LoadingValue.Value = Math.Max(LoadingValue.Value, 80);
+							}
+						}
+						else if (line.Contains("Deck.DeleteDeck"))
+						{
+							StringBuilder deckListJson = new StringBuilder();
+							line = reader.ReadLine();
+							if(line != "{")
+							{
+								break;
+							}
+							while (line != "}")
+							{
+								deckListJson.AppendLine(line);
+								line = reader.ReadLine();
+							}
+
+							deckListJson.AppendLine(line);
+							dynamic deck = JToken.Parse(deckListJson.ToString());
+
+							Guid id = Guid.Parse((string)deck["params"]["deckId"]);
+							if (_playerDecks.ContainsKey(id))
+							{
+								_playerDecks.Remove(id);
 							}
 						}
 					}
