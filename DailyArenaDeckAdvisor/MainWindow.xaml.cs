@@ -1,5 +1,6 @@
 ﻿using DailyArena.Common.Bindable;
 using DailyArena.Common.Database;
+using DailyArena.Common.Utility;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Serilog;
@@ -174,30 +175,19 @@ namespace DailyArena.DeckAdvisor
 		/// </summary>
 		private void SendUsageStats()
 		{
-			using (WebClient wc = new WebClient())
+			AssemblyName assemblyName = Assembly.GetExecutingAssembly().GetName();
+			string assemblyVersion = assemblyName.Version.ToString();
+			string assemblyArchitecture = assemblyName.ProcessorArchitecture.ToString();
+
+			NameValueCollection inputs = new NameValueCollection
 			{
-				try
-				{
-					AssemblyName assemblyName = Assembly.GetExecutingAssembly().GetName();
-					string assemblyVersion = assemblyName.Version.ToString();
-					string assemblyArchitecture = assemblyName.ProcessorArchitecture.ToString();
-
-					NameValueCollection inputs = new NameValueCollection
-					{
-						{ "application", "DailyArenaDeckAdvisor" },
-						{ "fingerprint", ((App)Application.Current).State.Fingerprint.ToString() },
-						{ "version", assemblyVersion },
-						{ "architecture", assemblyArchitecture }
-					};
-
-					string response = Encoding.UTF8.GetString(wc.UploadValues("https://clans.dailyarena.net/usage_stats.php", "POST", inputs));
-					_logger.Debug("Usage Statistics Response: {response}", response);
-				}
-				catch (WebException e)
-				{
-					_logger.Error(e, "Exception in SendUsageStats(), ignoring");
-				}
-			}
+				{ "application", "DailyArenaDeckAdvisor" },
+				{ "fingerprint", ((App)Application.Current).State.Fingerprint.ToString() },
+				{ "version", assemblyVersion },
+				{ "architecture", assemblyArchitecture }
+			};
+			string response = WebUtilities.UploadValues("https://clans.dailyarena.net/usage_stats.php", inputs);
+			_logger.Debug("Usage Statistics Response: {response}", response);
 		}
 
 		/// <summary>
@@ -272,34 +262,19 @@ namespace DailyArena.DeckAdvisor
 			if (string.Compare(serverUpdateTime, cacheTimestamp) > 0)
 			{
 				var landsUrl = $"https://clans.dailyarena.net/standard_lands.json?_c={Guid.NewGuid()}";
-				var landsRequest = WebRequest.Create(landsUrl);
-				landsRequest.Method = "GET";
+				var result = WebUtilities.FetchStringFromUrl(landsUrl);
 
-				try
+				dynamic json = JToken.Parse(result.ToString());
+				foreach (dynamic lands in json)
 				{
-					using (var landsResponse = landsRequest.GetResponse())
+					string landName = (string)lands["Name"];
+					if (!_colorsByLand.ContainsKey(landName))
 					{
-						_colorsByLand.Clear();
-
-						using (Stream landsResponseStream = landsResponse.GetResponseStream())
-						using (StreamReader landsResponseReader = new StreamReader(landsResponseStream))
-						{
-							var result = landsResponseReader.ReadToEnd();
-							dynamic json = JToken.Parse(result.ToString());
-							foreach (dynamic lands in json)
-							{
-								string landName = (string)lands["Name"];
-								if (!_colorsByLand.ContainsKey(landName))
-								{
-									_colorsByLand.Add((string)lands["Name"], CardColors.CardColorFromString((string)lands["Colors"]));
-								}
-							}
-						}
+						_colorsByLand.Add((string)lands["Name"], CardColors.CardColorFromString((string)lands["Colors"]));
 					}
-
-					SaveStandardLands(serverUpdateTime);
 				}
-				catch (WebException) { /* if we didn't find the file, ignore it */ }
+
+				SaveStandardLands(serverUpdateTime);
 			}
 			_logger.Debug("PopulateColorsByLand() Finished");
 		}
@@ -365,27 +340,12 @@ namespace DailyArena.DeckAdvisor
 			if (string.Compare(serverUpdateTime, cacheTimestamp) > 0)
 			{
 				var setTranslationsUrl = $"https://clans.dailyarena.net/set_name_translations.json?_c={Guid.NewGuid()}";
-				var setTranslationsRequest = WebRequest.Create(setTranslationsUrl);
-				setTranslationsRequest.Method = "GET";
+				var result = WebUtilities.FetchStringFromUrl(setTranslationsUrl);
 
-				try
-				{
-					using (var setTranslationsResponse = setTranslationsRequest.GetResponse())
-					{
-						_setNameTranslations.Clear();
+				dynamic json = JToken.Parse(result.ToString());
+				_setNameTranslations = json.ToObject<Dictionary<string, Dictionary<string, string>>>();
 
-						using (Stream setTranslationsResponseStream = setTranslationsResponse.GetResponseStream())
-						using (StreamReader setTranslationsResponseReader = new StreamReader(setTranslationsResponseStream))
-						{
-							var result = setTranslationsResponseReader.ReadToEnd();
-							dynamic json = JToken.Parse(result.ToString());
-							_setNameTranslations = json.ToObject<Dictionary<string, Dictionary<string, string>>>();
-						}
-					}
-
-					SaveSetTranslations(serverUpdateTime);
-				}
-				catch (WebException) { /* if we didn't find the file, ignore it */ }
+				SaveSetTranslations(serverUpdateTime);
 			}
 			_logger.Debug("PopulateSetTranslations() Finished");
 		}
@@ -473,36 +433,20 @@ namespace DailyArena.DeckAdvisor
 			{
 				_logger.Debug("Loading deck data from server");
 				var archetypesUrl = $"https://clans.dailyarena.net/{mappedFormat.Item1}_decks.json?_c={Guid.NewGuid()}";
-				var archetypesRequest = WebRequest.Create(archetypesUrl);
-				archetypesRequest.Method = "GET";
+				var result = WebUtilities.FetchStringFromUrl(archetypesUrl);
 
-				try
+				using (StringReader resultStringReader = new StringReader(result))
+				using (JsonTextReader resultJsonReader = new JsonTextReader(resultStringReader) { DateParseHandling = DateParseHandling.None })
 				{
-					using (var archetypesResponse = archetypesRequest.GetResponse())
-					{
-						using (Stream archetypesResponseStream = archetypesResponse.GetResponseStream())
-						using (StreamReader archetypesResponseReader = new StreamReader(archetypesResponseStream))
+					decksJson = JToken.ReadFrom(resultJsonReader);
+					_logger.Debug("Writing file {mappedFormat}_decks.json", mappedFormat.Item1);
+					File.WriteAllText($"{mappedFormat.Item1}_decks.json", JsonConvert.SerializeObject(
+						new
 						{
-							var result = archetypesResponseReader.ReadToEnd();
-							using (StringReader resultStringReader = new StringReader(result))
-							using (JsonTextReader resultJsonReader = new JsonTextReader(resultStringReader) { DateParseHandling = DateParseHandling.None })
-							{
-								decksJson = JToken.ReadFrom(resultJsonReader);
-								_logger.Debug("Writing file {mappedFormat}_decks.json", mappedFormat.Item1);
-								File.WriteAllText($"{mappedFormat.Item1}_decks.json", JsonConvert.SerializeObject(
-									new
-									{
-										Timestamp = serverTimestamp,
-										Decks = decksJson
-									}
-								));
-							}
+							Timestamp = serverTimestamp,
+							Decks = decksJson
 						}
-					}
-				}
-				catch (WebException e)
-				{
-					_logger.Error(e, "Web Exception while downloading decks file for {mappedFormat}", mappedFormat.Item1);
+					));
 				}
 			}
 
@@ -1459,7 +1403,9 @@ namespace DailyArena.DeckAdvisor
 							_logger.Debug("Insufficient Candidates Found, suggesting basic land replacements");
 							Random r = new Random();
 							// randomizing colors here so we don't always favor colors in WUBRG order
-							string[] colors = _colorsByLand[cardToReplace.Name].ColorString.Select(x => new { Sort = r.Next(), Value = x.ToString() }).
+							string[] colors = (_colorsByLand[cardToReplace.Name] == null ?
+								new string[] { "W", "U", "B", "R", "G" }.Select(x => new { Sort = r.Next(), Value = x }) :
+								_colorsByLand[cardToReplace.Name].ColorString.Select(x => new { Sort = r.Next(), Value = x.ToString() })).
 								OrderBy(y => y.Sort).Select(z => z.Value).ToArray();
 							Dictionary<string, int> _colorReplacements = new Dictionary<string, int>();
 							if (colors.Length > 0)
@@ -2591,7 +2537,7 @@ namespace DailyArena.DeckAdvisor
 				_logger.Debug("Deck Export Clicked, Deck={0}", item.Name);
 
 				Clipboard.SetText(item.ExportList);
-				MessageBox.Show($"{item.Name} Export Successful", "Export");
+				MessageBox.Show($"{item.Name} {Properties.Resources.Message_ExportSuccessful}", "Export");
 			}
 			catch(Exception ex)
 			{
@@ -2618,7 +2564,7 @@ namespace DailyArena.DeckAdvisor
 				_logger.Debug("Deck Export Suggested Clicked, Deck={0}", item.Name);
 
 				Clipboard.SetText(item.ExportListSuggested);
-				MessageBox.Show($"{item.Name} Export (with Replacements) Successful", "Export");
+				MessageBox.Show($"{item.Name} {Properties.Resources.Message_ExportReplacementsSuccessful}", "Export");
 			}
 			catch (Exception ex)
 			{

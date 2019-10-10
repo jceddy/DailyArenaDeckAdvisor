@@ -340,6 +340,24 @@ namespace DailyArena.DeckAdvisor.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Export (with Replacements) Successful.
+        /// </summary>
+        public static string Message_ExportReplacementsSuccessful {
+            get {
+                return ResourceManager.GetString("Message_ExportReplacementsSuccessful", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Export Successful.
+        /// </summary>
+        public static string Message_ExportSuccessful {
+            get {
+                return ResourceManager.GetString("Message_ExportSuccessful", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Next Booster Set to Purchase.
         /// </summary>
         public static string Meta_NextBooster {

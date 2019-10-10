@@ -101,7 +101,7 @@
 									<StackPanel Orientation="Horizontal">
 										<TextBlock Text="{Binding Quantity}" Width="15" TextAlignment="Right" />
 										<TextBlock Text="x " />
-										<TextBlock x:Name="CardName" FontWeight="Bold" Text="{Binding Card.Name}" Foreground="Green" FontStyle="Italic" ToolTipService.ShowDuration="600000">
+										<TextBlock x:Name="CardName" FontWeight="Bold" Text="{Binding Card.PrintedName}" Foreground="Green" FontStyle="Italic" ToolTipService.ShowDuration="600000">
 											<TextBlock.ToolTip>
 												<ToolTip Background="Transparent" BorderThickness="0">
 													<Grid MaxHeight="340" MaxWidth="488">
@@ -159,7 +159,7 @@
 									<StackPanel Orientation="Horizontal">
 										<TextBlock Text="{Binding Quantity}" Width="15" TextAlignment="Right" />
 										<TextBlock Text="x " />
-										<TextBlock x:Name="CardName" FontWeight="Bold" Text="{Binding Card.Name}" Foreground="Green" FontStyle="Italic" ToolTipService.ShowDuration="600000">
+										<TextBlock x:Name="CardName" FontWeight="Bold" Text="{Binding Card.PrintedName}" Foreground="Green" FontStyle="Italic" ToolTipService.ShowDuration="600000">
 											<TextBlock.ToolTip>
 												<ToolTip Background="Transparent" BorderThickness="0">
 													<Grid MaxHeight="340" MaxWidth="488">
@@ -381,7 +381,7 @@
 								<StackPanel Orientation="Horizontal">
 									<TextBlock Text="{Binding TotalCopiesNeeded}" Width="15" TextAlignment="Right" />
 									<TextBlock Text="x " />
-									<TextBlock FontWeight="Bold" Text="{Binding Name}" ToolTipService.ShowDuration="600000">
+									<TextBlock FontWeight="Bold" Text="{Binding Card.PrintedName}" ToolTipService.ShowDuration="600000">
 										<TextBlock.ToolTip>
 											<ToolTip Background="Transparent" BorderThickness="0">
 												<Grid MaxHeight="340" MaxWidth="488">

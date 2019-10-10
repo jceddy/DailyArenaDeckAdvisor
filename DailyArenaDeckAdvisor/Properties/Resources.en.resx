@@ -241,6 +241,14 @@
     <value>Processing collection from log...</value>
     <comment>The "processing collection from log" string for the loading screen.</comment>
   </data>
+  <data name="Message_ExportReplacementsSuccessful" xml:space="preserve">
+    <value>Export (with Replacements) Successful</value>
+    <comment>String for Export (with Replacements) Successful message.</comment>
+  </data>
+  <data name="Message_ExportSuccessful" xml:space="preserve">
+    <value>Export Successful</value>
+    <comment>String for Export Successful message.</comment>
+  </data>
   <data name="Meta_NextBooster" xml:space="preserve">
     <value>Next Booster Set to Purchase</value>
     <comment>Next Booster string for the Meta Report.</comment>

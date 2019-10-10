@@ -577,7 +577,7 @@ namespace DailyArena.DeckAdvisor
 					ReadOnlyDictionary<int, Card> cardsById = Card.CardsById;
 					_suggestedReplacementsView = _suggestedReplacements.
 						Select(x => new Tuple<string, string, int, Card, Card>(
-							cardsById[x.Item1].Name, cardsById[x.Item2].Name, x.Item3, cardsById[x.Item1], cardsById[x.Item2])
+							cardsById[x.Item1].PrintedName, cardsById[x.Item2].PrintedName, x.Item3, cardsById[x.Item1], cardsById[x.Item2])
 						).ToList().AsReadOnly();
 				}
 				return _suggestedReplacementsView;
@@ -789,6 +789,7 @@ namespace DailyArena.DeckAdvisor
 						Where(x => x.Card.RotationSafe || !RotationProof).
 						Select(x => new { SetName = x.Card.Set.Name, BoosterCost = x.Card.BoosterCost * x.Quantity }).
 						GroupBy(x => x.SetName).
+						Where(x => x.Key != "Arena").
 						Select(x => new { SetName = x.Key, BoosterCost = x.Sum(y => y.BoosterCost) }).
 						OrderByDescending(x => x.BoosterCost);
 
