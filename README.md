@@ -15,6 +15,20 @@ https://github.com/jceddy/DailyArenaDeckAdvisor/wiki/Getting-Started:-Developing
 Libraries used by this project:  
 https://github.com/jceddy/DailyArenaCommon
 
+# Release 1.0.4.0 Changes
+- More Support for Localization
+- Minor and Under-the-Hood Changes
+  - Fixed a bug that can cause a crash when generating replacement suggestions for decks missing a lot of colorless lands.
+  - Increased timeouts for various web operations, and added retries (some users are having issues due to network problems).
+
+# Release 1.0.3.8/1.0.3.9 Changes
+- Historic Format
+- Support for Localization
+- Minor and Under-the-Hood Changes
+  - Added code to keep Historic decks in the player’s inventory from showing up in the “unfinished decks” list in Standard formats.
+  - Added code to ignore non-Standard Legal cards in the player’s collection unless a Historic format is selected.
+  - Fixed a bug with Adventure cards.
+
 # Release 1.0.3.5 Changes
 - Suggestions for Imported Decks
 - Additional Default Deck Ordering Tweak for Arena Standard
