@@ -145,6 +145,10 @@
     <value>Экспортировать с заменами</value>
     <comment>Export w/Replacements button for Deck Details view.</comment>
   </data>
+  <data name="Button_Filters" xml:space="preserve">
+    <value>фильтры</value>
+    <comment>The string for the Filters button.</comment>
+  </data>
   <data name="Button_Issues" xml:space="preserve">
     <value>Вопросы</value>
     <comment>String for the Issues button on the settings dialog.</comment>
@@ -318,6 +322,10 @@
   <data name="Tooltip_Settings" xml:space="preserve">
     <value>Настройки</value>
     <comment>The string for the Settings tooltip.</comment>
+  </data>
+  <data name="Tooltip_ShowFilters" xml:space="preserve">
+    <value>Показать диалоги фильтров</value>
+    <comment>The string for the Fillters tooltip.</comment>
   </data>
   <data name="Tooltip_Wiki" xml:space="preserve">
     <value>Посмотреть Wiki на Github</value>

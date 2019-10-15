@@ -474,6 +474,11 @@
 						<ComboBoxItem Content="{x:Static p:Resources.Item_Historic_Bo1}" />
 						<ComboBoxItem Content="{x:Static p:Resources.Item_Historic_Bo3}" />
 					</ComboBox>
+
+					<!--
+					<Button x:Name="ShowFilters" Content="{x:Static p:Resources.Button_Filters}" ToolTip="{x:Static p:Resources.Tooltip_ShowFilters}" Margin="3" Padding="3" Click="ShowFilters_Click" />
+					-->
+					
 					<ToggleButton HorizontalAlignment="Center" Margin="3" Padding="3" FontWeight="Bold" IsChecked="{Binding RotationProof.Value, Mode=TwoWay}">
 						<ToggleButton.Style>
 							<Style TargetType="{x:Type ToggleButton}">

@@ -536,7 +536,7 @@ namespace DailyArena.DeckAdvisor
 						catch (KeyNotFoundException e)
 						{
 							Log.Error(e, "Card not found: {cardName}", cardName);
-							cardName = Regex.Split(cardName, " // ")[0];
+							cardName = Regex.Split(cardName, " // ")[0].Trim();
 							if (cardsByName[cardName].Count(x => x.Set.StandardLegal) == 0)
 							{
 								_logger.Debug("{cardName} is not standard legal, ignore this deck", cardName);
@@ -570,7 +570,7 @@ namespace DailyArena.DeckAdvisor
 				}
 				foreach (dynamic card in archetype["deck_list"])
 				{
-					string cardName = (string)card["name"];
+					string cardName = ((string)card["name"]).Trim();
 					int cardQuantity = (int)card["quantity"];
 
 					_logger.Debug("Processing main deck card: {cardName}, {cardQuantity}", cardName, cardQuantity);
@@ -591,7 +591,7 @@ namespace DailyArena.DeckAdvisor
 						_logger.Error(e, "Card name not found in cardsByName: {cardName}", cardName);
 						if (cardName.Contains("//"))
 						{
-							cardName = Regex.Split(cardName, " // ")[0];
+							cardName = Regex.Split(cardName, " // ")[0].Trim();
 							foreach (Card archetypeCard in cardsByName[cardName])
 							{
 								CardStats stats = _cardStats[archetypeCard];
@@ -1768,7 +1768,9 @@ namespace DailyArena.DeckAdvisor
 									_logger.Debug("Insufficient Candidates Found, suggesting basic land replacements");
 									Random r = new Random();
 									// randomizing colors here so we don't always favor colors in WUBRG order
-									string[] colors = _colorsByLand[cardToReplace.Name].ColorString.Select(x => new { Sort = r.Next(), Value = x.ToString() }).
+									string[] colors = (_colorsByLand[cardToReplace.Name] == null ?
+										new string[] { "W", "U", "B", "R", "G" }.Select(x => new { Sort = r.Next(), Value = x }) :
+										_colorsByLand[cardToReplace.Name].ColorString.Select(x => new { Sort = r.Next(), Value = x.ToString() })).
 										OrderBy(y => y.Sort).Select(z => z.Value).ToArray();
 									Dictionary<string, int> _colorReplacements = new Dictionary<string, int>();
 									if (colors.Length > 0)
@@ -2136,7 +2138,9 @@ namespace DailyArena.DeckAdvisor
 							_logger.Debug("Insufficient Candidates Found, suggesting basic land replacements");
 							Random r = new Random();
 							// randomizing colors here so we don't always favor colors in WUBRG order
-							string[] colors = _colorsByLand[cardToReplace.Name].ColorString.Select(x => new { Sort = r.Next(), Value = x.ToString() }).
+							string[] colors = (_colorsByLand[cardToReplace.Name] == null ?
+								new string[] { "W", "U", "B", "R", "G" }.Select(x => new { Sort = r.Next(), Value = x }) :
+								_colorsByLand[cardToReplace.Name].ColorString.Select(x => new { Sort = r.Next(), Value = x.ToString() })).
 								OrderBy(y => y.Sort).Select(z => z.Value).ToArray();
 							Dictionary<string, int> _colorReplacements = new Dictionary<string, int>();
 							if (colors.Length > 0)
@@ -2825,6 +2829,20 @@ namespace DailyArena.DeckAdvisor
 			{
 				_logger.Error(e, "Exception in SetCulture(), Using Default UI Culture");
 			}
+		}
+
+		/// <summary>
+		/// Callback that is triggered when the user clicks the filters button the GUI. Opens the filters popup.
+		/// </summary>
+		/// <param name="sender">The object that triggered the callback.</param>
+		/// <param name="e">Arguments regarding the event that triggered the callback.</param>
+		private void ShowFilters_Click(object sender, RoutedEventArgs e)
+		{
+			FiltersDialog filtersDialog = new FiltersDialog()
+			{
+				Owner = this
+			};
+			filtersDialog.ShowDialog();
 		}
 	}
 }

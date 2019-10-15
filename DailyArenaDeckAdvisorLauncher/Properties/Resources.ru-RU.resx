@@ -118,7 +118,7 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="TextBlock_CheckingForUpdates" xml:space="preserve">
-    <value>Checking for updates...</value>
+    <value>Проверка обновлений...</value>
     <comment>"Checking for updates" string.</comment>
   </data>
 </root>

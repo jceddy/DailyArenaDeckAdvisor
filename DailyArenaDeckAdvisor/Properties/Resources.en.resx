@@ -145,6 +145,10 @@
     <value>Export w/Replacements</value>
     <comment>Export w/Replacements button for Deck Details view.</comment>
   </data>
+  <data name="Button_Filters" xml:space="preserve">
+    <value>Filters</value>
+    <comment>The string for the Filters button.</comment>
+  </data>
   <data name="Button_Issues" xml:space="preserve">
     <value>Issues</value>
     <comment>String for the Issues button on the settings dialog.</comment>
@@ -318,6 +322,10 @@ Click to toggle to "Rotation Agnostic"</value>
   <data name="Tooltip_Settings" xml:space="preserve">
     <value>Settings</value>
     <comment>The string for the Settings tooltip.</comment>
+  </data>
+  <data name="Tooltip_ShowFilters" xml:space="preserve">
+    <value>Show filters dialog</value>
+    <comment>The string for the Fillters tooltip.</comment>
   </data>
   <data name="Tooltip_Wiki" xml:space="preserve">
     <value>View the Wiki on Github</value>

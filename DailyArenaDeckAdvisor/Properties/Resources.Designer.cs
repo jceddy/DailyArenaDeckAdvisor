@@ -124,6 +124,15 @@ namespace DailyArena.DeckAdvisor.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Filters.
+        /// </summary>
+        public static string Button_Filters {
+            get {
+                return ResourceManager.GetString("Button_Filters", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Issues.
         /// </summary>
         public static string Button_Issues {
@@ -509,6 +518,15 @@ namespace DailyArena.DeckAdvisor.Properties {
         public static string Tooltip_Settings {
             get {
                 return ResourceManager.GetString("Tooltip_Settings", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Show filters dialog.
+        /// </summary>
+        public static string Tooltip_ShowFilters {
+            get {
+                return ResourceManager.GetString("Tooltip_ShowFilters", resourceCulture);
             }
         }
         

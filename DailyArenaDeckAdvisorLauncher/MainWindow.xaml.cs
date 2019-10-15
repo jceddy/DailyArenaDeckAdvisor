@@ -1,7 +1,9 @@
 ﻿using Newtonsoft.Json;
 using Serilog;
 using System;
+using System.Configuration;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
@@ -33,6 +35,7 @@ namespace DailyArenaDeckAdvisorLauncher
 			_logger = application.Logger;
 			_logger.Debug("Main Window Constructor Called - {0}", "Launcher");
 
+			SetCulture();
 			InitializeComponent();
 		}
 
@@ -45,6 +48,41 @@ namespace DailyArenaDeckAdvisorLauncher
 		{
 			_logger.Debug("Window Closed, Shutting Down - {0}", "Launcher");
 			Application.Current.Shutdown();
+		}
+
+		/// <summary>
+		/// Sets the current UI culture from DailyArenaDeckAdvisor.exe.config if it's set there.
+		/// </summary>
+		private void SetCulture()
+		{
+			_logger.Debug("SetCulture() Called - {0}", "Launcher");
+
+			try
+			{
+				var appSettings = ConfigurationManager.OpenExeConfiguration("DailyArenaDeckAdvisor.exe");
+				if (appSettings == null)
+				{
+					_logger.Debug("No AppSettings Found, Using Default UI Culture");
+				}
+				else
+				{
+					var cultureSetting = appSettings.AppSettings.Settings["UICulture"];
+					if (cultureSetting != null)
+					{
+						var culture = cultureSetting.Value;
+						_logger.Debug("Setting UI Culture to {culture}", culture);
+						Thread.CurrentThread.CurrentUICulture = new CultureInfo(culture);
+					}
+					else
+					{
+						_logger.Debug("UICulture not set in AppSettings, Using Default UI Culture");
+					}
+				}
+			}
+			catch (ConfigurationErrorsException e)
+			{
+				_logger.Error(e, "Exception in SetCulture(), Using Default UI Culture");
+			}
 		}
 
 		/// <summary>
