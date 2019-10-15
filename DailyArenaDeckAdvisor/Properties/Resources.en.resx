@@ -129,6 +129,10 @@
     <value>Win</value>
     <comment>Win string for Archetype.</comment>
   </data>
+  <data name="Button_Apply" xml:space="preserve">
+    <value>Apply</value>
+    <comment>The string for the Apply button.</comment>
+  </data>
   <data name="Button_Close" xml:space="preserve">
     <value>Close</value>
     <comment>String for the Close button on the settings dialog.</comment>
@@ -221,6 +225,10 @@
     <value>Standard</value>
     <comment>The string for Standard in the Format ComboBox.</comment>
   </data>
+  <data name="Label_Cards" xml:space="preserve">
+    <value> cards</value>
+    <comment>"Cards" label for filters.</comment>
+  </data>
   <data name="Label_FontSize" xml:space="preserve">
     <value>Font Size:</value>
     <comment>Font size label for the settings dialog.</comment>
@@ -228,6 +236,26 @@
   <data name="Label_Format" xml:space="preserve">
     <value>Format:</value>
     <comment>The string for the Format label.</comment>
+  </data>
+  <data name="Label_HideFromCollection" xml:space="preserve">
+    <value>Hide decks from my collection</value>
+    <comment>Label for filter to hide decks from the user's collection on the GUI.</comment>
+  </data>
+  <data name="Label_HideIncompleteReplacements" xml:space="preserve">
+    <value>Hide decks with incomplete replacement suggestions</value>
+    <comment>Label for filter to hide decks with missing cards that the user doesn't have good replacements for.</comment>
+  </data>
+  <data name="Label_HideMissingCards" xml:space="preserve">
+    <value>Hide decks I don't have cards to complete</value>
+    <comment>Label for filter to hide decks the user is missing cards from.</comment>
+  </data>
+  <data name="Label_HideMissingWildcards" xml:space="preserve">
+    <value>Hide decks I don't have wildcards to complete</value>
+    <comment>Label for filter to hide decks the user doesn't have enough wildcards to complete.</comment>
+  </data>
+  <data name="Label_HideWithMore" xml:space="preserve">
+    <value>Hide decks with more than </value>
+    <comment>Label for first part of filter that hides decks containing more than some number of a specific wildcard rarity.</comment>
   </data>
   <data name="Loading_ComputingDeckSuggestions" xml:space="preserve">
     <value>Computing deck suggestions...</value>
@@ -244,6 +272,10 @@
   <data name="Loading_ProcessingCollectionFromLog" xml:space="preserve">
     <value>Processing collection from log...</value>
     <comment>The "processing collection from log" string for the loading screen.</comment>
+  </data>
+  <data name="Message_CloseConfirmation" xml:space="preserve">
+    <value>Filters have not been applied, close dialog?</value>
+    <comment>Confirmation message for Filters dialog close button.</comment>
   </data>
   <data name="Message_ExportReplacementsSuccessful" xml:space="preserve">
     <value>Export (with Replacements) Successful</value>
@@ -284,6 +316,10 @@
   <data name="Tab_MetaReport" xml:space="preserve">
     <value>Meta Report</value>
     <comment>String for the Meta Report tab.</comment>
+  </data>
+  <data name="Title_CloseConfirmation" xml:space="preserve">
+    <value>Close Confirmation</value>
+    <comment>Title for Filters close button confirmation.</comment>
   </data>
   <data name="Tooltip_Code" xml:space="preserve">
     <value>View the Code on Github</value>

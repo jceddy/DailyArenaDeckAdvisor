@@ -2630,13 +2630,12 @@ namespace DailyArena.DeckAdvisor
 		}
 
 		/// <summary>
-		/// Callback that is triggered when the user clicks the refresh button the GUI. (Only re-loads user log information, doesn't check for new data on server.)
+		/// Refresh the main window contents.
 		/// </summary>
-		/// <param name="sender">The object that triggered the callback.</param>
-		/// <param name="e">Arguments regarding the event that triggered the callback.</param>
-		private void Refresh_Click(object sender, RoutedEventArgs e)
+		/// <param name="hardRefresh">If true, check server for updates before refreshing.</param>
+		public void Refresh(bool hardRefresh)
 		{
-			_logger.Debug("Refresh Clicked");
+			_logger.Debug("Refresh({hardRefresh})", hardRefresh);
 
 			LoadingText.Value = Properties.Resources.Loading_LoadingCardDatabase;
 			LoadingValue.Value = 0;
@@ -2650,6 +2649,18 @@ namespace DailyArena.DeckAdvisor
 			});
 
 			Task loadTask = new Task(() => {
+				if(hardRefresh)
+				{
+					_logger.Debug("Initializing Card Database");
+					CardDatabase.Initialize(false);
+					LoadingValue.Value = 20;
+
+					PopulateColorsByLand();
+					LoadingValue.Value = 35;
+
+					PopulateColorsByLand();
+				}
+
 				LoadingValue.Value = 50;
 				ReloadAndCrunchAllData();
 			});
@@ -2657,12 +2668,23 @@ namespace DailyArena.DeckAdvisor
 				{
 					if (t.Exception != null)
 					{
-						_logger.Error(t.Exception, "Exception in {0} ({1} - {2})", "loadTask", "Refresh_Click", "Main Application");
+						_logger.Error(t.Exception, "Exception in {0} ({1} - {2})", "loadTask", "Refresh", "Main Application");
 					}
 				},
 				TaskContinuationOptions.OnlyOnFaulted
 			);
 			loadTask.Start();
+		}
+
+		/// <summary>
+		/// Callback that is triggered when the user clicks the refresh button the GUI. (Only re-loads user log information, doesn't check for new data on server.)
+		/// </summary>
+		/// <param name="sender">The object that triggered the callback.</param>
+		/// <param name="e">Arguments regarding the event that triggered the callback.</param>
+		private void Refresh_Click(object sender, RoutedEventArgs e)
+		{
+			_logger.Debug("Refresh Clicked");
+			Refresh(false);
 		}
 
 		/// <summary>
@@ -2673,41 +2695,7 @@ namespace DailyArena.DeckAdvisor
 		private void HardRefresh_Click(object sender, RoutedEventArgs e)
 		{
 			_logger.Debug("Hard Refresh Clicked");
-
-			LoadingText.Value = Properties.Resources.Loading_LoadingCardDatabase;
-			LoadingValue.Value = 0;
-
-			Dispatcher.Invoke(() =>
-			{
-				FilterPanel.Visibility = Visibility.Collapsed;
-				DeckTabs.Visibility = Visibility.Collapsed;
-				DeckTabs.ItemsSource = null;
-				LoadingScreen.Visibility = Visibility.Visible;
-			});
-
-			Task loadTask = new Task(() => {
-				_logger.Debug("Initializing Card Database");
-				CardDatabase.Initialize(false);
-				LoadingValue.Value = 20;
-
-				PopulateColorsByLand();
-				LoadingValue.Value = 35;
-
-				PopulateColorsByLand();
-				LoadingValue.Value = 50;
-
-				ReloadAndCrunchAllData();
-			});
-			loadTask.ContinueWith(t =>
-				{
-					if (t.Exception != null)
-					{
-						_logger.Error(t.Exception, "Exception in {0} ({1} - {2})", "loadTask", "HardRefresh_Click", "Main Application");
-					}
-				},
-				TaskContinuationOptions.OnlyOnFaulted
-			);
-			loadTask.Start();
+			Refresh(true);
 		}
 
 		/// <summary>

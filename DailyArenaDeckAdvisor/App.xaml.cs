@@ -102,9 +102,20 @@ namespace DailyArena.DeckAdvisor
 			{
 				string stateJson = File.ReadAllText("state.json");
 				State = JsonConvert.DeserializeObject<CachedState>(stateJson);
+
+				bool saveState = false;
 				if(State.Fingerprint == Guid.Empty)
 				{
 					State.Fingerprint = Guid.NewGuid();
+					saveState = true;
+				}
+				if(State.Filters == null)
+				{
+					State.Filters = new DeckFilters();
+					saveState = true;
+				}
+				if(saveState)
+				{
 					SaveState();
 				}
 			}

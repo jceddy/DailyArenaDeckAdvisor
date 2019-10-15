@@ -28,46 +28,54 @@
 				<ColumnDefinition Width="Auto" />
 			</Grid.ColumnDefinitions>
 
-			<TextBlock Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" FontSize="24" Margin="3" FontWeight="Bold" VerticalAlignment="Bottom" HorizontalAlignment="Center" Text="Filters" />
+			<TextBlock Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" FontSize="24" Margin="3" FontWeight="Bold" VerticalAlignment="Bottom" HorizontalAlignment="Center" Text="{x:Static p:Resources.Button_Filters}" />
 
 			<CheckBox Grid.Row="1" Grid.Column="0" Margin="3" HorizontalAlignment="Right" />
-			<TextBlock Grid.Row="1" Grid.Column="1" Margin="3" Text="Hide decks from my collection" />
+			<TextBlock Grid.Row="1" Grid.Column="1" Margin="3" Text="{x:Static p:Resources.Label_HideFromCollection}" />
 
 			<CheckBox Grid.Row="2" Grid.Column="0" Margin="3" HorizontalAlignment="Right" />
-			<TextBlock Grid.Row="2" Grid.Column="1" Margin="3" Text="Hide decks I don't have wildcards to complete" />
+			<TextBlock Grid.Row="2" Grid.Column="1" Margin="3" Text="{x:Static p:Resources.Label_HideMissingWildcards}" />
 
 			<CheckBox Grid.Row="3" Grid.Column="0" Margin="3" HorizontalAlignment="Right" />
-			<TextBlock Grid.Row="3" Grid.Column="1" Margin="3" Text="Hide decks I don't have cards to complete" />
+			<TextBlock Grid.Row="3" Grid.Column="1" Margin="3" Text="{x:Static p:Resources.Label_HideMissingCards}" />
 
 			<CheckBox Grid.Row="4" Grid.Column="0" Margin="3" HorizontalAlignment="Right" />
-			<TextBlock Grid.Row="4" Grid.Column="1" Margin="3" Text="Hide decks with incomplete replacement suggestions" />
+			<TextBlock Grid.Row="4" Grid.Column="1" Margin="3" Text="{x:Static p:Resources.Label_HideIncompleteReplacements}" />
 
 			<CheckBox Grid.Row="5" Grid.Column="0" Margin="3" HorizontalAlignment="Right" VerticalAlignment="Center" />
 			<StackPanel Grid.Row="5" Grid.Column="1" Orientation="Horizontal" Margin="3">
-				<TextBlock VerticalAlignment="Center" Text="Hide decks with more than " />
+				<TextBlock VerticalAlignment="Center" Text="{x:Static p:Resources.Label_HideWithMore}" />
 				<xctk:IntegerUpDown Value="0" Minimum="0" />
-				<TextBlock VerticalAlignment="Center" Text=" Mythic Rare cards" />
+				<TextBlock VerticalAlignment="Center" Text=" " />
+				<TextBlock VerticalAlignment="Center" FontWeight="Bold" Foreground="DarkOrange" Text="{x:Static p:Resources.Rarity_Mythic}" />
+				<TextBlock VerticalAlignment="Center" Text="{x:Static p:Resources.Label_Cards}" />
 			</StackPanel>
 
 			<CheckBox Grid.Row="6" Grid.Column="0" Margin="3" HorizontalAlignment="Right" VerticalAlignment="Center" />
 			<StackPanel Grid.Row="6" Grid.Column="1" Orientation="Horizontal" Margin="3">
-				<TextBlock VerticalAlignment="Center" Text="Hide decks with more than " />
+				<TextBlock VerticalAlignment="Center" Text="{x:Static p:Resources.Label_HideWithMore}" />
 				<xctk:IntegerUpDown Value="0" Minimum="0" />
-				<TextBlock VerticalAlignment="Center" Text=" Rare cards" />
+				<TextBlock VerticalAlignment="Center" Text=" " />
+				<TextBlock VerticalAlignment="Center" FontWeight="Bold" Foreground="DarkGoldenrod" Text="{x:Static p:Resources.Rarity_Rare}" />
+				<TextBlock VerticalAlignment="Center" Text="{x:Static p:Resources.Label_Cards}" />
 			</StackPanel>
 
 			<CheckBox Grid.Row="7" Grid.Column="0" Margin="3" HorizontalAlignment="Right" VerticalAlignment="Center" />
 			<StackPanel Grid.Row="7" Grid.Column="1" Orientation="Horizontal" Margin="3">
-				<TextBlock VerticalAlignment="Center" Text="Hide decks with more than " />
+				<TextBlock VerticalAlignment="Center" Text="{x:Static p:Resources.Label_HideWithMore}" />
 				<xctk:IntegerUpDown Value="0" Minimum="0" />
-				<TextBlock VerticalAlignment="Center" Text=" Uncommon cards" />
+				<TextBlock VerticalAlignment="Center" Text=" " />
+				<TextBlock VerticalAlignment="Center" FontWeight="Bold" Foreground="DarkGray" Text="{x:Static p:Resources.Rarity_Uncommon}" />
+				<TextBlock VerticalAlignment="Center" Text="{x:Static p:Resources.Label_Cards}" />
 			</StackPanel>
 
 			<CheckBox Grid.Row="8" Grid.Column="0" Margin="3" HorizontalAlignment="Right" VerticalAlignment="Center" />
 			<StackPanel Grid.Row="8" Grid.Column="1" Orientation="Horizontal" Margin="3">
-				<TextBlock VerticalAlignment="Center" Text="Hide decks with more than " />
+				<TextBlock VerticalAlignment="Center" Text="{x:Static p:Resources.Label_HideWithMore}" />
 				<xctk:IntegerUpDown Value="0" Minimum="0" />
-				<TextBlock VerticalAlignment="Center" Text=" Common cards" />
+				<TextBlock VerticalAlignment="Center" Text=" " />
+				<TextBlock VerticalAlignment="Center" FontWeight="Bold" Foreground="Black" Text="{x:Static p:Resources.Rarity_Common}" />
+				<TextBlock VerticalAlignment="Center" Text="{x:Static p:Resources.Label_Cards}" />
 			</StackPanel>
 
 			<Grid Grid.Row="9" Grid.Column="0" Grid.ColumnSpan="2" Margin="3" VerticalAlignment="Center">
@@ -76,7 +84,7 @@
 					<ColumnDefinition Width="*" />
 				</Grid.ColumnDefinitions>
 
-				<Button Grid.Column="0" Margin="3" Content="Apply" Click="Apply_Click" />
+				<Button Grid.Column="0" Margin="3" Content="{x:Static p:Resources.Button_Apply}" Click="Apply_Click" />
 				<Button Grid.Column="1" Margin="3" Content="{x:Static p:Resources.Button_Close}" Click="Close_Click" />
 			</Grid>
 		</Grid>

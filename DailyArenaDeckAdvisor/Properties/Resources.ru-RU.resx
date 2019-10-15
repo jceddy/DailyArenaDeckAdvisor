@@ -129,6 +129,10 @@
     <value>Побед</value>
     <comment>Win string for Archetype.</comment>
   </data>
+  <data name="Button_Apply" xml:space="preserve">
+    <value>Применять</value>
+    <comment>The string for the Apply button.</comment>
+  </data>
   <data name="Button_Close" xml:space="preserve">
     <value>Закрыть</value>
     <comment>String for the Close button on the settings dialog.</comment>
@@ -221,6 +225,10 @@
     <value>Стандарт</value>
     <comment>The string for Standard in the Format ComboBox.</comment>
   </data>
+  <data name="Label_Cards" xml:space="preserve">
+    <value> картами</value>
+    <comment>"Cards" label for filters.</comment>
+  </data>
   <data name="Label_FontSize" xml:space="preserve">
     <value>Размер шрифта:</value>
     <comment>Font size label for the settings dialog.</comment>
@@ -228,6 +236,26 @@
   <data name="Label_Format" xml:space="preserve">
     <value>Формат:</value>
     <comment>The string for the Format label.</comment>
+  </data>
+  <data name="Label_HideFromCollection" xml:space="preserve">
+    <value>Скрыть колоды из моей коллекции</value>
+    <comment>Label for filter to hide decks from the user's collection on the GUI.</comment>
+  </data>
+  <data name="Label_HideIncompleteReplacements" xml:space="preserve">
+    <value>Скрыть колоды с неполным списком возможных замен</value>
+    <comment>Label for filter to hide decks with missing cards that the user doesn't have good replacements for.</comment>
+  </data>
+  <data name="Label_HideMissingCards" xml:space="preserve">
+    <value>Скрыть колоды на которые не хватает карт</value>
+    <comment>Label for filter to hide decks the user is missing cards from.</comment>
+  </data>
+  <data name="Label_HideMissingWildcards" xml:space="preserve">
+    <value>Скрыть колоды, на которые у недостаточно Джокеров</value>
+    <comment>Label for filter to hide decks the user doesn't have enough wildcards to complete.</comment>
+  </data>
+  <data name="Label_HideWithMore" xml:space="preserve">
+    <value>Скрыть колоды с более чем </value>
+    <comment>Label for first part of filter that hides decks containing more than some number of a specific wildcard rarity.</comment>
   </data>
   <data name="Loading_ComputingDeckSuggestions" xml:space="preserve">
     <value>Обновляем список колод...</value>
@@ -244,6 +272,10 @@
   <data name="Loading_ProcessingCollectionFromLog" xml:space="preserve">
     <value>Смотрим карты в вашей коллекции...</value>
     <comment>The "processing collection from log" string for the loading screen.</comment>
+  </data>
+  <data name="Message_CloseConfirmation" xml:space="preserve">
+    <value>Фильтры не были применены, закрыть диалог?</value>
+    <comment>Confirmation message for Filters dialog close button.</comment>
   </data>
   <data name="Message_ExportReplacementsSuccessful" xml:space="preserve">
     <value>Успешно экспортировано (с заменами)</value>
@@ -285,6 +317,10 @@
     <value>Текущая мета</value>
     <comment>String for the Meta Report tab.</comment>
   </data>
+  <data name="Title_CloseConfirmation" xml:space="preserve">
+    <value>Закрыть Подтверждение</value>
+    <comment>Title for Filters close button confirmation.</comment>
+  </data>
   <data name="Tooltip_Code" xml:space="preserve">
     <value>Посмотреть код на Github</value>
     <comment>String for Code tooltip on the settings dialog.</comment>
@@ -324,7 +360,7 @@
     <comment>The string for the Settings tooltip.</comment>
   </data>
   <data name="Tooltip_ShowFilters" xml:space="preserve">
-    <value>Показать диалоги фильтров</value>
+    <value>Показать доступные фильтры</value>
     <comment>The string for the Fillters tooltip.</comment>
   </data>
   <data name="Tooltip_Wiki" xml:space="preserve">

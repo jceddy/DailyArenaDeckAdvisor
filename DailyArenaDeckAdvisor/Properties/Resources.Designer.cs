@@ -88,6 +88,15 @@ namespace DailyArena.DeckAdvisor.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Apply.
+        /// </summary>
+        public static string Button_Apply {
+            get {
+                return ResourceManager.GetString("Button_Apply", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Close.
         /// </summary>
         public static string Button_Close {
@@ -295,6 +304,15 @@ namespace DailyArena.DeckAdvisor.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to  cards.
+        /// </summary>
+        public static string Label_Cards {
+            get {
+                return ResourceManager.GetString("Label_Cards", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Font Size:.
         /// </summary>
         public static string Label_FontSize {
@@ -309,6 +327,51 @@ namespace DailyArena.DeckAdvisor.Properties {
         public static string Label_Format {
             get {
                 return ResourceManager.GetString("Label_Format", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Hide decks from my collection.
+        /// </summary>
+        public static string Label_HideFromCollection {
+            get {
+                return ResourceManager.GetString("Label_HideFromCollection", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Hide decks with incomplete replacement suggestions.
+        /// </summary>
+        public static string Label_HideIncompleteReplacements {
+            get {
+                return ResourceManager.GetString("Label_HideIncompleteReplacements", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Hide decks I don&apos;t have cards to complete.
+        /// </summary>
+        public static string Label_HideMissingCards {
+            get {
+                return ResourceManager.GetString("Label_HideMissingCards", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Hide decks I don&apos;t have wildcards to complete.
+        /// </summary>
+        public static string Label_HideMissingWildcards {
+            get {
+                return ResourceManager.GetString("Label_HideMissingWildcards", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Hide decks with more than .
+        /// </summary>
+        public static string Label_HideWithMore {
+            get {
+                return ResourceManager.GetString("Label_HideWithMore", resourceCulture);
             }
         }
         
@@ -345,6 +408,15 @@ namespace DailyArena.DeckAdvisor.Properties {
         public static string Loading_ProcessingCollectionFromLog {
             get {
                 return ResourceManager.GetString("Loading_ProcessingCollectionFromLog", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Filters have not been applied, close dialog?.
+        /// </summary>
+        public static string Message_CloseConfirmation {
+            get {
+                return ResourceManager.GetString("Message_CloseConfirmation", resourceCulture);
             }
         }
         
@@ -435,6 +507,15 @@ namespace DailyArena.DeckAdvisor.Properties {
         public static string Tab_MetaReport {
             get {
                 return ResourceManager.GetString("Tab_MetaReport", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Close Confirmation.
+        /// </summary>
+        public static string Title_CloseConfirmation {
+            get {
+                return ResourceManager.GetString("Title_CloseConfirmation", resourceCulture);
             }
         }
         

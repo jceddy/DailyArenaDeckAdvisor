@@ -1,6 +1,4 @@
-﻿using System.Collections.ObjectModel;
-using System.Diagnostics;
-using System.Windows;
+﻿using System.Windows;
 
 namespace DailyArena.DeckAdvisor
 {
@@ -10,10 +8,18 @@ namespace DailyArena.DeckAdvisor
 	public partial class FiltersDialog : Window
 	{
 		/// <summary>
+		/// The temporary filters object that belongs to this window.
+		/// </summary>
+		private DeckFilters _filters;
+
+		/// <summary>
 		/// Constructor. Initializes the component and sets the data context.
 		/// </summary>
 		public FiltersDialog()
 		{
+			App application = (App)Application.Current;
+			_filters = application.State.Filters.Clone();
+
 			InitializeComponent();
 			DataContext = this;
 		}
@@ -25,7 +31,14 @@ namespace DailyArena.DeckAdvisor
 		/// <param name="e">The routed event arguments.</param>
 		private void Apply_Click(object sender, RoutedEventArgs e)
 		{
-			/* TODO */
+			App application = (App)Application.Current;
+			if (application.State.Filters != _filters)
+			{
+				application.State.Filters.SetAllFields(_filters);
+				application.SaveState();
+				((MainWindow)Owner).Refresh(false);
+			}
+			Close();
 		}
 
 		/// <summary>
@@ -35,7 +48,20 @@ namespace DailyArena.DeckAdvisor
 		/// <param name="e">The routed event arguments.</param>
 		private void Close_Click(object sender, RoutedEventArgs e)
 		{
-			Close();
+			bool close = true;
+			App application = (App)Application.Current;
+			if (application.State.Filters != _filters)
+			{
+				MessageBoxResult messageBoxResult = MessageBox.Show(Properties.Resources.Message_CloseConfirmation, Properties.Resources.Title_CloseConfirmation, MessageBoxButton.YesNo);
+				if(messageBoxResult == MessageBoxResult.No)
+				{
+					close = false;
+				}
+			}
+			if (close)
+			{
+				Close();
+			}
 		}
 	}
 }

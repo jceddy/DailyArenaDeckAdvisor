@@ -26,5 +26,10 @@ namespace DailyArena.DeckAdvisor
 		/// Fingerprint for usage stats.
 		/// </summary>
 		public Guid Fingerprint { get; set; } = Guid.NewGuid();
+
+		/// <summary>
+		/// Deck filter values set by the user.
+		/// </summary>
+		public DeckFilters Filters { get; set; } = new DeckFilters();
 	}
 }

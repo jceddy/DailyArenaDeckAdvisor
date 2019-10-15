@@ -121,6 +121,7 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="CachedState.cs" />
+    <Compile Include="DeckFilters.cs" />
     <Compile Include="MetaReport.cs" />
     <Compile Include="ContentTemplateSelector.cs" />
     <Compile Include="Properties\Resources.ru-RU.Designer.cs">
