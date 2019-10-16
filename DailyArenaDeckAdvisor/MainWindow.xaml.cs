@@ -13,7 +13,6 @@ using System.Configuration;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Net;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -361,6 +360,9 @@ namespace DailyArena.DeckAdvisor
 		private void ReloadAndCrunchAllData()
 		{
 			_logger.Debug("ReloadAndCrunchAllData() Called");
+
+			App application = (App)Application.Current;
+			DeckFilters filters = application.State.Filters;
 
 			Dispatcher.Invoke(() => { _tabObjects.Clear(); });
 
@@ -843,7 +845,7 @@ namespace DailyArena.DeckAdvisor
 								LoadingValue.Value = Math.Max(LoadingValue.Value, 60);
 							}
 						}
-						else if (line.Contains("Deck.GetDeckListsV3"))
+						else if (line.Contains("Deck.GetDeckListsV3") && !filters.HideFromCollection)
 						{
 							StringBuilder deckListJson = new StringBuilder();
 							line = reader.ReadLine();
@@ -1013,7 +1015,7 @@ namespace DailyArena.DeckAdvisor
 								LoadingValue.Value = Math.Max(LoadingValue.Value, 20);
 							}
 						}
-						else if(line.Contains("Deck.CreateDeckV3") || line.Contains("Deck.UpdateDeckV3"))
+						else if((line.Contains("Deck.CreateDeckV3") || line.Contains("Deck.UpdateDeckV3")) && !filters.HideFromCollection)
 						{
 							StringBuilder deckListJson = new StringBuilder();
 							line = reader.ReadLine();
@@ -1181,7 +1183,7 @@ namespace DailyArena.DeckAdvisor
 								LoadingValue.Value = Math.Max(LoadingValue.Value, 80);
 							}
 						}
-						else if (line.Contains("Deck.DeleteDeck"))
+						else if (line.Contains("Deck.DeleteDeck") && !filters.HideFromCollection)
 						{
 							StringBuilder deckListJson = new StringBuilder();
 							line = reader.ReadLine();
@@ -2325,6 +2327,30 @@ namespace DailyArena.DeckAdvisor
 			LoadingValue.Value = 75;
 
 			_logger.Debug("Sorting Archetypes and generating Meta Report");
+			if(filters.HideMissingWildcards)
+			{
+				_archetypes = _archetypes.Where(x => x.TotalWildcardsNeeded == 0).ToList();
+			}
+			if(filters.HideMissingCards)
+			{
+				_archetypes = _archetypes.Where(x => x.BoosterCost == 0).ToList();
+			}
+			if(filters.HideIncompleteReplacements)
+			{
+				_archetypes = _archetypes.Where(
+					x => x.MainDeckToCollect.Sum(y => y.Value) + x.SideboardToCollect.Sum(y => y.Value) == x.SuggestedReplacements.Sum(y => y.Item3)
+				).ToList();
+			}
+			if(filters.HideMythic || filters.HideRare || filters.HideUncommon || filters.HideCommon)
+			{
+				_archetypes = _archetypes.Where(
+					x =>
+						(!filters.HideMythic || RarityCount(x.MainDeck.Concat(x.Sideboard), CardRarity.MythicRare, cardsByName) <= filters.MythicCount) &&
+						(!filters.HideRare || RarityCount(x.MainDeck.Concat(x.Sideboard), CardRarity.Rare, cardsByName) <= filters.RareCount) &&
+						(!filters.HideUncommon || RarityCount(x.MainDeck.Concat(x.Sideboard), CardRarity.Uncommon, cardsByName) <= filters.UncommonCount) &&
+						(!filters.HideCommon || RarityCount(x.MainDeck.Concat(x.Sideboard), CardRarity.Common, cardsByName) <= filters.CommonCount)
+				).ToList();
+			}
 			if (Format == Properties.Resources.Item_ArenaStandard)
 			{
 				// for Arena Standard, use slightly different ordering, favoring win rate over estimated booster cost
@@ -2361,6 +2387,20 @@ namespace DailyArena.DeckAdvisor
 			});
 
 			_logger.Debug("ReloadAndCrunchAllData() Finished");
+		}
+
+		/// <summary>
+		/// Get the number of cards from a quantified dictionary of card names of the specified rarity.
+		/// </summary>
+		/// <param name="cardQuantities">A dictionary mapping card names to quantities.</param>
+		/// <param name="rarity">The requested rarity.</param>
+		/// <param name="cardsByName">A list mapping card names to a list of card objects.</param>
+		/// <returns>The count of cards with the specified rarity.</returns>
+		private int RarityCount(IEnumerable<KeyValuePair<string, int>> cardQuantities, CardRarity rarity, ReadOnlyDictionary<string, List<Card>> cardsByName)
+		{
+			return cardQuantities
+				.Where(x => cardsByName[x.Key].Where(y => y.Rarity == rarity).Count() > 0 && cardsByName[x.Key].Where(y => y.Rarity.CompareTo(rarity) < 0).Count() == 0)
+				.Sum(z => z.Value);
 		}
 
 		/// <summary>

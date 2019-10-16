@@ -8,9 +8,9 @@ namespace DailyArena.DeckAdvisor
 	public partial class FiltersDialog : Window
 	{
 		/// <summary>
-		/// The temporary filters object that belongs to this window.
+		/// Gets or sets the temporary filters object that belongs to this window.
 		/// </summary>
-		private DeckFilters _filters;
+		public DeckFilters Filters { get; private set; }
 
 		/// <summary>
 		/// Constructor. Initializes the component and sets the data context.
@@ -18,7 +18,7 @@ namespace DailyArena.DeckAdvisor
 		public FiltersDialog()
 		{
 			App application = (App)Application.Current;
-			_filters = application.State.Filters.Clone();
+			Filters = application.State.Filters.Clone();
 
 			InitializeComponent();
 			DataContext = this;
@@ -32,9 +32,9 @@ namespace DailyArena.DeckAdvisor
 		private void Apply_Click(object sender, RoutedEventArgs e)
 		{
 			App application = (App)Application.Current;
-			if (application.State.Filters != _filters)
+			if (application.State.Filters != Filters)
 			{
-				application.State.Filters.SetAllFields(_filters);
+				application.State.Filters.SetAllFields(Filters);
 				application.SaveState();
 				((MainWindow)Owner).Refresh(false);
 			}
@@ -50,7 +50,7 @@ namespace DailyArena.DeckAdvisor
 		{
 			bool close = true;
 			App application = (App)Application.Current;
-			if (application.State.Filters != _filters)
+			if (application.State.Filters != Filters)
 			{
 				MessageBoxResult messageBoxResult = MessageBox.Show(Properties.Resources.Message_CloseConfirmation, Properties.Resources.Title_CloseConfirmation, MessageBoxButton.YesNo);
 				if(messageBoxResult == MessageBoxResult.No)
