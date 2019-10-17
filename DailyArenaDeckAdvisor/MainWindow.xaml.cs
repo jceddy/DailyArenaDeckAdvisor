@@ -1363,217 +1363,7 @@ namespace DailyArena.DeckAdvisor
 				}
 
 				_logger.Debug("Generating replacement suggestions for missing cards");
-				List<Tuple<int, int, int>> suggestedReplacements = new List<Tuple<int, int, int>>();
-				CardColors identity = null;
-				if(Format.Value == Properties.Resources.Item_Brawl)
-				{
-					identity = cardsByName[archetype.CommanderName].First().ColorIdentity;
-				}
-				var replacementsToFind = mainDeckToCollect.Concat(sideboardToCollect).GroupBy(x => x.Key).Select(x => new { Id = x.Key, Count = x.Sum(y => y.Value) });
-				foreach (var find in replacementsToFind)
-				{
-					_logger.Debug("Generating replacements suggestions for card with Arena Id: {0} (need {1})", find.Id, find.Count);
-					var cardToReplace = cardsById[find.Id];
-					var replacementsNeeded = find.Count;
-
-					if (cardToReplace.Type.Contains("Land"))
-					{
-						_logger.Debug("Processing Candidates based on Color");
-						var candidates = playerInventory.Select(x => new { Card = cardsById[x.Key], Quantity = x.Value }).
-							Where(x => x.Quantity > 0 && x.Card.Type == cardToReplace.Type && _colorsByLand[x.Card.Name] == _colorsByLand[cardToReplace.Name] && (identity == null || identity.Contains(x.Card.ColorIdentity))).
-							OrderByDescending(x => x.Card.Rank + CardStats.GetAssociationModifier(cardToReplace.Name, x.Card.Name, _cardStats));
-
-						foreach (var candidate in candidates)
-						{
-							if (replacementsNeeded == 0) { break; }
-							if (candidate.Quantity > replacementsNeeded)
-							{
-								suggestedReplacements.Add(new Tuple<int, int, int>(cardToReplace.ArenaId, candidate.Card.ArenaId, replacementsNeeded));
-								playerInventory[candidate.Card.ArenaId] -= replacementsNeeded;
-								replacementsNeeded = 0;
-							}
-							else
-							{
-								suggestedReplacements.Add(new Tuple<int, int, int>(cardToReplace.ArenaId, candidate.Card.ArenaId, candidate.Quantity));
-								playerInventory[candidate.Card.ArenaId] = 0;
-								replacementsNeeded -= candidate.Quantity;
-							}
-						}
-
-						if (replacementsNeeded > 0)
-						{
-							_logger.Debug("Insufficient Candidates Found, suggesting basic land replacements");
-							Random r = new Random();
-							// randomizing colors here so we don't always favor colors in WUBRG order
-							string[] colors = (_colorsByLand[cardToReplace.Name] == null ?
-								new string[] { "W", "U", "B", "R", "G" }.Select(x => new { Sort = r.Next(), Value = x }) :
-								_colorsByLand[cardToReplace.Name].ColorString.Select(x => new { Sort = r.Next(), Value = x.ToString() })).
-								OrderBy(y => y.Sort).Select(z => z.Value).ToArray();
-							Dictionary<string, int> _colorReplacements = new Dictionary<string, int>();
-							if (colors.Length > 0)
-							{
-								int colorIndex = 0;
-								while(replacementsNeeded > 0)
-								{
-									if(!_colorReplacements.ContainsKey(colors[colorIndex]))
-									{
-										_colorReplacements[colors[colorIndex]] = 0;
-									}
-									_colorReplacements[colors[colorIndex]]++;
-									replacementsNeeded--;
-									colorIndex = (colorIndex + 1) % colors.Length;
-								}
-								suggestedReplacements.AddRange(
-									_colorReplacements.Select(x => new Tuple<int, int, int>(cardToReplace.ArenaId, _basicLands[x.Key].ArenaId, x.Value))
-								);
-							}
-						}
-
-						if (replacementsNeeded > 0)
-						{
-							_logger.Debug("Insufficient Candidates Found, done looking");
-						}
-					}
-					else
-					{
-						_logger.Debug("Processing Candidates based on Type and Cost");
-						var candidates = playerInventory.Select(x => new { Card = cardsById[x.Key], Quantity = x.Value }).
-								Where(x => x.Quantity > 0 && x.Card.Type == cardToReplace.Type && x.Card.Cost == cardToReplace.Cost && (identity == null || identity.Contains(x.Card.ColorIdentity))).
-								OrderByDescending(x => x.Card.Rank + CardStats.GetAssociationModifier(cardToReplace.Name, x.Card.Name, _cardStats));
-
-						foreach (var candidate in candidates)
-						{
-							if (replacementsNeeded == 0) { break; }
-							if (candidate.Quantity > replacementsNeeded)
-							{
-								suggestedReplacements.Add(new Tuple<int, int, int>(cardToReplace.ArenaId, candidate.Card.ArenaId, replacementsNeeded));
-								playerInventory[candidate.Card.ArenaId] -= replacementsNeeded;
-								replacementsNeeded = 0;
-							}
-							else
-							{
-								suggestedReplacements.Add(new Tuple<int, int, int>(cardToReplace.ArenaId, candidate.Card.ArenaId, candidate.Quantity));
-								playerInventory[candidate.Card.ArenaId] = 0;
-								replacementsNeeded -= candidate.Quantity;
-							}
-						}
-
-						if (replacementsNeeded > 0)
-						{
-							_logger.Debug("Insufficient Candidates Found, Getting Candidates by Cost");
-							candidates = playerInventory.Select(x => new { Card = cardsById[x.Key], Quantity = x.Value }).
-								Where(x => x.Quantity > 0 && x.Card.Cost == cardToReplace.Cost && (identity == null || identity.Contains(x.Card.ColorIdentity))).
-								OrderByDescending(x => x.Card.Rank + CardStats.GetAssociationModifier(cardToReplace.Name, x.Card.Name, _cardStats));
-
-							foreach (var candidate in candidates)
-							{
-								if (replacementsNeeded == 0) { break; }
-								if (candidate.Quantity > replacementsNeeded)
-								{
-									suggestedReplacements.Add(new Tuple<int, int, int>(cardToReplace.ArenaId, candidate.Card.ArenaId, replacementsNeeded));
-									playerInventory[candidate.Card.ArenaId] -= replacementsNeeded;
-									replacementsNeeded = 0;
-								}
-								else
-								{
-									suggestedReplacements.Add(new Tuple<int, int, int>(cardToReplace.ArenaId, candidate.Card.ArenaId, candidate.Quantity));
-									playerInventory[candidate.Card.ArenaId] = 0;
-									replacementsNeeded -= candidate.Quantity;
-								}
-							}
-						}
-
-						if (replacementsNeeded > 0)
-						{
-							_logger.Debug("Insufficient Candidates Found, Getting Candidates by Cmc and Color");
-							candidates = playerInventory.Select(x => new { Card = cardsById[x.Key], Quantity = x.Value }).
-								Where(x => x.Quantity > 0 && x.Card.Cmc == cardToReplace.Cmc && x.Card.Colors == cardToReplace.Colors && (identity == null || identity.Contains(x.Card.ColorIdentity))).
-								OrderByDescending(x => x.Card.Rank + CardStats.GetAssociationModifier(cardToReplace.Name, x.Card.Name, _cardStats));
-
-							foreach (var candidate in candidates)
-							{
-								if (replacementsNeeded == 0) { break; }
-								if (candidate.Quantity > replacementsNeeded)
-								{
-									suggestedReplacements.Add(new Tuple<int, int, int>(cardToReplace.ArenaId, candidate.Card.ArenaId, replacementsNeeded));
-									playerInventory[candidate.Card.ArenaId] -= replacementsNeeded;
-									replacementsNeeded = 0;
-								}
-								else
-								{
-									suggestedReplacements.Add(new Tuple<int, int, int>(cardToReplace.ArenaId, candidate.Card.ArenaId, candidate.Quantity));
-									playerInventory[candidate.Card.ArenaId] = 0;
-									replacementsNeeded -= candidate.Quantity;
-								}
-							}
-						}
-
-						if (replacementsNeeded > 0)
-						{
-							_logger.Debug("Insufficient Candidates Found, Getting Candidates, looking for candidates with lower Cmc");
-							int cmcToTest = cardToReplace.Cmc - 1;
-							while (replacementsNeeded > 0 && cmcToTest > 0)
-							{
-								candidates = playerInventory.Select(x => new { Card = cardsById[x.Key], Quantity = x.Value }).
-									Where(x => x.Quantity > 0 && x.Card.Cmc == cmcToTest && x.Card.Colors == cardToReplace.Colors && (identity == null || identity.Contains(x.Card.ColorIdentity))).
-									OrderByDescending(x => x.Card.Rank + CardStats.GetAssociationModifier(cardToReplace.Name, x.Card.Name, _cardStats));
-
-								foreach (var candidate in candidates)
-								{
-									if (replacementsNeeded == 0) { break; }
-									if (candidate.Quantity > replacementsNeeded)
-									{
-										suggestedReplacements.Add(new Tuple<int, int, int>(cardToReplace.ArenaId, candidate.Card.ArenaId, replacementsNeeded));
-										playerInventory[candidate.Card.ArenaId] -= replacementsNeeded;
-										replacementsNeeded = 0;
-									}
-									else
-									{
-										suggestedReplacements.Add(new Tuple<int, int, int>(cardToReplace.ArenaId, candidate.Card.ArenaId, candidate.Quantity));
-										playerInventory[candidate.Card.ArenaId] = 0;
-										replacementsNeeded -= candidate.Quantity;
-									}
-								}
-								cmcToTest--;
-							}
-						}
-
-						if (replacementsNeeded > 0)
-						{
-							_logger.Debug("Insufficient Candidates Found, Getting Candidates, relaxing color requirments and looping through Cmc <= {0}", cardToReplace.Cmc);
-							int cmcToTest = cardToReplace.Cmc;
-							while (replacementsNeeded > 0 && cmcToTest > 0)
-							{
-								candidates = playerInventory.Select(x => new { Card = cardsById[x.Key], Quantity = x.Value }).
-									Where(x => x.Quantity > 0 && x.Card.Cmc == cmcToTest && cardToReplace.Colors.Contains(x.Card.Colors) && (identity == null || identity.Contains(x.Card.ColorIdentity))).
-									OrderByDescending(x => x.Card.Rank + CardStats.GetAssociationModifier(cardToReplace.Name, x.Card.Name, _cardStats));
-
-								foreach (var candidate in candidates)
-								{
-									if (replacementsNeeded == 0) { break; }
-									if (candidate.Quantity > replacementsNeeded)
-									{
-										suggestedReplacements.Add(new Tuple<int, int, int>(cardToReplace.ArenaId, candidate.Card.ArenaId, replacementsNeeded));
-										playerInventory[candidate.Card.ArenaId] -= replacementsNeeded;
-										replacementsNeeded = 0;
-									}
-									else
-									{
-										suggestedReplacements.Add(new Tuple<int, int, int>(cardToReplace.ArenaId, candidate.Card.ArenaId, candidate.Quantity));
-										playerInventory[candidate.Card.ArenaId] = 0;
-										replacementsNeeded -= candidate.Quantity;
-									}
-								}
-								cmcToTest--;
-							}
-						}
-
-						if (replacementsNeeded > 0)
-						{
-							_logger.Debug("Insufficient Candidates Found, done looking");
-						}
-					}
-				}
+				List<Tuple<int, int, int>> suggestedReplacements = GenerateReplacements(archetype, mainDeckToCollect, sideboardToCollect, playerInventory, cardsByName, cardsById);
 
 				_logger.Debug("Updating Archetype objects with suggestions");
 				archetype.SuggestedMainDeck = new ReadOnlyDictionary<int, int>(mainDeckCards);
@@ -1728,217 +1518,7 @@ namespace DailyArena.DeckAdvisor
 						}
 
 						_logger.Debug("Generating replacement suggestions for missing cards");
-						suggestedReplacements = new List<Tuple<int, int, int>>();
-						identity = null;
-						if (Format.Value == Properties.Resources.Item_Brawl)
-						{
-							identity = cardsByName[similarArchetype.CommanderName].First().ColorIdentity;
-						}
-						replacementsToFind = mainDeckToCollect.Concat(sideboardToCollect).GroupBy(x => x.Key).Select(x => new { Id = x.Key, Count = x.Sum(y => y.Value) });
-						foreach (var find in replacementsToFind)
-						{
-							_logger.Debug("Generating replacements suggestions for card with Arena Id: {0} (need {1})", find.Id, find.Count);
-							var cardToReplace = cardsById[find.Id];
-							var replacementsNeeded = find.Count;
-
-							if (cardToReplace.Type.Contains("Land"))
-							{
-								_logger.Debug("Processing Candidates based on Color");
-								var candidates = playerInventory.Select(x => new { Card = cardsById[x.Key], Quantity = x.Value }).
-									Where(x => x.Quantity > 0 && x.Card.Type == cardToReplace.Type && _colorsByLand[x.Card.Name] == _colorsByLand[cardToReplace.Name] && (identity == null || identity.Contains(x.Card.ColorIdentity))).
-									OrderByDescending(x => x.Card.Rank + CardStats.GetAssociationModifier(cardToReplace.Name, x.Card.Name, _cardStats));
-
-								foreach (var candidate in candidates)
-								{
-									if (replacementsNeeded == 0) { break; }
-									if (candidate.Quantity > replacementsNeeded)
-									{
-										suggestedReplacements.Add(new Tuple<int, int, int>(cardToReplace.ArenaId, candidate.Card.ArenaId, replacementsNeeded));
-										playerInventory[candidate.Card.ArenaId] -= replacementsNeeded;
-										replacementsNeeded = 0;
-									}
-									else
-									{
-										suggestedReplacements.Add(new Tuple<int, int, int>(cardToReplace.ArenaId, candidate.Card.ArenaId, candidate.Quantity));
-										playerInventory[candidate.Card.ArenaId] = 0;
-										replacementsNeeded -= candidate.Quantity;
-									}
-								}
-
-								if (replacementsNeeded > 0)
-								{
-									_logger.Debug("Insufficient Candidates Found, suggesting basic land replacements");
-									Random r = new Random();
-									// randomizing colors here so we don't always favor colors in WUBRG order
-									string[] colors = (_colorsByLand[cardToReplace.Name] == null ?
-										new string[] { "W", "U", "B", "R", "G" }.Select(x => new { Sort = r.Next(), Value = x }) :
-										_colorsByLand[cardToReplace.Name].ColorString.Select(x => new { Sort = r.Next(), Value = x.ToString() })).
-										OrderBy(y => y.Sort).Select(z => z.Value).ToArray();
-									Dictionary<string, int> _colorReplacements = new Dictionary<string, int>();
-									if (colors.Length > 0)
-									{
-										int colorIndex = 0;
-										while (replacementsNeeded > 0)
-										{
-											if (!_colorReplacements.ContainsKey(colors[colorIndex]))
-											{
-												_colorReplacements[colors[colorIndex]] = 0;
-											}
-											_colorReplacements[colors[colorIndex]]++;
-											replacementsNeeded--;
-											colorIndex = (colorIndex + 1) % colors.Length;
-										}
-										suggestedReplacements.AddRange(
-											_colorReplacements.Select(x => new Tuple<int, int, int>(cardToReplace.ArenaId, _basicLands[x.Key].ArenaId, x.Value))
-										);
-									}
-								}
-
-								if (replacementsNeeded > 0)
-								{
-									_logger.Debug("Insufficient Candidates Found, done looking");
-								}
-							}
-							else
-							{
-								_logger.Debug("Processing Candidates based on Type and Cost");
-								var candidates = playerInventory.Select(x => new { Card = cardsById[x.Key], Quantity = x.Value }).
-										Where(x => x.Quantity > 0 && x.Card.Type == cardToReplace.Type && x.Card.Cost == cardToReplace.Cost && (identity == null || identity.Contains(x.Card.ColorIdentity))).
-										OrderByDescending(x => x.Card.Rank + CardStats.GetAssociationModifier(cardToReplace.Name, x.Card.Name, _cardStats));
-
-								foreach (var candidate in candidates)
-								{
-									if (replacementsNeeded == 0) { break; }
-									if (candidate.Quantity > replacementsNeeded)
-									{
-										suggestedReplacements.Add(new Tuple<int, int, int>(cardToReplace.ArenaId, candidate.Card.ArenaId, replacementsNeeded));
-										playerInventory[candidate.Card.ArenaId] -= replacementsNeeded;
-										replacementsNeeded = 0;
-									}
-									else
-									{
-										suggestedReplacements.Add(new Tuple<int, int, int>(cardToReplace.ArenaId, candidate.Card.ArenaId, candidate.Quantity));
-										playerInventory[candidate.Card.ArenaId] = 0;
-										replacementsNeeded -= candidate.Quantity;
-									}
-								}
-
-								if (replacementsNeeded > 0)
-								{
-									_logger.Debug("Insufficient Candidates Found, Getting Candidates by Cost");
-									candidates = playerInventory.Select(x => new { Card = cardsById[x.Key], Quantity = x.Value }).
-										Where(x => x.Quantity > 0 && x.Card.Cost == cardToReplace.Cost && (identity == null || identity.Contains(x.Card.ColorIdentity))).
-										OrderByDescending(x => x.Card.Rank + CardStats.GetAssociationModifier(cardToReplace.Name, x.Card.Name, _cardStats));
-
-									foreach (var candidate in candidates)
-									{
-										if (replacementsNeeded == 0) { break; }
-										if (candidate.Quantity > replacementsNeeded)
-										{
-											suggestedReplacements.Add(new Tuple<int, int, int>(cardToReplace.ArenaId, candidate.Card.ArenaId, replacementsNeeded));
-											playerInventory[candidate.Card.ArenaId] -= replacementsNeeded;
-											replacementsNeeded = 0;
-										}
-										else
-										{
-											suggestedReplacements.Add(new Tuple<int, int, int>(cardToReplace.ArenaId, candidate.Card.ArenaId, candidate.Quantity));
-											playerInventory[candidate.Card.ArenaId] = 0;
-											replacementsNeeded -= candidate.Quantity;
-										}
-									}
-								}
-
-								if (replacementsNeeded > 0)
-								{
-									_logger.Debug("Insufficient Candidates Found, Getting Candidates by Cmc and Color");
-									candidates = playerInventory.Select(x => new { Card = cardsById[x.Key], Quantity = x.Value }).
-										Where(x => x.Quantity > 0 && x.Card.Cmc == cardToReplace.Cmc && x.Card.Colors == cardToReplace.Colors && (identity == null || identity.Contains(x.Card.ColorIdentity))).
-										OrderByDescending(x => x.Card.Rank + CardStats.GetAssociationModifier(cardToReplace.Name, x.Card.Name, _cardStats));
-
-									foreach (var candidate in candidates)
-									{
-										if (replacementsNeeded == 0) { break; }
-										if (candidate.Quantity > replacementsNeeded)
-										{
-											suggestedReplacements.Add(new Tuple<int, int, int>(cardToReplace.ArenaId, candidate.Card.ArenaId, replacementsNeeded));
-											playerInventory[candidate.Card.ArenaId] -= replacementsNeeded;
-											replacementsNeeded = 0;
-										}
-										else
-										{
-											suggestedReplacements.Add(new Tuple<int, int, int>(cardToReplace.ArenaId, candidate.Card.ArenaId, candidate.Quantity));
-											playerInventory[candidate.Card.ArenaId] = 0;
-											replacementsNeeded -= candidate.Quantity;
-										}
-									}
-								}
-
-								if (replacementsNeeded > 0)
-								{
-									_logger.Debug("Insufficient Candidates Found, Getting Candidates, looking for candidates with lower Cmc");
-									int cmcToTest = cardToReplace.Cmc - 1;
-									while (replacementsNeeded > 0 && cmcToTest > 0)
-									{
-										candidates = playerInventory.Select(x => new { Card = cardsById[x.Key], Quantity = x.Value }).
-											Where(x => x.Quantity > 0 && x.Card.Cmc == cmcToTest && x.Card.Colors == cardToReplace.Colors && (identity == null || identity.Contains(x.Card.ColorIdentity))).
-											OrderByDescending(x => x.Card.Rank + CardStats.GetAssociationModifier(cardToReplace.Name, x.Card.Name, _cardStats));
-
-										foreach (var candidate in candidates)
-										{
-											if (replacementsNeeded == 0) { break; }
-											if (candidate.Quantity > replacementsNeeded)
-											{
-												suggestedReplacements.Add(new Tuple<int, int, int>(cardToReplace.ArenaId, candidate.Card.ArenaId, replacementsNeeded));
-												playerInventory[candidate.Card.ArenaId] -= replacementsNeeded;
-												replacementsNeeded = 0;
-											}
-											else
-											{
-												suggestedReplacements.Add(new Tuple<int, int, int>(cardToReplace.ArenaId, candidate.Card.ArenaId, candidate.Quantity));
-												playerInventory[candidate.Card.ArenaId] = 0;
-												replacementsNeeded -= candidate.Quantity;
-											}
-										}
-										cmcToTest--;
-									}
-								}
-
-								if (replacementsNeeded > 0)
-								{
-									_logger.Debug("Insufficient Candidates Found, Getting Candidates, relaxing color requirments and looping through Cmc <= {0}", cardToReplace.Cmc);
-									int cmcToTest = cardToReplace.Cmc;
-									while (replacementsNeeded > 0 && cmcToTest > 0)
-									{
-										candidates = playerInventory.Select(x => new { Card = cardsById[x.Key], Quantity = x.Value }).
-											Where(x => x.Quantity > 0 && x.Card.Cmc == cmcToTest && cardToReplace.Colors.Contains(x.Card.Colors) && (identity == null || identity.Contains(x.Card.ColorIdentity))).
-											OrderByDescending(x => x.Card.Rank + CardStats.GetAssociationModifier(cardToReplace.Name, x.Card.Name, _cardStats));
-
-										foreach (var candidate in candidates)
-										{
-											if (replacementsNeeded == 0) { break; }
-											if (candidate.Quantity > replacementsNeeded)
-											{
-												suggestedReplacements.Add(new Tuple<int, int, int>(cardToReplace.ArenaId, candidate.Card.ArenaId, replacementsNeeded));
-												playerInventory[candidate.Card.ArenaId] -= replacementsNeeded;
-												replacementsNeeded = 0;
-											}
-											else
-											{
-												suggestedReplacements.Add(new Tuple<int, int, int>(cardToReplace.ArenaId, candidate.Card.ArenaId, candidate.Quantity));
-												playerInventory[candidate.Card.ArenaId] = 0;
-												replacementsNeeded -= candidate.Quantity;
-											}
-										}
-										cmcToTest--;
-									}
-								}
-
-								if (replacementsNeeded > 0)
-								{
-									_logger.Debug("Insufficient Candidates Found, done looking");
-								}
-							}
-						}
+						suggestedReplacements = GenerateReplacements(similarArchetype, mainDeckToCollect, sideboardToCollect, playerInventory, cardsByName, cardsById);
 
 						_logger.Debug("Updating Archetype objects with suggestions");
 						similarArchetype.SuggestedMainDeck = new ReadOnlyDictionary<int, int>(mainDeckCards);
@@ -2098,217 +1678,7 @@ namespace DailyArena.DeckAdvisor
 				}
 
 				_logger.Debug("Generating replacement suggestions for missing cards");
-				List<Tuple<int, int, int>> suggestedReplacements = new List<Tuple<int, int, int>>();
-				CardColors identity = null;
-				if (Format.Value == Properties.Resources.Item_Brawl)
-				{
-					identity = cardsByName[playerDeck.CommanderName].First().ColorIdentity;
-				}
-				var replacementsToFind = mainDeckToCollect.Concat(sideboardToCollect).GroupBy(x => x.Key).Select(x => new { Id = x.Key, Count = x.Sum(y => y.Value) });
-				foreach (var find in replacementsToFind)
-				{
-					_logger.Debug("Generating replacements suggestions for card with Arena Id: {0} (need {1})", find.Id, find.Count);
-					var cardToReplace = cardsById[find.Id];
-					var replacementsNeeded = find.Count;
-
-					if (cardToReplace.Type.Contains("Land"))
-					{
-						_logger.Debug("Processing Candidates based on Color");
-						var candidates = playerInventory.Select(x => new { Card = cardsById[x.Key], Quantity = x.Value }).
-							Where(x => x.Quantity > 0 && x.Card.Type == cardToReplace.Type && _colorsByLand[x.Card.Name] == _colorsByLand[cardToReplace.Name] && (identity == null || identity.Contains(x.Card.ColorIdentity))).
-							OrderByDescending(x => x.Card.Rank + CardStats.GetAssociationModifier(cardToReplace.Name, x.Card.Name, _cardStats));
-
-						foreach (var candidate in candidates)
-						{
-							if (replacementsNeeded == 0) { break; }
-							if (candidate.Quantity > replacementsNeeded)
-							{
-								suggestedReplacements.Add(new Tuple<int, int, int>(cardToReplace.ArenaId, candidate.Card.ArenaId, replacementsNeeded));
-								playerInventory[candidate.Card.ArenaId] -= replacementsNeeded;
-								replacementsNeeded = 0;
-							}
-							else
-							{
-								suggestedReplacements.Add(new Tuple<int, int, int>(cardToReplace.ArenaId, candidate.Card.ArenaId, candidate.Quantity));
-								playerInventory[candidate.Card.ArenaId] = 0;
-								replacementsNeeded -= candidate.Quantity;
-							}
-						}
-
-						if (replacementsNeeded > 0)
-						{
-							_logger.Debug("Insufficient Candidates Found, suggesting basic land replacements");
-							Random r = new Random();
-							// randomizing colors here so we don't always favor colors in WUBRG order
-							string[] colors = (_colorsByLand[cardToReplace.Name] == null ?
-								new string[] { "W", "U", "B", "R", "G" }.Select(x => new { Sort = r.Next(), Value = x }) :
-								_colorsByLand[cardToReplace.Name].ColorString.Select(x => new { Sort = r.Next(), Value = x.ToString() })).
-								OrderBy(y => y.Sort).Select(z => z.Value).ToArray();
-							Dictionary<string, int> _colorReplacements = new Dictionary<string, int>();
-							if (colors.Length > 0)
-							{
-								int colorIndex = 0;
-								while (replacementsNeeded > 0)
-								{
-									if (!_colorReplacements.ContainsKey(colors[colorIndex]))
-									{
-										_colorReplacements[colors[colorIndex]] = 0;
-									}
-									_colorReplacements[colors[colorIndex]]++;
-									replacementsNeeded--;
-									colorIndex = (colorIndex + 1) % colors.Length;
-								}
-								suggestedReplacements.AddRange(
-									_colorReplacements.Select(x => new Tuple<int, int, int>(cardToReplace.ArenaId, _basicLands[x.Key].ArenaId, x.Value))
-								);
-							}
-						}
-
-						if (replacementsNeeded > 0)
-						{
-							_logger.Debug("Insufficient Candidates Found, done looking");
-						}
-					}
-					else
-					{
-						_logger.Debug("Processing Candidates based on Type and Cost");
-						var candidates = playerInventory.Select(x => new { Card = cardsById[x.Key], Quantity = x.Value }).
-								Where(x => x.Quantity > 0 && x.Card.Type == cardToReplace.Type && x.Card.Cost == cardToReplace.Cost && (identity == null || identity.Contains(x.Card.ColorIdentity))).
-								OrderByDescending(x => x.Card.Rank + CardStats.GetAssociationModifier(cardToReplace.Name, x.Card.Name, _cardStats));
-
-						foreach (var candidate in candidates)
-						{
-							if (replacementsNeeded == 0) { break; }
-							if (candidate.Quantity > replacementsNeeded)
-							{
-								suggestedReplacements.Add(new Tuple<int, int, int>(cardToReplace.ArenaId, candidate.Card.ArenaId, replacementsNeeded));
-								playerInventory[candidate.Card.ArenaId] -= replacementsNeeded;
-								replacementsNeeded = 0;
-							}
-							else
-							{
-								suggestedReplacements.Add(new Tuple<int, int, int>(cardToReplace.ArenaId, candidate.Card.ArenaId, candidate.Quantity));
-								playerInventory[candidate.Card.ArenaId] = 0;
-								replacementsNeeded -= candidate.Quantity;
-							}
-						}
-
-						if (replacementsNeeded > 0)
-						{
-							_logger.Debug("Insufficient Candidates Found, Getting Candidates by Cost");
-							candidates = playerInventory.Select(x => new { Card = cardsById[x.Key], Quantity = x.Value }).
-								Where(x => x.Quantity > 0 && x.Card.Cost == cardToReplace.Cost && (identity == null || identity.Contains(x.Card.ColorIdentity))).
-								OrderByDescending(x => x.Card.Rank + CardStats.GetAssociationModifier(cardToReplace.Name, x.Card.Name, _cardStats));
-
-							foreach (var candidate in candidates)
-							{
-								if (replacementsNeeded == 0) { break; }
-								if (candidate.Quantity > replacementsNeeded)
-								{
-									suggestedReplacements.Add(new Tuple<int, int, int>(cardToReplace.ArenaId, candidate.Card.ArenaId, replacementsNeeded));
-									playerInventory[candidate.Card.ArenaId] -= replacementsNeeded;
-									replacementsNeeded = 0;
-								}
-								else
-								{
-									suggestedReplacements.Add(new Tuple<int, int, int>(cardToReplace.ArenaId, candidate.Card.ArenaId, candidate.Quantity));
-									playerInventory[candidate.Card.ArenaId] = 0;
-									replacementsNeeded -= candidate.Quantity;
-								}
-							}
-						}
-
-						if (replacementsNeeded > 0)
-						{
-							_logger.Debug("Insufficient Candidates Found, Getting Candidates by Cmc and Color");
-							candidates = playerInventory.Select(x => new { Card = cardsById[x.Key], Quantity = x.Value }).
-								Where(x => x.Quantity > 0 && x.Card.Cmc == cardToReplace.Cmc && x.Card.Colors == cardToReplace.Colors && (identity == null || identity.Contains(x.Card.ColorIdentity))).
-								OrderByDescending(x => x.Card.Rank + CardStats.GetAssociationModifier(cardToReplace.Name, x.Card.Name, _cardStats));
-
-							foreach (var candidate in candidates)
-							{
-								if (replacementsNeeded == 0) { break; }
-								if (candidate.Quantity > replacementsNeeded)
-								{
-									suggestedReplacements.Add(new Tuple<int, int, int>(cardToReplace.ArenaId, candidate.Card.ArenaId, replacementsNeeded));
-									playerInventory[candidate.Card.ArenaId] -= replacementsNeeded;
-									replacementsNeeded = 0;
-								}
-								else
-								{
-									suggestedReplacements.Add(new Tuple<int, int, int>(cardToReplace.ArenaId, candidate.Card.ArenaId, candidate.Quantity));
-									playerInventory[candidate.Card.ArenaId] = 0;
-									replacementsNeeded -= candidate.Quantity;
-								}
-							}
-						}
-
-						if (replacementsNeeded > 0)
-						{
-							_logger.Debug("Insufficient Candidates Found, Getting Candidates, looking for candidates with lower Cmc");
-							int cmcToTest = cardToReplace.Cmc - 1;
-							while (replacementsNeeded > 0 && cmcToTest > 0)
-							{
-								candidates = playerInventory.Select(x => new { Card = cardsById[x.Key], Quantity = x.Value }).
-									Where(x => x.Quantity > 0 && x.Card.Cmc == cmcToTest && x.Card.Colors == cardToReplace.Colors && (identity == null || identity.Contains(x.Card.ColorIdentity))).
-									OrderByDescending(x => x.Card.Rank + CardStats.GetAssociationModifier(cardToReplace.Name, x.Card.Name, _cardStats));
-
-								foreach (var candidate in candidates)
-								{
-									if (replacementsNeeded == 0) { break; }
-									if (candidate.Quantity > replacementsNeeded)
-									{
-										suggestedReplacements.Add(new Tuple<int, int, int>(cardToReplace.ArenaId, candidate.Card.ArenaId, replacementsNeeded));
-										playerInventory[candidate.Card.ArenaId] -= replacementsNeeded;
-										replacementsNeeded = 0;
-									}
-									else
-									{
-										suggestedReplacements.Add(new Tuple<int, int, int>(cardToReplace.ArenaId, candidate.Card.ArenaId, candidate.Quantity));
-										playerInventory[candidate.Card.ArenaId] = 0;
-										replacementsNeeded -= candidate.Quantity;
-									}
-								}
-								cmcToTest--;
-							}
-						}
-
-						if (replacementsNeeded > 0)
-						{
-							_logger.Debug("Insufficient Candidates Found, Getting Candidates, relaxing color requirments and looping through Cmc <= {0}", cardToReplace.Cmc);
-							int cmcToTest = cardToReplace.Cmc;
-							while (replacementsNeeded > 0 && cmcToTest > 0)
-							{
-								candidates = playerInventory.Select(x => new { Card = cardsById[x.Key], Quantity = x.Value }).
-									Where(x => x.Quantity > 0 && x.Card.Cmc == cmcToTest && cardToReplace.Colors.Contains(x.Card.Colors) && (identity == null || identity.Contains(x.Card.ColorIdentity))).
-									OrderByDescending(x => x.Card.Rank + CardStats.GetAssociationModifier(cardToReplace.Name, x.Card.Name, _cardStats));
-
-								foreach (var candidate in candidates)
-								{
-									if (replacementsNeeded == 0) { break; }
-									if (candidate.Quantity > replacementsNeeded)
-									{
-										suggestedReplacements.Add(new Tuple<int, int, int>(cardToReplace.ArenaId, candidate.Card.ArenaId, replacementsNeeded));
-										playerInventory[candidate.Card.ArenaId] -= replacementsNeeded;
-										replacementsNeeded = 0;
-									}
-									else
-									{
-										suggestedReplacements.Add(new Tuple<int, int, int>(cardToReplace.ArenaId, candidate.Card.ArenaId, candidate.Quantity));
-										playerInventory[candidate.Card.ArenaId] = 0;
-										replacementsNeeded -= candidate.Quantity;
-									}
-								}
-								cmcToTest--;
-							}
-						}
-
-						if (replacementsNeeded > 0)
-						{
-							_logger.Debug("Insufficient Candidates Found, done looking");
-						}
-					}
-				}
+				List<Tuple<int, int, int>> suggestedReplacements = GenerateReplacements(playerDeck, mainDeckToCollect, sideboardToCollect, playerInventory, cardsByName, cardsById);
 
 				_logger.Debug("Updating Player Deck objects with suggestions");
 				playerDeck.SuggestedMainDeck = new ReadOnlyDictionary<int, int>(mainDeckCards);
@@ -2387,6 +1757,238 @@ namespace DailyArena.DeckAdvisor
 			});
 
 			_logger.Debug("ReloadAndCrunchAllData() Finished");
+		}
+
+		/// <summary>
+		/// Generate replacement suggestions for a deck archetype.
+		/// </summary>
+		/// <param name="archetype">The deck to generate replacements suggestions for.</param>
+		/// <param name="mainDeckToCollect">The main deck cards for the deck that the player hasn't collected yet.</param>
+		/// <param name="sideboardToCollect">The sideboard cards for the deck that the player hasn't collected yet.</param>
+		/// <param name="playerInventory">The player's card inventory/collection.</param>
+		/// <param name="cardsByName">A dictionary mapping card names to lists of Card objects.</param>
+		/// <param name="cardsById">A dictioanry mapping arena ids to Card objects.</param>
+		/// <returns>A list of Tuple&lt;int, int, int&gt; with Item1 = card to be replaced, Item2 = suggested replacement, Item3 = number of times to make this replacement</returns>
+		private List<Tuple<int, int, int>> GenerateReplacements(Archetype archetype, Dictionary<int, int> mainDeckToCollect, Dictionary<int, int> sideboardToCollect,
+			Dictionary<int, int> playerInventory, IDictionary<string, List<Card>> cardsByName, IDictionary<int, Card> cardsById)
+		{
+			_logger.Debug("GenerateReplacements() Called for Archetype {archetypeName}", archetype.Name);
+
+			List<Tuple<int, int, int>> suggestedReplacements = new List<Tuple<int, int, int>>();
+			CardColors identity = null;
+			if (Format.Value == Properties.Resources.Item_Brawl)
+			{
+				identity = cardsByName[archetype.CommanderName].First().ColorIdentity;
+			}
+			var replacementsToFind = mainDeckToCollect.Concat(sideboardToCollect).GroupBy(x => x.Key).Select(x => new { Id = x.Key, Count = x.Sum(y => y.Value) });
+			foreach (var find in replacementsToFind)
+			{
+				_logger.Debug("Generating replacements suggestions for card with Arena Id: {0} (need {1})", find.Id, find.Count);
+				var cardToReplace = cardsById[find.Id];
+				var replacementsNeeded = find.Count;
+
+				if (cardToReplace.Type.Contains("Land"))
+				{
+					_logger.Debug("Processing Candidates based on Color");
+					var candidates = playerInventory.Select(x => new { Card = cardsById[x.Key], Quantity = x.Value }).
+						Where(x => x.Quantity > 0 && x.Card.Type == cardToReplace.Type && _colorsByLand[x.Card.Name] == _colorsByLand[cardToReplace.Name] && (identity == null || identity.Contains(x.Card.ColorIdentity))).
+						OrderByDescending(x => x.Card.Rank + CardStats.GetAssociationModifier(cardToReplace.Name, x.Card.Name, _cardStats));
+
+					foreach (var candidate in candidates)
+					{
+						if (replacementsNeeded == 0) { break; }
+						if (candidate.Quantity > replacementsNeeded)
+						{
+							suggestedReplacements.Add(new Tuple<int, int, int>(cardToReplace.ArenaId, candidate.Card.ArenaId, replacementsNeeded));
+							playerInventory[candidate.Card.ArenaId] -= replacementsNeeded;
+							replacementsNeeded = 0;
+						}
+						else
+						{
+							suggestedReplacements.Add(new Tuple<int, int, int>(cardToReplace.ArenaId, candidate.Card.ArenaId, candidate.Quantity));
+							playerInventory[candidate.Card.ArenaId] = 0;
+							replacementsNeeded -= candidate.Quantity;
+						}
+					}
+
+					if (replacementsNeeded > 0)
+					{
+						_logger.Debug("Insufficient Candidates Found, suggesting basic land replacements");
+						Random r = new Random();
+						// randomizing colors here so we don't always favor colors in WUBRG order
+						string[] colors = (_colorsByLand[cardToReplace.Name] == null ?
+							new string[] { "W", "U", "B", "R", "G" }.Select(x => new { Sort = r.Next(), Value = x }) :
+							_colorsByLand[cardToReplace.Name].ColorString.Select(x => new { Sort = r.Next(), Value = x.ToString() })).
+							OrderBy(y => y.Sort).Select(z => z.Value).ToArray();
+						Dictionary<string, int> _colorReplacements = new Dictionary<string, int>();
+						if (colors.Length > 0)
+						{
+							int colorIndex = 0;
+							while (replacementsNeeded > 0)
+							{
+								if (!_colorReplacements.ContainsKey(colors[colorIndex]))
+								{
+									_colorReplacements[colors[colorIndex]] = 0;
+								}
+								_colorReplacements[colors[colorIndex]]++;
+								replacementsNeeded--;
+								colorIndex = (colorIndex + 1) % colors.Length;
+							}
+							suggestedReplacements.AddRange(
+								_colorReplacements.Select(x => new Tuple<int, int, int>(cardToReplace.ArenaId, _basicLands[x.Key].ArenaId, x.Value))
+							);
+						}
+					}
+
+					if (replacementsNeeded > 0)
+					{
+						_logger.Debug("Insufficient Candidates Found, done looking");
+					}
+				}
+				else
+				{
+					_logger.Debug("Processing Candidates based on Type and Cost");
+					var candidates = playerInventory.Select(x => new { Card = cardsById[x.Key], Quantity = x.Value }).
+							Where(x => x.Quantity > 0 && x.Card.Type == cardToReplace.Type && x.Card.Cost == cardToReplace.Cost && (identity == null || identity.Contains(x.Card.ColorIdentity))).
+							OrderByDescending(x => x.Card.Rank + CardStats.GetAssociationModifier(cardToReplace.Name, x.Card.Name, _cardStats));
+
+					foreach (var candidate in candidates)
+					{
+						if (replacementsNeeded == 0) { break; }
+						if (candidate.Quantity > replacementsNeeded)
+						{
+							suggestedReplacements.Add(new Tuple<int, int, int>(cardToReplace.ArenaId, candidate.Card.ArenaId, replacementsNeeded));
+							playerInventory[candidate.Card.ArenaId] -= replacementsNeeded;
+							replacementsNeeded = 0;
+						}
+						else
+						{
+							suggestedReplacements.Add(new Tuple<int, int, int>(cardToReplace.ArenaId, candidate.Card.ArenaId, candidate.Quantity));
+							playerInventory[candidate.Card.ArenaId] = 0;
+							replacementsNeeded -= candidate.Quantity;
+						}
+					}
+
+					if (replacementsNeeded > 0)
+					{
+						_logger.Debug("Insufficient Candidates Found, Getting Candidates by Cost");
+						candidates = playerInventory.Select(x => new { Card = cardsById[x.Key], Quantity = x.Value }).
+							Where(x => x.Quantity > 0 && x.Card.Cost == cardToReplace.Cost && (identity == null || identity.Contains(x.Card.ColorIdentity))).
+							OrderByDescending(x => x.Card.Rank + CardStats.GetAssociationModifier(cardToReplace.Name, x.Card.Name, _cardStats));
+
+						foreach (var candidate in candidates)
+						{
+							if (replacementsNeeded == 0) { break; }
+							if (candidate.Quantity > replacementsNeeded)
+							{
+								suggestedReplacements.Add(new Tuple<int, int, int>(cardToReplace.ArenaId, candidate.Card.ArenaId, replacementsNeeded));
+								playerInventory[candidate.Card.ArenaId] -= replacementsNeeded;
+								replacementsNeeded = 0;
+							}
+							else
+							{
+								suggestedReplacements.Add(new Tuple<int, int, int>(cardToReplace.ArenaId, candidate.Card.ArenaId, candidate.Quantity));
+								playerInventory[candidate.Card.ArenaId] = 0;
+								replacementsNeeded -= candidate.Quantity;
+							}
+						}
+					}
+
+					if (replacementsNeeded > 0)
+					{
+						_logger.Debug("Insufficient Candidates Found, Getting Candidates by Cmc and Color");
+						candidates = playerInventory.Select(x => new { Card = cardsById[x.Key], Quantity = x.Value }).
+							Where(x => x.Quantity > 0 && x.Card.Cmc == cardToReplace.Cmc && x.Card.Colors == cardToReplace.Colors && (identity == null || identity.Contains(x.Card.ColorIdentity))).
+							OrderByDescending(x => x.Card.Rank + CardStats.GetAssociationModifier(cardToReplace.Name, x.Card.Name, _cardStats));
+
+						foreach (var candidate in candidates)
+						{
+							if (replacementsNeeded == 0) { break; }
+							if (candidate.Quantity > replacementsNeeded)
+							{
+								suggestedReplacements.Add(new Tuple<int, int, int>(cardToReplace.ArenaId, candidate.Card.ArenaId, replacementsNeeded));
+								playerInventory[candidate.Card.ArenaId] -= replacementsNeeded;
+								replacementsNeeded = 0;
+							}
+							else
+							{
+								suggestedReplacements.Add(new Tuple<int, int, int>(cardToReplace.ArenaId, candidate.Card.ArenaId, candidate.Quantity));
+								playerInventory[candidate.Card.ArenaId] = 0;
+								replacementsNeeded -= candidate.Quantity;
+							}
+						}
+					}
+
+					if (replacementsNeeded > 0)
+					{
+						_logger.Debug("Insufficient Candidates Found, Getting Candidates, looking for candidates with lower Cmc");
+						int cmcToTest = cardToReplace.Cmc - 1;
+						while (replacementsNeeded > 0 && cmcToTest > 0)
+						{
+							candidates = playerInventory.Select(x => new { Card = cardsById[x.Key], Quantity = x.Value }).
+								Where(x => x.Quantity > 0 && x.Card.Cmc == cmcToTest && x.Card.Colors == cardToReplace.Colors && (identity == null || identity.Contains(x.Card.ColorIdentity))).
+								OrderByDescending(x => x.Card.Rank + CardStats.GetAssociationModifier(cardToReplace.Name, x.Card.Name, _cardStats));
+
+							foreach (var candidate in candidates)
+							{
+								if (replacementsNeeded == 0) { break; }
+								if (candidate.Quantity > replacementsNeeded)
+								{
+									suggestedReplacements.Add(new Tuple<int, int, int>(cardToReplace.ArenaId, candidate.Card.ArenaId, replacementsNeeded));
+									playerInventory[candidate.Card.ArenaId] -= replacementsNeeded;
+									replacementsNeeded = 0;
+								}
+								else
+								{
+									suggestedReplacements.Add(new Tuple<int, int, int>(cardToReplace.ArenaId, candidate.Card.ArenaId, candidate.Quantity));
+									playerInventory[candidate.Card.ArenaId] = 0;
+									replacementsNeeded -= candidate.Quantity;
+								}
+							}
+							cmcToTest--;
+						}
+					}
+
+					if (replacementsNeeded > 0)
+					{
+						_logger.Debug("Insufficient Candidates Found, Getting Candidates, relaxing color requirments and looping through Cmc <= {0}", cardToReplace.Cmc);
+						int cmcToTest = cardToReplace.Cmc;
+						while (replacementsNeeded > 0 && cmcToTest > 0)
+						{
+							candidates = playerInventory.Select(x => new { Card = cardsById[x.Key], Quantity = x.Value }).
+								Where(x => x.Quantity > 0 && x.Card.Cmc == cmcToTest && cardToReplace.Colors.Contains(x.Card.Colors) && (identity == null || identity.Contains(x.Card.ColorIdentity))).
+								OrderByDescending(x => x.Card.Rank + CardStats.GetAssociationModifier(cardToReplace.Name, x.Card.Name, _cardStats));
+
+							foreach (var candidate in candidates)
+							{
+								if (replacementsNeeded == 0) { break; }
+								if (candidate.Quantity > replacementsNeeded)
+								{
+									suggestedReplacements.Add(new Tuple<int, int, int>(cardToReplace.ArenaId, candidate.Card.ArenaId, replacementsNeeded));
+									playerInventory[candidate.Card.ArenaId] -= replacementsNeeded;
+									replacementsNeeded = 0;
+								}
+								else
+								{
+									suggestedReplacements.Add(new Tuple<int, int, int>(cardToReplace.ArenaId, candidate.Card.ArenaId, candidate.Quantity));
+									playerInventory[candidate.Card.ArenaId] = 0;
+									replacementsNeeded -= candidate.Quantity;
+								}
+							}
+							cmcToTest--;
+						}
+					}
+
+					if (replacementsNeeded > 0)
+					{
+						_logger.Debug("Insufficient Candidates Found, done looking");
+					}
+				}
+			}
+
+			_logger.Debug("GenerateReplacements() Finished");
+
+			return suggestedReplacements;
 		}
 
 		/// <summary>
