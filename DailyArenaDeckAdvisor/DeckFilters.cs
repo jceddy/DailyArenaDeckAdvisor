@@ -382,6 +382,48 @@ namespace DailyArena.DeckAdvisor
 		#endregion
 
 		/// <summary>
+		/// Check if this is equal to another object.
+		/// </summary>
+		/// <param name="obj">The other object to compare this one to.</param>
+		/// <returns>True if the object is a DeckFilter and all its fields are the same, false otherwise.</returns>
+		public override bool Equals(object obj)
+		{
+			if(obj == null)
+			{
+				return false;
+			}
+			else if(obj is DeckFilters)
+			{
+				return Equals((DeckFilters)obj);
+			}
+			else
+			{
+				return false;
+			}
+		}
+
+		/// <summary>
+		/// Get this DeckFilters objects, hash code.
+		/// </summary>
+		/// <returns>The hash code.</returns>
+		public override int GetHashCode()
+		{
+			return
+				HideFromCollection.GetHashCode() |
+				HideMissingWildcards.GetHashCode() << 1 |
+				HideMissingCards.GetHashCode() << 2 |
+				HideIncompleteReplacements.GetHashCode() << 3 |
+				HideMythic.GetHashCode() << 4 |
+				MythicCount.GetHashCode() << 5 |
+				HideRare.GetHashCode() << 11 |
+				RareCount.GetHashCode() << 12 |
+				HideUncommon.GetHashCode() << 18 |
+				UncommonCount.GetHashCode() << 19 |
+				HideCommon.GetHashCode() << 25 |
+				CommonCount.GetHashCode() << 26;
+		}
+
+		/// <summary>
 		/// Check if this is equal to another DeckFilters object.
 		/// </summary>
 		/// <param name="other">The other DeckFilters object to compare this one to.</param>

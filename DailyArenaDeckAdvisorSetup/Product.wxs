@@ -16,13 +16,29 @@
 		<?define DailyArenaDeckAdvisorUpdaterExeSourcePath = "$(var.ProjectDir)..\DailyArenaDeckAdvisorUpdater\x64\Release\DailyArenaDeckAdvisorUpdater.exe" ?>
 		<?define DailyArenaDeckAdvisorConfigSourcePath = "$(var.ProjectDir)..\DailyArenaDeckAdvisor\x64\Release\DailyArenaDeckAdvisor.exe.config" ?>
 		<?define DailyArenaCommonDllSourcePath = "$(var.ProjectDir)..\DailyArenaDeckAdvisor\x64\Release\DailyArena.Common.dll" ?>
-		<?define DailyArenaEnResourceDllPath = "$(var.ProjectDir)..\DailyArenaDeckAdvisor\x64\Release\en\DailyArenaDeckAdvisor.resources.dll" ?>
-		<?define DailyArenaRuResourceDllPath = "$(var.ProjectDir)..\DailyArenaDeckAdvisor\x64\Release\ru-RU\DailyArenaDeckAdvisor.resources.dll" ?>
 		<?define XceedToolkitDllPath = "$(var.ProjectDir)..\DailyArenaDeckAdvisor\x64\Release\Xceed.Wpf.Toolkit.dll" ?>
 		<?define XceedAvalonDockDllPath = "$(var.ProjectDir)..\DailyArenaDeckAdvisor\x64\Release\Xceed.Wpf.AvalonDock.dll" ?>
 		<?define XceedAeroDllPath = "$(var.ProjectDir)..\DailyArenaDeckAdvisor\x64\Release\Xceed.Wpf.AvalonDock.Themes.Aero.dll" ?>
 		<?define XceedMetroDllPath = "$(var.ProjectDir)..\DailyArenaDeckAdvisor\x64\Release\Xceed.Wpf.AvalonDock.Themes.Metro.dll" ?>
 		<?define XceedVS2010DllPath = "$(var.ProjectDir)..\DailyArenaDeckAdvisor\x64\Release\Xceed.Wpf.AvalonDock.Themes.VS2010.dll" ?>
+
+		<!-- DailyArena language resource files -->
+		<?define DailyArenaEnResourceDllPath = "$(var.ProjectDir)..\DailyArenaDeckAdvisor\x64\Release\en\DailyArenaDeckAdvisor.resources.dll" ?>
+		<?define DailyArenaLauncherEnResourceDllPath = "$(var.ProjectDir)..\DailyArenaDeckAdvisorLauncher\x64\Release\en\DailyArenaDeckAdvisorLauncher.resources.dll" ?>
+		<?define DailyArenaRuResourceDllPath = "$(var.ProjectDir)..\DailyArenaDeckAdvisor\x64\Release\ru\DailyArenaDeckAdvisor.resources.dll" ?>
+		<?define DailyArenaLauncherRuResourceDllPath = "$(var.ProjectDir)..\DailyArenaDeckAdvisorLauncher\x64\Release\ru\DailyArenaDeckAdvisorLauncher.resources.dll" ?>
+	
+		<!-- Xceed language resource files -->
+		<?define XceedDeResourceDllPath = "$(var.ProjectDir)..\DailyArenaDeckAdvisor\x64\Release\de\Xceed.Wpf.AvalonDock.resources.dll" ?>
+		<?define XceedEsResourceDllPath = "$(var.ProjectDir)..\DailyArenaDeckAdvisor\x64\Release\es\Xceed.Wpf.AvalonDock.resources.dll" ?>
+		<?define XceedFrResourceDllPath = "$(var.ProjectDir)..\DailyArenaDeckAdvisor\x64\Release\fr\Xceed.Wpf.AvalonDock.resources.dll" ?>
+		<?define XceedHuResourceDllPath = "$(var.ProjectDir)..\DailyArenaDeckAdvisor\x64\Release\hu\Xceed.Wpf.AvalonDock.resources.dll" ?>
+		<?define XceedItResourceDllPath = "$(var.ProjectDir)..\DailyArenaDeckAdvisor\x64\Release\it\Xceed.Wpf.AvalonDock.resources.dll" ?>
+		<?define XceedPtResourceDllPath = "$(var.ProjectDir)..\DailyArenaDeckAdvisor\x64\Release\pt-BR\Xceed.Wpf.AvalonDock.resources.dll" ?>
+		<?define XceedRoResourceDllPath = "$(var.ProjectDir)..\DailyArenaDeckAdvisor\x64\Release\ro\Xceed.Wpf.AvalonDock.resources.dll" ?>
+		<?define XceedRuResourceDllPath = "$(var.ProjectDir)..\DailyArenaDeckAdvisor\x64\Release\ru\Xceed.Wpf.AvalonDock.resources.dll" ?>
+		<?define XceedSvResourceDllPath = "$(var.ProjectDir)..\DailyArenaDeckAdvisor\x64\Release\sv\Xceed.Wpf.AvalonDock.resources.dll" ?>
+		<?define XceedZhResourceDllPath = "$(var.ProjectDir)..\DailyArenaDeckAdvisor\x64\Release\zh-Hans\Xceed.Wpf.AvalonDock.resources.dll" ?>
 	<?else ?>
 		<?define Win64 = "no" ?>
 		<?define PlatformProgramFilesFolder = "ProgramFilesFolder" ?>
@@ -35,13 +51,29 @@
 		<?define DailyArenaDeckAdvisorUpdaterExeSourcePath = "$(var.ProjectDir)..\DailyArenaDeckAdvisorUpdater\x86\Release\DailyArenaDeckAdvisorUpdater.exe" ?>
 		<?define DailyArenaDeckAdvisorConfigSourcePath = "$(var.ProjectDir)..\DailyArenaDeckAdvisor\x86\Release\DailyArenaDeckAdvisor.exe.config" ?>
 		<?define DailyArenaCommonDllSourcePath = "$(var.ProjectDir)..\DailyArenaDeckAdvisor\x86\Release\DailyArena.Common.dll" ?>
-		<?define DailyArenaEnResourceDllPath = "$(var.ProjectDir)..\DailyArenaDeckAdvisor\x86\Release\en\DailyArenaDeckAdvisor.resources.dll" ?>
-		<?define DailyArenaRuResourceDllPath = "$(var.ProjectDir)..\DailyArenaDeckAdvisor\x86\Release\ru-RU\DailyArenaDeckAdvisor.resources.dll" ?>
 		<?define XceedToolkitDllPath = "$(var.ProjectDir)..\DailyArenaDeckAdvisor\x86\Release\Xceed.Wpf.Toolkit.dll" ?>
 		<?define XceedAvalonDockDllPath = "$(var.ProjectDir)..\DailyArenaDeckAdvisor\x86\Release\Xceed.Wpf.AvalonDock.dll" ?>
 		<?define XceedAeroDllPath = "$(var.ProjectDir)..\DailyArenaDeckAdvisor\x86\Release\Xceed.Wpf.AvalonDock.Themes.Aero.dll" ?>
 		<?define XceedMetroDllPath = "$(var.ProjectDir)..\DailyArenaDeckAdvisor\x86\Release\Xceed.Wpf.AvalonDock.Themes.Metro.dll" ?>
 		<?define XceedVS2010DllPath = "$(var.ProjectDir)..\DailyArenaDeckAdvisor\x86\Release\Xceed.Wpf.AvalonDock.Themes.VS2010.dll" ?>
+
+		<!-- DailyArena language resource files -->
+		<?define DailyArenaEnResourceDllPath = "$(var.ProjectDir)..\DailyArenaDeckAdvisor\x86\Release\en\DailyArenaDeckAdvisor.resources.dll" ?>
+		<?define DailyArenaLauncherEnResourceDllPath = "$(var.ProjectDir)..\DailyArenaDeckAdvisorLauncher\x86\Release\en\DailyArenaDeckAdvisorLauncher.resources.dll" ?>
+		<?define DailyArenaRuResourceDllPath = "$(var.ProjectDir)..\DailyArenaDeckAdvisor\x86\Release\ru\DailyArenaDeckAdvisor.resources.dll" ?>
+		<?define DailyArenaLauncherRuResourceDllPath = "$(var.ProjectDir)..\DailyArenaDeckAdvisorLauncher\x86\Release\ru\DailyArenaDeckAdvisorLauncher.resources.dll" ?>
+
+		<!-- Xceed language resource files -->
+		<?define XceedDeResourceDllPath = "$(var.ProjectDir)..\DailyArenaDeckAdvisor\x86\Release\de\Xceed.Wpf.AvalonDock.resources.dll" ?>
+		<?define XceedEsResourceDllPath = "$(var.ProjectDir)..\DailyArenaDeckAdvisor\x86\Release\es\Xceed.Wpf.AvalonDock.resources.dll" ?>
+		<?define XceedFrResourceDllPath = "$(var.ProjectDir)..\DailyArenaDeckAdvisor\x86\Release\fr\Xceed.Wpf.AvalonDock.resources.dll" ?>
+		<?define XceedHuResourceDllPath = "$(var.ProjectDir)..\DailyArenaDeckAdvisor\x86\Release\hu\Xceed.Wpf.AvalonDock.resources.dll" ?>
+		<?define XceedItResourceDllPath = "$(var.ProjectDir)..\DailyArenaDeckAdvisor\x86\Release\it\Xceed.Wpf.AvalonDock.resources.dll" ?>
+		<?define XceedPtResourceDllPath = "$(var.ProjectDir)..\DailyArenaDeckAdvisor\x86\Release\pt-BR\Xceed.Wpf.AvalonDock.resources.dll" ?>
+		<?define XceedRoResourceDllPath = "$(var.ProjectDir)..\DailyArenaDeckAdvisor\x86\Release\ro\Xceed.Wpf.AvalonDock.resources.dll" ?>
+		<?define XceedRuResourceDllPath = "$(var.ProjectDir)..\DailyArenaDeckAdvisor\x86\Release\ru\Xceed.Wpf.AvalonDock.resources.dll" ?>
+		<?define XceedSvResourceDllPath = "$(var.ProjectDir)..\DailyArenaDeckAdvisor\x86\Release\sv\Xceed.Wpf.AvalonDock.resources.dll" ?>
+		<?define XceedZhResourceDllPath = "$(var.ProjectDir)..\DailyArenaDeckAdvisor\x86\Release\zh-Hans\Xceed.Wpf.AvalonDock.resources.dll" ?>
 	<?endif ?>
 
 	<Product Id="*" Name="!(loc.ApplicationName)" Language="!(loc.Language)" Version="$(var.VersionNumber)" Manufacturer="!(loc.ManufacturerFullName)" UpgradeCode="$(var.UpgradeCode)">
@@ -160,15 +192,82 @@
 							<File Source="$(var.XceedVS2010DllPath)" Id="XceedVS2010Dll" KeyPath="yes" />
 						</Component>
 
-						<!-- language resource files that go in subfolders -->
+						<!-- language resource files -->
+						<Directory Id="deResourceFolder" Name="de">
+							<!-- Xceed language resource files -->
+							<Component Id="de_Xceed.Wpf.AvalonDock.resources.dll_comp" Guid="704e2538-4702-4303-b561-20b4821ac94f" Win64="$(var.Win64)">
+								<File Source="$(var.XceedDeResourceDllPath)" Id="XceedDeResourceDll" KeyPath="yes" />
+							</Component>
+						</Directory>
 						<Directory Id="enResourceFolder" Name="en">
+							<!-- DailyArena language resource files -->
 							<Component Id="en_DailyArenaDeckAdvisor.resource.dll_comp" Guid="d16f81d1-15e8-4b8a-9244-139a27b27f16" Win64="$(var.Win64)">
 								<File Source="$(var.DailyArenaEnResourceDllPath)" Id="DailyArenaEnResourceDll" KeyPath="yes" />
 							</Component>
+							<Component Id="en_DailyArenaDeckAdvisorLauncher.resource.dll_comp" Guid="3cec9634-a73c-4d7d-b5f9-3022210cafe8" Win64="$(var.Win64)">
+								<File Source="$(var.DailyArenaLauncherEnResourceDllPath)" Id="DailyArenaLauncherEnResourceDll" KeyPath="yes" />
+							</Component>
 						</Directory>
-						<Directory Id="ruResourceFolder" Name="ru-RU">
-							<Component Id="ru_RU_DailyArenaDeckAdvisor.resource.dll_comp" Guid="40cf52c8-7f77-4fe4-b0be-1e7175ff9d68" Win64="$(var.Win64)">
+						<Directory Id="esResourceFolder" Name="es">
+							<!-- Xceed language resource files -->
+							<Component Id="es_Xceed.Wpf.AvalonDock.resources.dll_comp" Guid="28e7b111-b0b8-4d10-b63b-a1b4735b3aa7" Win64="$(var.Win64)">
+								<File Source="$(var.XceedEsResourceDllPath)" Id="XceedEsResourceDll" KeyPath="yes" />
+							</Component>
+						</Directory>
+						<Directory Id="frResourceFolder" Name="fr">
+							<!-- Xceed language resource files -->
+							<Component Id="fr_Xceed.Wpf.AvalonDock.resources.dll_comp" Guid="4fdb2069-eba3-41a4-96ad-0ca3f070a989" Win64="$(var.Win64)">
+								<File Source="$(var.XceedFrResourceDllPath)" Id="XceedFrResourceDll" KeyPath="yes" />
+							</Component>
+						</Directory>
+						<Directory Id="huResourceFolder" Name="hu">
+							<!-- Xceed language resource files -->
+							<Component Id="hu_Xceed.Wpf.AvalonDock.resources.dll_comp" Guid="52fcd910-5fdb-4b7d-8480-80b637a4bc63" Win64="$(var.Win64)">
+								<File Source="$(var.XceedHuResourceDllPath)" Id="XceedHuResourceDll" KeyPath="yes" />
+							</Component>
+						</Directory>
+						<Directory Id="itResourceFolder" Name="it">
+							<!-- Xceed language resource files -->
+							<Component Id="it_Xceed.Wpf.AvalonDock.resources.dll_comp" Guid="453813f9-3e9b-414e-9c04-2838d28e200a" Win64="$(var.Win64)">
+								<File Source="$(var.XceedItResourceDllPath)" Id="XceedItResourceDll" KeyPath="yes" />
+							</Component>
+						</Directory>
+						<Directory Id="ptResourceFolder" Name="pt-BR">
+							<!-- Xceed language resource files -->
+							<Component Id="pt_BR_Xceed.Wpf.AvalonDock.resources.dll_comp" Guid="9ad96039-55f4-4caf-98de-526c01dd96e4" Win64="$(var.Win64)">
+								<File Source="$(var.XceedPtResourceDllPath)" Id="XceedPtResourceDll" KeyPath="yes" />
+							</Component>
+						</Directory>
+						<Directory Id="roResourceFolder" Name="ro">
+							<!-- Xceed language resource files -->
+							<Component Id="ro_Xceed.Wpf.AvalonDock.resources.dll_comp" Guid="6336aa14-29e3-4c3f-b7cf-d0aa3106d463" Win64="$(var.Win64)">
+								<File Source="$(var.XceedRoResourceDllPath)" Id="XceedRoResourceDll" KeyPath="yes" />
+							</Component>
+						</Directory>
+						<Directory Id="ruResourceFolder" Name="ru">
+							<!-- DailyArena language resource files -->
+							<Component Id="ru_DailyArenaDeckAdvisor.resource.dll_comp" Guid="40cf52c8-7f77-4fe4-b0be-1e7175ff9d68" Win64="$(var.Win64)">
 								<File Source="$(var.DailyArenaRuResourceDllPath)" Id="DailyArenaRuResourceDll" KeyPath="yes" />
+							</Component>
+							<Component Id="ru_DailyArenaDeckAdvisorLauncher.resource.dll_comp" Guid="ebca2b66-50a5-4ba2-bcf2-081cdef19195" Win64="$(var.Win64)">
+								<File Source="$(var.DailyArenaLauncherRuResourceDllPath)" Id="DailyArenaLauncherRuResourceDll" KeyPath="yes" />
+							</Component>
+
+							<!-- Xceed language resource files -->
+							<Component Id="ru_Xceed.Wpf.AvalonDock.resources.dll_comp" Guid="66d814a4-6cb4-4489-afb5-43253bfd4f7e" Win64="$(var.Win64)">
+								<File Source="$(var.XceedRuResourceDllPath)" Id="XceedRuResourceDll" KeyPath="yes" />
+							</Component>
+						</Directory>
+						<Directory Id="svResourceFolder" Name="sv">
+							<!-- Xceed language resource files -->
+							<Component Id="sv_Xceed.Wpf.AvalonDock.resources.dll_comp" Guid="30fc4907-9c0f-4d4f-85bc-e371a661ef78" Win64="$(var.Win64)">
+								<File Source="$(var.XceedSvResourceDllPath)" Id="XceedSvResourceDll" KeyPath="yes" />
+							</Component>
+						</Directory>
+						<Directory Id="zhResourceFolder" Name="zh-Hans">
+							<!-- Xceed language resource files -->
+							<Component Id="zh_Hans_Xceed.Wpf.AvalonDock.resources.dll_comp" Guid="c11a22ea-b541-409e-8d74-fad7ba1e9629" Win64="$(var.Win64)">
+								<File Source="$(var.XceedZhResourceDllPath)" Id="XceedZhResourceDll" KeyPath="yes" />
 							</Component>
 						</Directory>
 					</Directory>
@@ -206,9 +305,25 @@
 				<ComponentRef Id="Xceed.Wpf.AvalonDock.Themes.Aero.dll_comp" />
 				<ComponentRef Id="Xceed.Wpf.AvalonDock.Themes.Metro.dll_comp" />
 				<ComponentRef Id="Xceed.Wpf.AvalonDock.Themes.VS2010.dll_comp" />
+				
+				<!-- DailyArena language resource files -->
 				<ComponentRef Id="en_DailyArenaDeckAdvisor.resource.dll_comp" />
-				<ComponentRef Id="ru_RU_DailyArenaDeckAdvisor.resource.dll_comp" />
-
+				<ComponentRef Id="en_DailyArenaDeckAdvisorLauncher.resource.dll_comp" />
+				<ComponentRef Id="ru_DailyArenaDeckAdvisor.resource.dll_comp" />
+				<ComponentRef Id="ru_DailyArenaDeckAdvisorLauncher.resource.dll_comp" />
+				
+				<!-- Xceed language resource files -->
+				<ComponentRef Id="de_Xceed.Wpf.AvalonDock.resources.dll_comp" />
+				<ComponentRef Id="es_Xceed.Wpf.AvalonDock.resources.dll_comp" />
+				<ComponentRef Id="fr_Xceed.Wpf.AvalonDock.resources.dll_comp" />
+				<ComponentRef Id="hu_Xceed.Wpf.AvalonDock.resources.dll_comp" />
+				<ComponentRef Id="it_Xceed.Wpf.AvalonDock.resources.dll_comp" />
+				<ComponentRef Id="pt_BR_Xceed.Wpf.AvalonDock.resources.dll_comp" />
+				<ComponentRef Id="ro_Xceed.Wpf.AvalonDock.resources.dll_comp" />
+				<ComponentRef Id="ru_Xceed.Wpf.AvalonDock.resources.dll_comp" />
+				<ComponentRef Id="sv_Xceed.Wpf.AvalonDock.resources.dll_comp" />
+				<ComponentRef Id="zh_Hans_Xceed.Wpf.AvalonDock.resources.dll_comp" />
+			
 				<!-- Registry entries -->
 				<ComponentRef Id="RegValInstallLocation_comp" />
 			

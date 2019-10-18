@@ -27,7 +27,7 @@
 			<TextBlock Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" FontSize="24" Margin="3" FontWeight="Bold" VerticalAlignment="Bottom" HorizontalAlignment="Center" Text="{x:Static p:Resources.Tooltip_Settings}" />
 			<StackPanel Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" Orientation="Horizontal" HorizontalAlignment="Center">
 				<Label Margin="3" FontWeight="Bold" VerticalContentAlignment="Center" Content="{x:Static p:Resources.Label_FontSize}" />
-				<ComboBox x:Name="FontSize" SelectedValue="{Binding Owner.SelectedFontSize.Value, Mode=TwoWay}"
+				<ComboBox x:Name="FontSizeCombo" SelectedValue="{Binding Owner.SelectedFontSize.Value, Mode=TwoWay}"
 						  Margin="3" VerticalContentAlignment="Center" ItemsSource="{Binding FontSizes}" />
 			</StackPanel>
 			<Button Grid.Row="2" Grid.Column="0" x:Name="Code" Margin="3" Padding="3" Content="{x:Static p:Resources.Button_Code}" ToolTip="{x:Static p:Resources.Tooltip_Code}" Click="GithubButton_Click" />
