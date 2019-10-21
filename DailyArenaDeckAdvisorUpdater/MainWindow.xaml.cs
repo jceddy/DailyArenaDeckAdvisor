@@ -1,10 +1,13 @@
 ﻿using System;
+using System.Configuration;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Net;
 using System.Reflection;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 
@@ -23,7 +26,43 @@ namespace DailyArenaDeckAdvisorUpdater
 			App application = (App)Application.Current;
 			FileLogger.Log("Main Window Constructor Called - {0}", "Updater");
 
+			SetCulture();
 			InitializeComponent();
+		}
+
+		/// <summary>
+		/// Sets the current UI culture from DailyArenaDeckAdvisor.exe.config if it's set there.
+		/// </summary>
+		private void SetCulture()
+		{
+			FileLogger.Log("SetCulture() Called - {0}", "Launcher");
+
+			try
+			{
+				var appSettings = ConfigurationManager.OpenExeConfiguration("DailyArenaDeckAdvisor.exe");
+				if (appSettings == null)
+				{
+					FileLogger.Log("No AppSettings Found, Using Default UI Culture");
+				}
+				else
+				{
+					var cultureSetting = appSettings.AppSettings.Settings["UICulture"];
+					if (cultureSetting != null)
+					{
+						var culture = cultureSetting.Value;
+						FileLogger.Log("Setting UI Culture to {0}", culture);
+						Thread.CurrentThread.CurrentUICulture = new CultureInfo(culture);
+					}
+					else
+					{
+						FileLogger.Log("UICulture not set in AppSettings, Using Default UI Culture");
+					}
+				}
+			}
+			catch (ConfigurationErrorsException e)
+			{
+				FileLogger.Log(e, "Exception in SetCulture(), Using Default UI Culture");
+			}
 		}
 
 		/// <summary>
