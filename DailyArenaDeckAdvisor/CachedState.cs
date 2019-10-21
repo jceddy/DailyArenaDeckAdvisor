@@ -8,17 +8,27 @@ namespace DailyArena.DeckAdvisor
 	public class CachedState
 	{
 		/// <summary>
-		/// The Last value selected from the Format drop-down.
+		/// Gets or sets the last value selected from the Format drop-down.
 		/// </summary>
 		public string LastFormat { get; set; }
 
 		/// <summary>
-		/// The State of the "rotation-proof" toggle button.
+		/// Gets or sets the last value selcted by the deck Sort drop-down.
+		/// </summary>
+		public string LastSort { get; set; }
+
+		/// <summary>
+		/// Gets or sets the last value selected by the deck Sort Dir drop-down.
+		/// </summary>
+		public string LastSortDir { get; set; }
+
+		/// <summary>
+		/// Gets or sets the State of the "rotation-proof" toggle button.
 		/// </summary>
 		public bool RotationProof { get; set; }
 
 		/// <summary>
-		/// The selected font size for the application.
+		/// Gets or sets the selected font size for the application.
 		/// </summary>
 		public int FontSize { get; set; }
 

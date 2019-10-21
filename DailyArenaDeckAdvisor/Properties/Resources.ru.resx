@@ -209,9 +209,37 @@
     <value>Арена Стандарт</value>
     <comment>The string for Arena Standard in the Format ComboBox.</comment>
   </data>
+  <data name="Item_Ascending" xml:space="preserve">
+    <value>Восходящий</value>
+    <comment>The string for Ascending in the Sort Dir ComboBox.</comment>
+  </data>
+  <data name="Item_BoosterCost" xml:space="preserve">
+    <value>Стоимость бустера</value>
+    <comment>The string for Booster Cost in the Sort ComboBox.</comment>
+  </data>
+  <data name="Item_BoosterCostIgnoringCollection" xml:space="preserve">
+    <value>Повышение стоимости (игнорирование коллекции)</value>
+    <comment>The string for Booster Cost (Ignoring Collection) in the Sort ComboBox.</comment>
+  </data>
+  <data name="Item_BoosterCostIgnoringWildcards" xml:space="preserve">
+    <value>Стоимость бустера (Игнорирование подстановочных знаков)</value>
+    <comment>The string for Booster Cost (Ignoring Wildcards) in the Sort ComboBox.</comment>
+  </data>
   <data name="Item_Brawl" xml:space="preserve">
     <value>Бравл</value>
     <comment>The string for Brawl in the Format ComboBox.</comment>
+  </data>
+  <data name="Item_CommonCount" xml:space="preserve">
+    <value>Обычные граф</value>
+    <comment>The string for Common Count in the Sort ComboBox.</comment>
+  </data>
+  <data name="Item_Default" xml:space="preserve">
+    <value>По умолчанию</value>
+    <comment>The string for Default in the Sort/Dir ComboBox.</comment>
+  </data>
+  <data name="Item_Descending" xml:space="preserve">
+    <value>нисходящий</value>
+    <comment>The string for Descending in the Sort Dir ComboBox.</comment>
   </data>
   <data name="Item_Historic_Bo1" xml:space="preserve">
     <value>Исторический (Bo1)</value>
@@ -221,9 +249,25 @@
     <value>Исторический (Bo3)</value>
     <comment>The string for Historic (Bo3) in the Format ComboBox.</comment>
   </data>
+  <data name="Item_MythicRareCount" xml:space="preserve">
+    <value>Раритетные Граф</value>
+    <comment>The string for Mythic Rare Count in the Sort ComboBox.</comment>
+  </data>
+  <data name="Item_RareCount" xml:space="preserve">
+    <value>Редкие граф</value>
+    <comment>The string for Rare Count in the Sort ComboBox.</comment>
+  </data>
   <data name="Item_Standard" xml:space="preserve">
     <value>Стандарт</value>
     <comment>The string for Standard in the Format ComboBox.</comment>
+  </data>
+  <data name="Item_UncommonCount" xml:space="preserve">
+    <value>Необычные граф</value>
+    <comment>The string for Uncommon Count in the Sort ComboBox.</comment>
+  </data>
+  <data name="Item_WinRate" xml:space="preserve">
+    <value>Статистика побед/поражений</value>
+    <comment>The string for Win/Loss Record in the Sort ComboBox.</comment>
   </data>
   <data name="Label_Cards" xml:space="preserve">
     <value> картами</value>

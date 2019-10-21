@@ -37,6 +37,11 @@ namespace DailyArena.DeckAdvisor
 		List<Archetype> _archetypes = new List<Archetype>();
 
 		/// <summary>
+		/// The current meta report.
+		/// </summary>
+		MetaReport _report;
+
+		/// <summary>
 		/// The player's card inventory; key = Arena Id of a card, value = Quantity of that card owned.
 		/// </summary>
 		Dictionary<int, int> _playerInventory = new Dictionary<int, int>();
@@ -109,17 +114,27 @@ namespace DailyArena.DeckAdvisor
 		ILogger _logger;
 
 		/// <summary>
-		/// The selected format being viewed.
+		/// Gets or sets the selected format being viewed.
 		/// </summary>
 		public Bindable<string> Format { get; private set; } = new Bindable<string>();
 
 		/// <summary>
-		/// The state of the "Rotation" toggle button.
+		/// Gets or sets the selected deck sort field.
+		/// </summary>
+		public Bindable<string> Sort { get; private set; } = new Bindable<string>();
+
+		/// <summary>
+		/// Gets or sets the selected deck sort direction.
+		/// </summary>
+		public Bindable<string> SortDir { get; private set; } = new Bindable<string>();
+
+		/// <summary>
+		/// Gets or sets the state of the "Rotation" toggle button.
 		/// </summary>
 		public BindableBool RotationProof { get; private set; } = new BindableBool();
 
 		/// <summary>
-		/// The selected font size for the display.
+		/// Gets or sets the selected font size for the display.
 		/// </summary>
 		public Bindable<int> SelectedFontSize { get; private set; } = new Bindable<int>() { Value = 12 };
 
@@ -539,6 +554,7 @@ namespace DailyArena.DeckAdvisor
 						{
 							Log.Error(e, "Card not found: {cardName}", cardName);
 							cardName = Regex.Split(cardName, " // ")[0].Trim();
+							cardName = Regex.Split(cardName, " <")[0].Trim();
 							if (cardsByName[cardName].Count(x => x.Set.StandardLegal) == 0)
 							{
 								_logger.Debug("{cardName} is not standard legal, ignore this deck", cardName);
@@ -1721,27 +1737,11 @@ namespace DailyArena.DeckAdvisor
 						(!filters.HideCommon || RarityCount(x.MainDeck.Concat(x.Sideboard), CardRarity.Common, cardsByName) <= filters.CommonCount)
 				).ToList();
 			}
-			if (Format == Properties.Resources.Item_ArenaStandard)
-			{
-				// for Arena Standard, use slightly different ordering, favoring win rate over estimated booster cost
-				_orderedArchetypes = _archetypes.OrderBy(x => x.IsPlayerDeck ? 0 : 1).ThenBy(x => x.BoosterCost == 0 ? 0 : (x.BoosterCostAfterWC == 0 ? 1 : 2)).ThenByDescending(x => x.BoosterCostAfterWC == 0 ? x.WinRate : x.BoosterCostAfterWC).ThenBy(x => x.BoosterCostAfterWC).ThenBy(x => x.BoosterCost);
-			}
-			else
-			{
-				_orderedArchetypes = _archetypes.OrderBy(x => x.IsPlayerDeck ? 0 : 1).ThenBy(x => x.BoosterCostAfterWC).ThenBy(x => x.BoosterCost);
-			}
-			MetaReport report = new MetaReport(cardsByName, _cardStats, cardsById, _playerInventoryCounts, _archetypes, RotationProof.Value, _setNameTranslations);
+			
+			_report = new MetaReport(cardsByName, _cardStats, cardsById, _playerInventoryCounts, _archetypes, RotationProof.Value, _setNameTranslations);
 
 			LoadingValue.Value = 90;
-
-			Dispatcher.Invoke(() =>
-			{
-				_tabObjects.Add(report);
-				foreach (Archetype archetype in _orderedArchetypes)
-				{
-					_tabObjects.Add(archetype);
-				}
-			});
+			SortArchetypes();
 
 			LoadingValue.Value = 100;
 
@@ -2022,13 +2022,36 @@ namespace DailyArena.DeckAdvisor
 
 			App application = (App)Application.Current;
 			Format.Value = application.State.LastFormat;
+			bool saveState = false;
 			if(string.IsNullOrWhiteSpace(Format.Value) || !_formatMappings.ContainsKey(Format.Value))
 			{
 				Format.Value = Properties.Resources.Item_Standard;
 				application.State.LastFormat = Format.Value;
+				saveState = true;
+			}
+			Sort.Value = application.State.LastSort;
+			if(string.IsNullOrWhiteSpace(Sort.Value))
+			{
+				Sort.Value = Properties.Resources.Item_Default;
+				application.State.LastSort = Format.Value;
+				saveState = true;
+			}
+			SortDir.Value = application.State.LastSortDir;
+			if(string.IsNullOrWhiteSpace(SortDir.Value))
+			{
+				SortDir.Value = Properties.Resources.Item_Default;
+				application.State.LastSortDir = SortDir.Value;
+				saveState = true;
+			}
+			
+			if(saveState)
+			{
 				application.SaveState();
 			}
+
 			Format.PropertyChanged += Format_PropertyChanged;
+			Sort.PropertyChanged += Sort_PropertyChanged;
+			SortDir.PropertyChanged += SortDir_PropertyChanged;
 
 			RotationProof.Value = application.State.RotationProof;
 			RotationProof.PropertyChanged += RotationProof_PropertyChanged;
@@ -2109,6 +2132,88 @@ namespace DailyArena.DeckAdvisor
 				TaskContinuationOptions.OnlyOnFaulted
 			);
 			loadTask.Start();
+		}
+
+		/// <summary>
+		/// Method that generates _orderedArchetypes from _archetypes based on format and selected sort options.
+		/// </summary>
+		private void SortArchetypes()
+		{
+			if (Format == Properties.Resources.Item_ArenaStandard)
+			{
+				// for Arena Standard, use slightly different ordering, favoring win rate over estimated booster cost
+				_orderedArchetypes = _archetypes.OrderBy(x => x.IsPlayerDeck ? 0 : 1).ThenBy(x => x.BoosterCost == 0 ? 0 : (x.BoosterCostAfterWC == 0 ? 1 : 2)).ThenByDescending(x => x.BoosterCostAfterWC == 0 ? x.WinRate : x.BoosterCostAfterWC).ThenBy(x => x.BoosterCostAfterWC).ThenBy(x => x.BoosterCost);
+			}
+			else
+			{
+				_orderedArchetypes = _archetypes.OrderBy(x => x.IsPlayerDeck ? 0 : 1).ThenBy(x => x.BoosterCostAfterWC).ThenBy(x => x.BoosterCost);
+			}
+
+			Dispatcher.Invoke(() =>
+			{
+				_tabObjects.Clear();
+				_tabObjects.Add(_report);
+				foreach (Archetype archetype in _orderedArchetypes)
+				{
+					_tabObjects.Add(archetype);
+				}
+			});
+		}
+
+		/// <summary>
+		/// Callback that is triggered when the user selects a different Sort from the drop-down on the GUI.
+		/// </summary>
+		/// <param name="sender">The object that triggered the callback.</param>
+		/// <param name="e">Arguments regarding the event that triggered the callback.</param>
+		private void Sort_PropertyChanged(object sender, PropertyChangedEventArgs e)
+		{
+			_logger.Debug("New Sort Selected, Sort={0}", Sort.Value);
+
+			App application = (App)Application.Current;
+			application.State.LastSort = Sort.Value;
+			application.SaveState();
+
+			Task sortTask = new Task(() => {
+				SortArchetypes();
+			});
+			sortTask.ContinueWith(t =>
+				{
+					if (t.Exception != null)
+					{
+						_logger.Error(t.Exception, "Exception in {0} ({1} - {2})", "sortTask", "Sort_PropertyChanged", "Main Application");
+					}
+				},
+				TaskContinuationOptions.OnlyOnFaulted
+			);
+			sortTask.Start();
+		}
+
+		/// <summary>
+		/// Callback that is triggered when the user selects a different Sort Dir from the drop-down on the GUI.
+		/// </summary>
+		/// <param name="sender">The object that triggered the callback.</param>
+		/// <param name="e">Arguments regarding the event that triggered the callback.</param>
+		private void SortDir_PropertyChanged(object sender, PropertyChangedEventArgs e)
+		{
+			_logger.Debug("New Sort Dir Selected, SortDir={0}", SortDir.Value);
+
+			App application = (App)Application.Current;
+			application.State.LastSortDir = SortDir.Value;
+			application.SaveState();
+
+			Task sortTask = new Task(() => {
+				SortArchetypes();
+			});
+			sortTask.ContinueWith(t =>
+				{
+					if (t.Exception != null)
+					{
+						_logger.Error(t.Exception, "Exception in {0} ({1} - {2})", "sortTask", "Sort_PropertyChanged", "Main Application");
+					}
+				},
+				TaskContinuationOptions.OnlyOnFaulted
+			);
+			sortTask.Start();
 		}
 
 		/// <summary>

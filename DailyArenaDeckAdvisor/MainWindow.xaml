@@ -477,6 +477,26 @@
 
 					<Button x:Name="ShowFilters" Content="{x:Static p:Resources.Button_Filters}" ToolTip="{x:Static p:Resources.Tooltip_ShowFilters}" Margin="3" Padding="3" Click="ShowFilters_Click" />
 
+					<Label Margin="3" FontWeight="Bold" VerticalContentAlignment="Center" Content="Sort Decks:" />
+					<ComboBox x:Name="SelectedSort" SelectedValue="{x:Static p:Resources.Item_Default}" SelectedValuePath="Content"
+						  Margin="3" VerticalContentAlignment="Center">
+						<ComboBoxItem Content="{x:Static p:Resources.Item_Default}" />
+						<ComboBoxItem Content="{x:Static p:Resources.Item_BoosterCost}" />
+						<ComboBoxItem Content="{x:Static p:Resources.Item_BoosterCostIgnoringWildcards}" />
+						<ComboBoxItem Content="{x:Static p:Resources.Item_BoosterCostIgnoringCollection}" />
+						<ComboBoxItem Content="{x:Static p:Resources.Item_WinRate}" />
+						<ComboBoxItem Content="{x:Static p:Resources.Item_MythicRareCount}" />
+						<ComboBoxItem Content="{x:Static p:Resources.Item_RareCount}" />
+						<ComboBoxItem Content="{x:Static p:Resources.Item_UncommonCount}" />
+						<ComboBoxItem Content="{x:Static p:Resources.Item_CommonCount}" />
+					</ComboBox>
+					<ComboBox x:Name="SelectedSortDir" SelectedValue="{x:Static p:Resources.Item_Default}" SelectedValuePath="Content"
+						  Margin="3" VerticalContentAlignment="Center">
+						<ComboBoxItem Content="{x:Static p:Resources.Item_Default}" />
+						<ComboBoxItem Content="{x:Static p:Resources.Item_Ascending}" />
+						<ComboBoxItem Content="{x:Static p:Resources.Item_Descending}" />
+					</ComboBox>
+					
 					<ToggleButton HorizontalAlignment="Center" Margin="3" Padding="3" FontWeight="Bold" IsChecked="{Binding RotationProof.Value, Mode=TwoWay}">
 						<ToggleButton.Style>
 							<Style TargetType="{x:Type ToggleButton}">

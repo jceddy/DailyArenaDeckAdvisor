@@ -268,11 +268,74 @@ namespace DailyArena.DeckAdvisor.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Ascending.
+        /// </summary>
+        public static string Item_Ascending {
+            get {
+                return ResourceManager.GetString("Item_Ascending", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Booster Cost.
+        /// </summary>
+        public static string Item_BoosterCost {
+            get {
+                return ResourceManager.GetString("Item_BoosterCost", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Booster Cost (Ignoring Collection).
+        /// </summary>
+        public static string Item_BoosterCostIgnoringCollection {
+            get {
+                return ResourceManager.GetString("Item_BoosterCostIgnoringCollection", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Booster Cost (Ignoring Wildcards).
+        /// </summary>
+        public static string Item_BoosterCostIgnoringWildcards {
+            get {
+                return ResourceManager.GetString("Item_BoosterCostIgnoringWildcards", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Brawl.
         /// </summary>
         public static string Item_Brawl {
             get {
                 return ResourceManager.GetString("Item_Brawl", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Common Count.
+        /// </summary>
+        public static string Item_CommonCount {
+            get {
+                return ResourceManager.GetString("Item_CommonCount", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Default.
+        /// </summary>
+        public static string Item_Default {
+            get {
+                return ResourceManager.GetString("Item_Default", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Descending.
+        /// </summary>
+        public static string Item_Descending {
+            get {
+                return ResourceManager.GetString("Item_Descending", resourceCulture);
             }
         }
         
@@ -295,11 +358,47 @@ namespace DailyArena.DeckAdvisor.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Mythic Rare Count.
+        /// </summary>
+        public static string Item_MythicRareCount {
+            get {
+                return ResourceManager.GetString("Item_MythicRareCount", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Rare Count.
+        /// </summary>
+        public static string Item_RareCount {
+            get {
+                return ResourceManager.GetString("Item_RareCount", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Standard.
         /// </summary>
         public static string Item_Standard {
             get {
                 return ResourceManager.GetString("Item_Standard", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Uncommon Count.
+        /// </summary>
+        public static string Item_UncommonCount {
+            get {
+                return ResourceManager.GetString("Item_UncommonCount", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Win/Loss Record.
+        /// </summary>
+        public static string Item_WinRate {
+            get {
+                return ResourceManager.GetString("Item_WinRate", resourceCulture);
             }
         }
         
