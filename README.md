@@ -15,6 +15,11 @@ https://github.com/jceddy/DailyArenaDeckAdvisor/wiki/Getting-Started:-Developing
 Libraries used by this project:  
 https://github.com/jceddy/DailyArenaCommon
 
+# Release 1.0.4.4 Changes
+ - Deck Filters
+ - More Localization Support
+ - Fixed bug due to trailing spaces on the card name for Mefolk Secretkeeper.
+
 # Release 1.0.4.0 Changes
 - More Support for Localization
 - Minor and Under-the-Hood Changes
