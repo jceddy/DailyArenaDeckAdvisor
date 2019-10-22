@@ -2033,7 +2033,7 @@ namespace DailyArena.DeckAdvisor
 			if(string.IsNullOrWhiteSpace(Sort.Value))
 			{
 				Sort.Value = Properties.Resources.Item_Default;
-				application.State.LastSort = Format.Value;
+				application.State.LastSort = Sort.Value;
 				saveState = true;
 			}
 			SortDir.Value = application.State.LastSortDir;
@@ -2139,14 +2139,50 @@ namespace DailyArena.DeckAdvisor
 		/// </summary>
 		private void SortArchetypes()
 		{
+			Func<Archetype, double> orderFunc = x => 0.0;
+
+			if(Sort.Value == Properties.Resources.Item_BoosterCost)
+			{
+				orderFunc = x => SortDir.Value == Properties.Resources.Item_Descending ? 0.0 - x.BoosterCostAfterWC : x.BoosterCostAfterWC;
+			}
+			else if(Sort.Value == Properties.Resources.Item_BoosterCostIgnoringWildcards)
+			{
+				orderFunc = x => SortDir.Value == Properties.Resources.Item_Descending ? 0.0 - x.BoosterCost : x.BoosterCost;
+			}
+			else if(Sort.Value == Properties.Resources.Item_BoosterCostIgnoringCollection)
+			{
+				orderFunc = x => SortDir.Value == Properties.Resources.Item_Descending ? 0.0 - x.TotalBoosterCost : x.TotalBoosterCost;
+			}
+			else if(Sort.Value == Properties.Resources.Item_WinRate)
+			{
+				// default is descending for win rate (highest win rate on top), all others default to ascending (lowest cost on top)
+				orderFunc = x => SortDir.Value == Properties.Resources.Item_Ascending ? x.WinRate : 0.0 - x.WinRate;
+			}
+			else if (Sort.Value == Properties.Resources.Item_MythicRareCount)
+			{
+				orderFunc = x => SortDir.Value == Properties.Resources.Item_Descending ? 0.0 - x.GetRarityCount(CardRarity.MythicRare) : x.GetRarityCount(CardRarity.MythicRare);
+			}
+			else if (Sort.Value == Properties.Resources.Item_RareCount)
+			{
+				orderFunc = x => SortDir.Value == Properties.Resources.Item_Descending ? 0.0 - x.GetRarityCount(CardRarity.Rare) : x.GetRarityCount(CardRarity.Rare);
+			}
+			else if (Sort.Value == Properties.Resources.Item_UncommonCount)
+			{
+				orderFunc = x => SortDir.Value == Properties.Resources.Item_Descending ? 0.0 - x.GetRarityCount(CardRarity.Uncommon) : x.GetRarityCount(CardRarity.Uncommon);
+			}
+			else if (Sort.Value == Properties.Resources.Item_CommonCount)
+			{
+				orderFunc = x => SortDir.Value == Properties.Resources.Item_Descending ? 0.0 - x.GetRarityCount(CardRarity.Common) : x.GetRarityCount(CardRarity.Common);
+			}
+
 			if (Format == Properties.Resources.Item_ArenaStandard)
 			{
 				// for Arena Standard, use slightly different ordering, favoring win rate over estimated booster cost
-				_orderedArchetypes = _archetypes.OrderBy(x => x.IsPlayerDeck ? 0 : 1).ThenBy(x => x.BoosterCost == 0 ? 0 : (x.BoosterCostAfterWC == 0 ? 1 : 2)).ThenByDescending(x => x.BoosterCostAfterWC == 0 ? x.WinRate : x.BoosterCostAfterWC).ThenBy(x => x.BoosterCostAfterWC).ThenBy(x => x.BoosterCost);
+				_orderedArchetypes = _archetypes.OrderBy(orderFunc).ThenBy(x => x.IsPlayerDeck ? 0 : 1).ThenBy(x => x.BoosterCost == 0 ? 0 : (x.BoosterCostAfterWC == 0 ? 1 : 2)).ThenByDescending(x => x.BoosterCostAfterWC == 0 ? x.WinRate : x.BoosterCostAfterWC).ThenBy(x => x.BoosterCostAfterWC).ThenBy(x => x.BoosterCost);
 			}
 			else
 			{
-				_orderedArchetypes = _archetypes.OrderBy(x => x.IsPlayerDeck ? 0 : 1).ThenBy(x => x.BoosterCostAfterWC).ThenBy(x => x.BoosterCost);
+				_orderedArchetypes = _archetypes.OrderBy(orderFunc).ThenBy(x => x.IsPlayerDeck ? 0 : 1).ThenBy(x => x.BoosterCostAfterWC).ThenBy(x => x.BoosterCost);
 			}
 
 			Dispatcher.Invoke(() =>

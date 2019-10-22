@@ -315,6 +315,30 @@ namespace DailyArena.DeckAdvisor
 		}
 
 		/// <summary>
+		/// The average number of boosters a player would need to open to collect the cards for the deck, starting from an empty collection.
+		/// </summary>
+		private double _totalBoosterCost = -1;
+
+		/// <summary>
+		/// Gets the average number of boosters a player would need to open to collect the cards for the deck, starting from an empty collection.
+		/// </summary>
+		public double TotalBoosterCost
+		{
+			get
+			{
+				if (_totalBoosterCost < 0 && _mainDeckToCollect != null && _sideboardToCollect != null)
+				{
+					ReadOnlyDictionary<int, Card> cardsById = Card.CardsById;
+					_totalBoosterCost = _mainDeckToCollect.Sum(x => cardsById[x.Key].BoosterCost * Math.Min(x.Value, 4)) +
+						_sideboardToCollect.Sum(x => cardsById[x.Key].BoosterCost * Math.Min(x.Value, 4)) +
+						_suggestedMainDeck.Sum(x => cardsById[x.Key].BoosterCost * Math.Min(x.Value, 4)) +
+						_suggestedSideboard.Sum(x => cardsById[x.Key].BoosterCost * Math.Min(x.Value, 4));
+				}
+				return _totalBoosterCost;
+			}
+		}
+
+		/// <summary>
 		/// The average number of boosters the player will need to open to collect the cards for the deck (assuming they don't spend wildcards).
 		/// </summary>
 		private double _boosterCost = -1;
@@ -461,6 +485,40 @@ namespace DailyArena.DeckAdvisor
 				}
 				return _totalWildcardsNeeded;
 			}
+		}
+
+		/// <summary>
+		/// Total card counts by rarity.
+		/// </summary>
+		private Dictionary<CardRarity, int> _rarityCounts = null;
+
+		/// <summary>
+		/// Get the number of cards of the given rarity in the deck archetype.
+		/// </summary>
+		/// <param name="rarity">The rarity to count.</param>
+		/// <returns>The number of cards of the requested rarity in the deck archetype.</returns>
+		public int GetRarityCount(CardRarity rarity)
+		{
+			if(_rarityCounts == null)
+			{
+				if(_mainDeckToCollect != null && _sideboardToCollect != null)
+				{
+					ReadOnlyDictionary<int, Card> cardsById = Card.CardsById;
+					_rarityCounts = _mainDeckToCollect.Select(x => new { cardsById[x.Key].Rarity, Count = _anyNumber.Contains(cardsById[x.Key].Name) ? Math.Min(x.Value, 4) - (_suggestedMainDeck.Where(y => y.Key == x.Key).Count() + _suggestedSideboard.Where(z => z.Key == x.Key).Count()) : x.Value }).
+						Concat(_sideboardToCollect.Select(x => new { cardsById[x.Key].Rarity, Count = _anyNumber.Contains(cardsById[x.Key].Name) ? Math.Min(x.Value, 4) - (_suggestedMainDeck.Where(y => y.Key == x.Key).Count() + _suggestedSideboard.Where(z => z.Key == x.Key).Count()) : x.Value })).
+						Concat(_suggestedMainDeck.Select(x => new { cardsById[x.Key].Rarity, Count = Math.Min(x.Value, 4) })).
+						Concat(_suggestedSideboard.Select(x => new { cardsById[x.Key].Rarity, Count = Math.Min(x.Value, 4) })).
+						Concat(new List<CardRarity>() { CardRarity.MythicRare, CardRarity.Rare, CardRarity.Uncommon, CardRarity.Common }.Select(x => new { Rarity = x, Count = 0 })).
+						GroupBy(x => x.Rarity).
+						ToDictionary(x => x.Key, x => x.Sum(y => y.Count));
+				}
+				else
+				{
+					return -1;
+				}
+			}
+
+			return _rarityCounts[rarity];
 		}
 
 		/// <summary>

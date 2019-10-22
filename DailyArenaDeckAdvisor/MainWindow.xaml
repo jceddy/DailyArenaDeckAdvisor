@@ -212,7 +212,8 @@
 						<TextBlock FontWeight="Bold" HorizontalAlignment="Left" TextDecorations="Underline" Text="{x:Static p:Resources.Deck_ExpectedCost}" />
 						<StackPanel Orientation="Horizontal">
 							<TextBlock HorizontalAlignment="Left" Text="{Binding BoosterCost, StringFormat={}{0:0.00}}"/>
-							<TextBlock HorizontalAlignment="Left" Text="{Binding BoosterCostAfterWC, StringFormat={} ({0:0.00})}"/>
+							<TextBlock HorizontalAlignment="Left" Text="{Binding BoosterCostAfterWC, StringFormat={} ({0:0.00} -}"/>
+							<TextBlock HorizontalAlignment="Left" Text="{Binding TotalBoosterCost, StringFormat={} {0:0.00})}"/>
 						</StackPanel>
 
 						<TextBlock HorizontalAlignment="Left" Visibility="{Binding CollectVisibility}" />
@@ -478,7 +479,7 @@
 					<Button x:Name="ShowFilters" Content="{x:Static p:Resources.Button_Filters}" ToolTip="{x:Static p:Resources.Tooltip_ShowFilters}" Margin="3" Padding="3" Click="ShowFilters_Click" />
 
 					<Label Margin="3" FontWeight="Bold" VerticalContentAlignment="Center" Content="Sort Decks:" />
-					<ComboBox x:Name="SelectedSort" SelectedValue="{x:Static p:Resources.Item_Default}" SelectedValuePath="Content"
+					<ComboBox x:Name="SelectedSort" SelectedValue="{Binding Sort.Value, Mode=TwoWay}" SelectedValuePath="Content"
 						  Margin="3" VerticalContentAlignment="Center">
 						<ComboBoxItem Content="{x:Static p:Resources.Item_Default}" />
 						<ComboBoxItem Content="{x:Static p:Resources.Item_BoosterCost}" />
@@ -490,7 +491,7 @@
 						<ComboBoxItem Content="{x:Static p:Resources.Item_UncommonCount}" />
 						<ComboBoxItem Content="{x:Static p:Resources.Item_CommonCount}" />
 					</ComboBox>
-					<ComboBox x:Name="SelectedSortDir" SelectedValue="{x:Static p:Resources.Item_Default}" SelectedValuePath="Content"
+					<ComboBox x:Name="SelectedSortDir" SelectedValue="{Binding SortDir.Value, Mode=TwoWay}" SelectedValuePath="Content"
 						  Margin="3" VerticalContentAlignment="Center">
 						<ComboBoxItem Content="{x:Static p:Resources.Item_Default}" />
 						<ComboBoxItem Content="{x:Static p:Resources.Item_Ascending}" />
