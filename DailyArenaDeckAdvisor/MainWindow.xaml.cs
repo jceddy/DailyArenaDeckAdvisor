@@ -13,6 +13,7 @@ using System.Configuration;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -200,8 +201,15 @@ namespace DailyArena.DeckAdvisor
 				{ "version", assemblyVersion },
 				{ "architecture", assemblyArchitecture }
 			};
-			string response = WebUtilities.UploadValues("https://clans.dailyarena.net/usage_stats.php", inputs);
+			string response = WebUtilities.UploadValues("https://clans.dailyarena.net/usage_stats.php", inputs, "POST", true, out List<WebException> exceptions);
 			_logger.Debug("Usage Statistics Response: {response}", response);
+			if(response == null)
+			{
+				foreach(WebException exception in exceptions)
+				{
+					_logger.Error(exception, "Exception from UploadValues in {method}", "SendUsageStats");
+				}
+			}
 		}
 
 		/// <summary>
@@ -276,19 +284,29 @@ namespace DailyArena.DeckAdvisor
 			if (string.Compare(serverUpdateTime, cacheTimestamp) > 0)
 			{
 				var landsUrl = $"https://clans.dailyarena.net/standard_lands.json?_c={Guid.NewGuid()}";
-				var result = WebUtilities.FetchStringFromUrl(landsUrl);
+				var result = WebUtilities.FetchStringFromUrl(landsUrl, _colorsByLand.Count != 0, out List<WebException> exceptions);
 
-				dynamic json = JToken.Parse(result.ToString());
-				foreach (dynamic lands in json)
+				if (result == null)
 				{
-					string landName = (string)lands["Name"];
-					if (!_colorsByLand.ContainsKey(landName))
+					foreach (WebException exception in exceptions)
 					{
-						_colorsByLand.Add((string)lands["Name"], CardColors.CardColorFromString((string)lands["Colors"]));
+						_logger.Error(exception, "Exception from FetchStringFromUrl in {method}", "PopulateColorsByLand");
 					}
 				}
+				else
+				{
+					dynamic json = JToken.Parse(result.ToString());
+					foreach (dynamic lands in json)
+					{
+						string landName = (string)lands["Name"];
+						if (!_colorsByLand.ContainsKey(landName))
+						{
+							_colorsByLand.Add((string)lands["Name"], CardColors.CardColorFromString((string)lands["Colors"]));
+						}
+					}
 
-				SaveStandardLands(serverUpdateTime);
+					SaveStandardLands(serverUpdateTime);
+				}
 			}
 			_logger.Debug("PopulateColorsByLand() Finished");
 		}
@@ -354,12 +372,22 @@ namespace DailyArena.DeckAdvisor
 			if (string.Compare(serverUpdateTime, cacheTimestamp) > 0)
 			{
 				var setTranslationsUrl = $"https://clans.dailyarena.net/set_name_translations.json?_c={Guid.NewGuid()}";
-				var result = WebUtilities.FetchStringFromUrl(setTranslationsUrl);
+				var result = WebUtilities.FetchStringFromUrl(setTranslationsUrl, _setNameTranslations.Count != 0, out List<WebException> exceptions);
 
-				dynamic json = JToken.Parse(result.ToString());
-				_setNameTranslations = json.ToObject<Dictionary<string, Dictionary<string, string>>>();
+				if (result == null)
+				{
+					foreach (WebException exception in exceptions)
+					{
+						_logger.Error(exception, "Exception from FetchStringFromUrl in {method}", "PopulateSetTranslations");
+					}
+				}
+				else
+				{
+					dynamic json = JToken.Parse(result.ToString());
+					_setNameTranslations = json.ToObject<Dictionary<string, Dictionary<string, string>>>();
 
-				SaveSetTranslations(serverUpdateTime);
+					SaveSetTranslations(serverUpdateTime);
+				}
 			}
 			_logger.Debug("PopulateSetTranslations() Finished");
 		}
@@ -450,20 +478,30 @@ namespace DailyArena.DeckAdvisor
 			{
 				_logger.Debug("Loading deck data from server");
 				var archetypesUrl = $"https://clans.dailyarena.net/{mappedFormat.Item1}_decks.json?_c={Guid.NewGuid()}";
-				var result = WebUtilities.FetchStringFromUrl(archetypesUrl);
+				var result = WebUtilities.FetchStringFromUrl(archetypesUrl, decksJson != null, out List<WebException> exceptions);
 
-				using (StringReader resultStringReader = new StringReader(result))
-				using (JsonTextReader resultJsonReader = new JsonTextReader(resultStringReader) { DateParseHandling = DateParseHandling.None })
+				if (result == null)
 				{
-					decksJson = JToken.ReadFrom(resultJsonReader);
-					_logger.Debug("Writing file {mappedFormat}_decks.json", mappedFormat.Item1);
-					File.WriteAllText($"{mappedFormat.Item1}_decks.json", JsonConvert.SerializeObject(
-						new
-						{
-							Timestamp = serverTimestamp,
-							Decks = decksJson
-						}
-					));
+					foreach (WebException exception in exceptions)
+					{
+						_logger.Error(exception, "Exception from FetchStringFromUrl in {method}", "ReloadAndCrunchAllData");
+					}
+				}
+				else
+				{
+					using (StringReader resultStringReader = new StringReader(result))
+					using (JsonTextReader resultJsonReader = new JsonTextReader(resultStringReader) { DateParseHandling = DateParseHandling.None })
+					{
+						decksJson = JToken.ReadFrom(resultJsonReader);
+						_logger.Debug("Writing file {mappedFormat}_decks.json", mappedFormat.Item1);
+						File.WriteAllText($"{mappedFormat.Item1}_decks.json", JsonConvert.SerializeObject(
+							new
+							{
+								Timestamp = serverTimestamp,
+								Decks = decksJson
+							}
+						));
+					}
 				}
 			}
 
