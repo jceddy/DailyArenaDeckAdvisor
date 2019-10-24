@@ -520,6 +520,33 @@ namespace DailyArena.DeckAdvisor.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Created.
+        /// </summary>
+        public static string Message_Created {
+            get {
+                return ResourceManager.GetString("Message_Created", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Error Sending Data to Server.
+        /// </summary>
+        public static string Message_ErrorSendingData {
+            get {
+                return ResourceManager.GetString("Message_ErrorSendingData", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Exists.
+        /// </summary>
+        public static string Message_Exists {
+            get {
+                return ResourceManager.GetString("Message_Exists", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Export (with Replacements) Successful.
         /// </summary>
         public static string Message_ExportReplacementsSuccessful {
@@ -534,6 +561,15 @@ namespace DailyArena.DeckAdvisor.Properties {
         public static string Message_ExportSuccessful {
             get {
                 return ResourceManager.GetString("Message_ExportSuccessful", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Github Issue.
+        /// </summary>
+        public static string Message_GithubIssue {
+            get {
+                return ResourceManager.GetString("Message_GithubIssue", resourceCulture);
             }
         }
         

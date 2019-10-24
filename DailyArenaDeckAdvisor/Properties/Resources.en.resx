@@ -321,6 +321,18 @@
     <value>Filters have not been applied, close dialog?</value>
     <comment>Confirmation message for Filters dialog close button.</comment>
   </data>
+  <data name="Message_Created" xml:space="preserve">
+    <value>Created</value>
+    <comment>The Created message.</comment>
+  </data>
+  <data name="Message_ErrorSendingData" xml:space="preserve">
+    <value>Error Sending Data to Server</value>
+    <comment>The string to report an error when creating a Github issue.</comment>
+  </data>
+  <data name="Message_Exists" xml:space="preserve">
+    <value>Exists</value>
+    <comment>The Exists message.</comment>
+  </data>
   <data name="Message_ExportReplacementsSuccessful" xml:space="preserve">
     <value>Export (with Replacements) Successful</value>
     <comment>String for Export (with Replacements) Successful message.</comment>
@@ -328,6 +340,10 @@
   <data name="Message_ExportSuccessful" xml:space="preserve">
     <value>Export Successful</value>
     <comment>String for Export Successful message.</comment>
+  </data>
+  <data name="Message_GithubIssue" xml:space="preserve">
+    <value>Github Issue</value>
+    <comment>The Github Issue message.</comment>
   </data>
   <data name="Meta_NextBooster" xml:space="preserve">
     <value>Next Booster Set to Purchase</value>

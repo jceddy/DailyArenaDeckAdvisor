@@ -2203,11 +2203,12 @@ namespace DailyArena.DeckAdvisor
 
 			if (response == null)
 			{
-				ExceptionText.Value = "Error Sending Data to Server";
+				ExceptionText.Value = Properties.Resources.Message_ErrorSendingData;
 			}
 			else
 			{
-				ExceptionText.Value = string.Format("Github Issue {0} {1}", response.Number, response.State);
+				string stateString = response.State == "created" ? Properties.Resources.Message_Created : Properties.Resources.Message_Exists;
+				ExceptionText.Value = string.Format("{0} {1} {2}", Properties.Resources.Message_GithubIssue, response.Number, stateString);
 				IssueUrl.Value = $"https://github.com/jceddy/DailyArenaDeckAdvisor/issues/{response.Number}";
 			}
 

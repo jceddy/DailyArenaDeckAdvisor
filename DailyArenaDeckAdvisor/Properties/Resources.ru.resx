@@ -321,6 +321,18 @@
     <value>Фильтры не были применены, закрыть диалог?</value>
     <comment>Confirmation message for Filters dialog close button.</comment>
   </data>
+  <data name="Message_Created" xml:space="preserve">
+    <value>созданный</value>
+    <comment>The Created message.</comment>
+  </data>
+  <data name="Message_ErrorSendingData" xml:space="preserve">
+    <value>Ошибка отправки данных на сервер</value>
+    <comment>The string to report an error when creating a Github issue.</comment>
+  </data>
+  <data name="Message_Exists" xml:space="preserve">
+    <value>Существует</value>
+    <comment>The Exists message.</comment>
+  </data>
   <data name="Message_ExportReplacementsSuccessful" xml:space="preserve">
     <value>Успешно экспортировано (с заменами)</value>
     <comment>String for Export (with Replacements) Successful message.</comment>
@@ -328,6 +340,10 @@
   <data name="Message_ExportSuccessful" xml:space="preserve">
     <value>Успешно экспортировано</value>
     <comment>String for Export Successful message.</comment>
+  </data>
+  <data name="Message_GithubIssue" xml:space="preserve">
+    <value>Github проблема</value>
+    <comment>The Github Issue message.</comment>
   </data>
   <data name="Meta_NextBooster" xml:space="preserve">
     <value>Рекомендован к покупке бустер из выпускы</value>
