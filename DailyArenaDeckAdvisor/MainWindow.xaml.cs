@@ -10,6 +10,7 @@ using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Configuration;
+using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -24,6 +25,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
 using System.Windows.Media;
+using System.Windows.Navigation;
 
 namespace DailyArena.DeckAdvisor
 {
@@ -140,17 +142,27 @@ namespace DailyArena.DeckAdvisor
 		public Bindable<int> SelectedFontSize { get; private set; } = new Bindable<int>() { Value = 12 };
 
 		/// <summary>
-		/// The message to show on the loading screen.
+		/// Gets or sets the message to show on the loading screen.
 		/// </summary>
 		public Bindable<string> LoadingText { get; private set; }
 
 		/// <summary>
-		/// The value for the loading progress bar.
+		/// Gets or sets the value for the loading progress bar.
 		/// </summary>
 		public Bindable<int> LoadingValue { get; private set; } = new Bindable<int>();
 
 		/// <summary>
-		/// The Bitmap Scaling Mode (can be overridden in App.config for users with funky video card/driver combinations that cause crashing under high-quality scaling.
+		/// Gets or sets the message to show on the exception screen.
+		/// </summary>
+		public Bindable<string> ExceptionText { get; private set; } = new Bindable<string>();
+
+		/// <summary>
+		/// Gets or sets the Url for an automatically-created Github issue.
+		/// </summary>
+		public Bindable<string> IssueUrl { get; private set; } = new Bindable<string>();
+
+		/// <summary>
+		/// Gets or sets the Bitmap Scaling Mode (can be overridden in App.config for users with funky video card/driver combinations that cause crashing under high-quality scaling.
 		/// </summary>
 		public BitmapScalingMode BitmapScalingMode { get; private set; }
 
@@ -919,7 +931,7 @@ namespace DailyArena.DeckAdvisor
 								foreach (dynamic deck in json)
 								{
 									string name = deck["name"];
-									int commanderId = deck["commandZoneGRPId"];
+									int commanderId = (deck["commandZoneGRPIds"] == null) ? 0 : deck["commandZoneGRPIds"][0];
 									int[] mainDeck = deck["mainDeck"].ToObject<int[]>();
 									int[] sideboard = deck["sideboard"].ToObject<int[]>();
 									Guid id = Guid.Parse((string)deck["id"]);
@@ -1885,9 +1897,11 @@ namespace DailyArena.DeckAdvisor
 				}
 				else
 				{
+					bool isCommander = Format.Value == Properties.Resources.Item_Brawl && cardToReplace.Name == archetype.CommanderName;
+
 					_logger.Debug("Processing Candidates based on Type and Cost");
 					var candidates = playerInventory.Select(x => new { Card = cardsById[x.Key], Quantity = x.Value }).
-							Where(x => x.Quantity > 0 && x.Card.Type == cardToReplace.Type && x.Card.Cost == cardToReplace.Cost && (identity == null || identity.Contains(x.Card.ColorIdentity))).
+							Where(x => x.Quantity > 0 && x.Card.Type == cardToReplace.Type && x.Card.Cost == cardToReplace.Cost && (identity == null || (isCommander && identity == x.Card.ColorIdentity && x.Card.Type.Contains("Legendary")) || (!isCommander && identity.Contains(x.Card.ColorIdentity)))).
 							OrderByDescending(x => x.Card.Rank + CardStats.GetAssociationModifier(cardToReplace.Name, x.Card.Name, _cardStats));
 
 					foreach (var candidate in candidates)
@@ -1911,7 +1925,7 @@ namespace DailyArena.DeckAdvisor
 					{
 						_logger.Debug("Insufficient Candidates Found, Getting Candidates by Cost");
 						candidates = playerInventory.Select(x => new { Card = cardsById[x.Key], Quantity = x.Value }).
-							Where(x => x.Quantity > 0 && x.Card.Cost == cardToReplace.Cost && (identity == null || identity.Contains(x.Card.ColorIdentity))).
+							Where(x => x.Quantity > 0 && x.Card.Cost == cardToReplace.Cost && (identity == null || (isCommander && identity == x.Card.ColorIdentity && x.Card.Type.Contains("Legendary")) || (!isCommander && identity.Contains(x.Card.ColorIdentity)))).
 							OrderByDescending(x => x.Card.Rank + CardStats.GetAssociationModifier(cardToReplace.Name, x.Card.Name, _cardStats));
 
 						foreach (var candidate in candidates)
@@ -1936,7 +1950,7 @@ namespace DailyArena.DeckAdvisor
 					{
 						_logger.Debug("Insufficient Candidates Found, Getting Candidates by Cmc and Color");
 						candidates = playerInventory.Select(x => new { Card = cardsById[x.Key], Quantity = x.Value }).
-							Where(x => x.Quantity > 0 && x.Card.Cmc == cardToReplace.Cmc && x.Card.Colors == cardToReplace.Colors && (identity == null || identity.Contains(x.Card.ColorIdentity))).
+							Where(x => x.Quantity > 0 && x.Card.Cmc == cardToReplace.Cmc && x.Card.Colors == cardToReplace.Colors && (identity == null || (isCommander && identity == x.Card.ColorIdentity && x.Card.Type.Contains("Legendary")) || (!isCommander && identity.Contains(x.Card.ColorIdentity)))).
 							OrderByDescending(x => x.Card.Rank + CardStats.GetAssociationModifier(cardToReplace.Name, x.Card.Name, _cardStats));
 
 						foreach (var candidate in candidates)
@@ -1964,7 +1978,7 @@ namespace DailyArena.DeckAdvisor
 						while (replacementsNeeded > 0 && cmcToTest > 0)
 						{
 							candidates = playerInventory.Select(x => new { Card = cardsById[x.Key], Quantity = x.Value }).
-								Where(x => x.Quantity > 0 && x.Card.Cmc == cmcToTest && x.Card.Colors == cardToReplace.Colors && (identity == null || identity.Contains(x.Card.ColorIdentity))).
+								Where(x => x.Quantity > 0 && x.Card.Cmc == cmcToTest && x.Card.Colors == cardToReplace.Colors && (identity == null || (isCommander && identity == x.Card.ColorIdentity && x.Card.Type.Contains("Legendary")) || (!isCommander && identity.Contains(x.Card.ColorIdentity)))).
 								OrderByDescending(x => x.Card.Rank + CardStats.GetAssociationModifier(cardToReplace.Name, x.Card.Name, _cardStats));
 
 							foreach (var candidate in candidates)
@@ -1989,12 +2003,12 @@ namespace DailyArena.DeckAdvisor
 
 					if (replacementsNeeded > 0)
 					{
-						_logger.Debug("Insufficient Candidates Found, Getting Candidates, relaxing color requirments and looping through Cmc <= {0}", cardToReplace.Cmc);
+						_logger.Debug("Insufficient Candidates Found, Getting Candidates, relaxing color requirements and looping through Cmc <= {0}", cardToReplace.Cmc);
 						int cmcToTest = cardToReplace.Cmc;
 						while (replacementsNeeded > 0 && cmcToTest > 0)
 						{
 							candidates = playerInventory.Select(x => new { Card = cardsById[x.Key], Quantity = x.Value }).
-								Where(x => x.Quantity > 0 && x.Card.Cmc == cmcToTest && cardToReplace.Colors.Contains(x.Card.Colors) && (identity == null || identity.Contains(x.Card.ColorIdentity))).
+								Where(x => x.Quantity > 0 && x.Card.Cmc == cmcToTest && cardToReplace.Colors.Contains(x.Card.Colors) && (identity == null || (isCommander && identity == x.Card.ColorIdentity && x.Card.Type.Contains("Legendary")) || (!isCommander && identity.Contains(x.Card.ColorIdentity)))).
 								OrderByDescending(x => x.Card.Rank + CardStats.GetAssociationModifier(cardToReplace.Name, x.Card.Name, _cardStats));
 
 							foreach (var candidate in candidates)
@@ -2125,11 +2139,83 @@ namespace DailyArena.DeckAdvisor
 					if (t.Exception != null)
 					{
 						_logger.Error(t.Exception, "Exception in {0} ({1} - {2})", "loadTask", "Window_Loaded", "Main Application");
+
+						ReportException("loadTask", "Window_Loaded", t.Exception);
 					}
 				},
 				TaskContinuationOptions.OnlyOnFaulted
 			);
 			loadTask.Start();
+		}
+
+		/// <summary>
+		/// Report an Exception to Github.
+		/// </summary>
+		/// <param name="task">The task that threw the exception.</param>
+		/// <param name="method">The method that threw the exception.</param>
+		/// <param name="exception">The exception being reported.</param>
+		private void ReportException(string task, string method, Exception taskException)
+		{
+			_logger.Debug("ReportException Called: task={task}, method={method}", task, method);
+
+			ExceptionText.Value = "Unhandled Exception - Sending Data to Server";
+
+			Dispatcher.Invoke(() =>
+			{
+				LoadingScreen.Visibility = Visibility.Collapsed;
+				FilterPanel.Visibility = Visibility.Collapsed;
+				DeckTabs.Visibility = Visibility.Collapsed;
+				ExceptionScreen.Visibility = Visibility.Visible;
+			});
+
+			List<GithubAttachment> attachments = new List<GithubAttachment>();
+
+			var dadaLogFolder = string.Format("{0}Low\\DailyArena\\DailyArenaDeckAdvisor\\logs", Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData));
+			var dadaLogFiles = Directory.EnumerateFiles(dadaLogFolder, "log*.txt");
+			FileInfo dadaLogFileInfo = dadaLogFiles.Select(x => new FileInfo(x)).OrderByDescending(y => y.LastWriteTimeUtc).First();
+			var dadaLogAttachmentName = dadaLogFileInfo.Name;
+			string dadaLogContent;
+			using (FileStream dadaLogStream = File.Open(dadaLogFileInfo.FullName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+			using (StreamReader dadaLogReader = new StreamReader(dadaLogStream))
+			{
+				dadaLogContent = dadaLogReader.ReadToEndAsync().Result;
+			}
+			attachments.Add(new GithubAttachment(dadaLogAttachmentName, dadaLogContent));
+
+			var mtgaLogFolder = GetLogFolderLocation();
+			string mtgaLogContent = File.ReadAllText(mtgaLogFolder + "\\output_log.txt");
+			attachments.Add(new GithubAttachment("output_log.txt", mtgaLogContent));
+
+			string nl = Environment.NewLine + Environment.NewLine;
+
+			GithubIssueResponse response = GithubUtilities.CreateNewIssue("daily-arena-deck-advisor", "jceddy", "DailyArenaDeckAdvisor",
+				string.Format("Unhandled Exception in {0} ({1} - Main Application)", task, method),
+				$"An unhandled exception was detected.{nl}Exception:{nl}{taskException.ToString()}{nl}%{dadaLogAttachmentName}%{nl}%output_log.txt%",
+				new string[] { "automatic" }, ((App)Application.Current).State.Fingerprint, attachments.ToArray(), out string serverResponse, out Exception exception);
+			if (serverResponse != null)
+			{
+				_logger.Debug("Server Response: {serverResponse}", serverResponse);
+			}
+			if (exception != null)
+			{
+				_logger.Error(exception, "Exception in {0} ({1} - {2})", "CreateNewIssue", method, "Main Application");
+			}
+
+			if (response == null)
+			{
+				ExceptionText.Value = "Error Sending Data to Server";
+			}
+			else
+			{
+				ExceptionText.Value = string.Format("Github Issue {0} {1}", response.Number, response.State);
+				IssueUrl.Value = $"https://github.com/jceddy/DailyArenaDeckAdvisor/issues/{response.Number}";
+			}
+
+			Task sleepTask = new Task(() => { Thread.Sleep(10000); });
+			sleepTask.Start();
+			sleepTask.Wait();
+
+			Dispatcher.Invoke(() => { Close(); });
 		}
 
 		/// <summary>
@@ -2165,6 +2251,8 @@ namespace DailyArena.DeckAdvisor
 					if (t.Exception != null)
 					{
 						_logger.Error(t.Exception, "Exception in {0} ({1} - {2})", "loadTask", "Format_PropertyChanged", "Main Application");
+
+						ReportException("loadTask", "Format_PropertyChanged", t.Exception);
 					}
 				},
 				TaskContinuationOptions.OnlyOnFaulted
@@ -2255,6 +2343,8 @@ namespace DailyArena.DeckAdvisor
 					if (t.Exception != null)
 					{
 						_logger.Error(t.Exception, "Exception in {0} ({1} - {2})", "sortTask", "Sort_PropertyChanged", "Main Application");
+
+						ReportException("sortTask", "Sort_PropertyChanged", t.Exception);
 					}
 				},
 				TaskContinuationOptions.OnlyOnFaulted
@@ -2282,7 +2372,9 @@ namespace DailyArena.DeckAdvisor
 				{
 					if (t.Exception != null)
 					{
-						_logger.Error(t.Exception, "Exception in {0} ({1} - {2})", "sortTask", "Sort_PropertyChanged", "Main Application");
+						_logger.Error(t.Exception, "Exception in {0} ({1} - {2})", "sortTask", "SortDir_PropertyChanged", "Main Application");
+
+						ReportException("sortTask", "SortDir_PropertyChanged", t.Exception);
 					}
 				},
 				TaskContinuationOptions.OnlyOnFaulted
@@ -2325,6 +2417,8 @@ namespace DailyArena.DeckAdvisor
 						if (t.Exception != null)
 						{
 							_logger.Error(t.Exception, "Exception in {0} ({1} - {2})", "loadTask", "RotationProof_PropertyChanged", "Main Application");
+
+							ReportException("loadTask", "RotationProof_PropertyChanged", t.Exception);
 						}
 					},
 					TaskContinuationOptions.OnlyOnFaulted
@@ -2490,6 +2584,8 @@ namespace DailyArena.DeckAdvisor
 					if (t.Exception != null)
 					{
 						_logger.Error(t.Exception, "Exception in {0} ({1} - {2})", "loadTask", "Refresh", "Main Application");
+
+						ReportException("loadTask", "Refresh", t.Exception);
 					}
 				},
 				TaskContinuationOptions.OnlyOnFaulted
@@ -2652,6 +2748,17 @@ namespace DailyArena.DeckAdvisor
 				Owner = this
 			};
 			filtersDialog.ShowDialog();
+		}
+
+		/// <summary>
+		/// Callback that is triggered when the Github issue link is clocked.
+		/// </summary>
+		/// <param name="sender">The object that triggered the callback.</param>
+		/// <param name="e">Arguments regarding the event that triggered the callback.</param>
+		private void Hyperlink_RequestNavigate(object sender, RequestNavigateEventArgs e)
+		{
+			Process.Start(new ProcessStartInfo(e.Uri.AbsoluteUri));
+			e.Handled = true;
 		}
 	}
 }

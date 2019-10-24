@@ -55,14 +55,16 @@ namespace DailyArena.DeckAdvisor
 					rollingInterval: RollingInterval.Hour,
 					retainedFileCountLimit: 5,
 					fileSizeLimitBytes: 10485760,
-					rollOnFileSizeLimit: true).
+					rollOnFileSizeLimit: true,
+					shared: true).
 				CreateLogger();
 			FirstChanceLogger = new LoggerConfiguration().MinimumLevel.Debug().WriteTo.
 				File(new CompactJsonFormatter(), $"{dataFolder}\\logs\\firstChanceExceptions.txt",
 					rollingInterval: RollingInterval.Hour,
 					retainedFileCountLimit: 2,
 					fileSizeLimitBytes: 10485760,
-					rollOnFileSizeLimit: true).
+					rollOnFileSizeLimit: true,
+					shared: true).
 				CreateLogger();
 
 			DispatcherUnhandledException += (sender, e) =>

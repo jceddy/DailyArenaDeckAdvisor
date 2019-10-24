@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Windows;
@@ -735,15 +736,27 @@ namespace DailyArena.DeckAdvisor
 			{
 				if (_exportList == null)
 				{
+					StringBuilder exportList = new StringBuilder();
+
+					if (_commanderCard != null)
+					{
+						exportList.AppendFormat("Commander{0}1 {1} ({2}) {3}{0}{0}", Environment.NewLine, _commanderCard.Card.Name, _commanderCard.Card.Set.ArenaCode, _commanderCard.Card.CollectorNumber);
+					}
+
 					ReadOnlyDictionary<int, Card> cardsById = Card.CardsById;
-					var mainDeck = SuggestedMainDeck.Concat(MainDeckToCollect).GroupBy(x => x.Key).
+					var mainDeck = SuggestedMainDeck.Concat(MainDeckToCollect).Where(x => _commanderCard == null || x.Key != _commanderCard.Card.ArenaId).GroupBy(x => x.Key).
 						Select(x => new { Card = cardsById[x.Key], Quantity = x.Sum(y => y.Value) }).
 						Select(x => $"{x.Quantity} {x.Card.Name} ({x.Card.Set.ArenaCode}) {x.Card.CollectorNumber}");
 					var sideboard = SuggestedSideboard.Concat(SideboardToCollect).GroupBy(x => x.Key).
 						Select(x => new { Card = cardsById[x.Key], Quantity = x.Sum(y => y.Value) }).
 						Select(x => $"{x.Quantity} {x.Card.Name} ({x.Card.Set.ArenaCode}) {x.Card.CollectorNumber}");
 
-					_exportList = string.Format("{0}{1}{1}{2}", string.Join(Environment.NewLine, mainDeck), Environment.NewLine, string.Join(Environment.NewLine, sideboard));
+					exportList.AppendFormat("Deck{0}{1}", Environment.NewLine, string.Join(Environment.NewLine, mainDeck));
+					if(sideboard.Count() > 0)
+					{
+						exportList.AppendFormat("{0}{0}Sideboard{0}{1}", Environment.NewLine, string.Join(Environment.NewLine, sideboard));
+					}
+					_exportList = exportList.ToString();
 				}
 				return _exportList;
 			}
@@ -763,6 +776,21 @@ namespace DailyArena.DeckAdvisor
 			{
 				if (_exportListSuggested == null)
 				{
+					StringBuilder exportList = new StringBuilder();
+					int finalCommanderCardId = 0;
+					if(_commanderCard != null)
+					{
+						List<int> commanderReplacement = SuggestedReplacements.Where(x => x.Item1 == _commanderCard.Card.ArenaId).Select(x => x.Item2).ToList();
+						if(commanderReplacement.Count > 0)
+						{
+							finalCommanderCardId = commanderReplacement[0];
+						}
+						else
+						{
+							finalCommanderCardId = _commanderCard.Card.ArenaId;
+						}
+					}
+
 					Dictionary<int, int> mainDeckReplacements = new Dictionary<int, int>();
 					Dictionary<int, int> sideboardReplacements = new Dictionary<int, int>();
 					foreach (Tuple<int, int, int> replacement in SuggestedReplacements)
@@ -809,14 +837,26 @@ namespace DailyArena.DeckAdvisor
 					}
 
 					ReadOnlyDictionary<int, Card> cardsById = Card.CardsById;
-					var mainDeck = SuggestedMainDeck.Concat(mainDeckReplacements).GroupBy(x => x.Key).
+
+					if (finalCommanderCardId != 0)
+					{
+						Card commanderCard = cardsById[finalCommanderCardId];
+						exportList.AppendFormat("Commander{0}1 {1} ({2}) {3}{0}{0}", Environment.NewLine, commanderCard.Name, commanderCard.Set.ArenaCode, commanderCard.CollectorNumber);
+					}
+
+					var mainDeck = SuggestedMainDeck.Concat(mainDeckReplacements).Where(x => finalCommanderCardId == 0 || x.Key != finalCommanderCardId).GroupBy(x => x.Key).
 						Select(x => new { Card = cardsById[x.Key], Quantity = x.Sum(y => y.Value) }).
 						Select(x => $"{x.Quantity} {x.Card.Name} ({x.Card.Set.ArenaCode}) {x.Card.CollectorNumber}");
 					var sideboard = SuggestedSideboard.Concat(sideboardReplacements).GroupBy(x => x.Key).
 						Select(x => new { Card = cardsById[x.Key], Quantity = x.Sum(y => y.Value) }).
 						Select(x => $"{x.Quantity} {x.Card.Name} ({x.Card.Set.ArenaCode}) {x.Card.CollectorNumber}");
 
-					_exportListSuggested = string.Format("{0}{1}{1}{2}", string.Join(Environment.NewLine, mainDeck), Environment.NewLine, string.Join(Environment.NewLine, sideboard));
+					exportList.AppendFormat("Deck{0}{1}", Environment.NewLine, string.Join(Environment.NewLine, mainDeck));
+					if (sideboard.Count() > 0)
+					{
+						exportList.AppendFormat("{0}{0}Sideboard{0}{1}", Environment.NewLine, string.Join(Environment.NewLine, sideboard));
+					}
+					_exportListSuggested = exportList.ToString();
 				}
 				return _exportListSuggested;
 			}
