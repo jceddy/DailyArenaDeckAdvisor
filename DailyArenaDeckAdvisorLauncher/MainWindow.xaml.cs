@@ -115,7 +115,6 @@ namespace DailyArenaDeckAdvisorLauncher
 						{
 							try
 							{
-								File.Delete("DailyArenaDeckAdvisorUpdater.exe");
 								foreach(string path in Directory.EnumerateDirectories(Directory.GetCurrentDirectory()))
 								{
 									foreach(string filePath in Directory.EnumerateFiles(path))
@@ -126,6 +125,7 @@ namespace DailyArenaDeckAdvisorLauncher
 										}
 									}
 								}
+								File.Delete("DailyArenaDeckAdvisorUpdater.exe");
 								deleteSuccess = true;
 								break;
 							}
