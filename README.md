@@ -15,6 +15,15 @@ https://github.com/jceddy/DailyArenaDeckAdvisor/wiki/Getting-Started:-Developing
 Libraries used by this project:  
 https://github.com/jceddy/DailyArenaCommon
 
+# Release 1.0.5.2 Changes
+ - Deck Sorting
+ - Brawl Commander Replacement Suggestions
+ - More Localization Support
+ - Minor and Under-the-Hood Changes
+   - Fixed some small bugs with the Updater relating to language resource files.
+   - Additional error handling and automatic Github issue creation.
+   - Bug fix for application crash when "Rotation Proof" toggle is on.
+
 # Release 1.0.4.4 Changes
  - Deck Filters
  - More Localization Support
