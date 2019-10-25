@@ -915,6 +915,10 @@ namespace DailyArena.DeckAdvisor
 						else if (line.Contains("Deck.GetDeckListsV3") && !filters.HideFromCollection)
 						{
 							StringBuilder deckListJson = new StringBuilder();
+							if(line.EndsWith("["))
+							{
+								deckListJson.AppendLine("[");
+							}
 							line = reader.ReadLine();
 							while (line != "]")
 							{
