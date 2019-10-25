@@ -550,6 +550,7 @@ namespace DailyArena.DeckAdvisor
 						{
 							Log.Error(e, "Card not found: {cardName}", cardName);
 							cardName = Regex.Split(cardName, " // ")[0].Trim();
+							cardName = Regex.Split(cardName, " <")[0].Trim();
 							if (cardsByName[cardName].Count(x => x.Set.RotationSafe) == 0)
 							{
 								_logger.Debug("{cardName} is rotating soon, ignore this deck", cardName);
