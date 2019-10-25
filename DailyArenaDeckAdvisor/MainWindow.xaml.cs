@@ -1103,7 +1103,9 @@ namespace DailyArena.DeckAdvisor
 								dynamic deck = JToken.Parse(deckListJson.ToString());
 
 								string name = deck["name"];
-								int commanderId = deck["commandZoneGRPId"];
+								int[] commanders = deck["commandZoneGRPIds"] == null ? new int[0] : deck["commandZoneGRPIds"].ToObject<int[]>();
+								/* TODO: handle commanders more like mainDeck/sideboard */
+								int commanderId = commanders.Length == 0 ? 0 : commanders[0];
 								int[] mainDeck = deck["mainDeck"].ToObject<int[]>();
 								int[] sideboard = deck["sideboard"].ToObject<int[]>();
 								Guid id = Guid.Parse((string)deck["id"]);
