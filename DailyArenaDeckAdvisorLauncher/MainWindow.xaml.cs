@@ -116,6 +116,16 @@ namespace DailyArenaDeckAdvisorLauncher
 							try
 							{
 								File.Delete("DailyArenaDeckAdvisorUpdater.exe");
+								foreach(string path in Directory.EnumerateDirectories(Directory.GetCurrentDirectory()))
+								{
+									foreach(string filePath in Directory.EnumerateFiles(path))
+									{
+										if(filePath.EndsWith("DailyArenaDeckAdvisorUpdater.resources.dll"))
+										{
+											File.Delete(path);
+										}
+									}
+								}
 								deleteSuccess = true;
 								break;
 							}
@@ -130,7 +140,7 @@ namespace DailyArenaDeckAdvisorLauncher
 
 							using (ZipArchive archive = ZipFile.Open(updaterFileLocation, ZipArchiveMode.Read))
 							{
-								var entries = archive.Entries.Where(x => x.Name == "DailyArenaDeckAdvisorUpdater.exe");
+								var entries = archive.Entries.Where(x => x.Name.StartsWith("DailyArenaDeckAdvisorUpdater"));
 								foreach (var entry in entries)
 								{
 									entry.ExtractToFile(entry.Name, true);

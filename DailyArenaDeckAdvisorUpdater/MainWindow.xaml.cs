@@ -111,7 +111,7 @@ namespace DailyArenaDeckAdvisorUpdater
 						FileLogger.Log("Extracting Updater Zip Entries");
 						using (ZipArchive archive = ZipFile.Open(zipFile, ZipArchiveMode.Read))
 						{
-							var entries = archive.Entries.Where(x => x.Name != "DailyArenaDeckAdvisorUpdater.exe");
+							var entries = archive.Entries.Where(x => !x.Name.StartsWith("DailyArenaDeckAdvisorUpdater"));
 							foreach (var entry in entries)
 							{
 								if (entry.FullName.EndsWith("/"))
