@@ -492,7 +492,7 @@ namespace DailyArena.DeckAdvisor
 				var archetypesUrl = $"https://clans.dailyarena.net/{mappedFormat.Item1}_decks.json?_c={Guid.NewGuid()}";
 				var result = WebUtilities.FetchStringFromUrl(archetypesUrl, decksJson != null, out List<WebException> exceptions);
 
-				if (result == null)
+				if (string.IsNullOrWhiteSpace(result))
 				{
 					foreach (WebException exception in exceptions)
 					{
@@ -931,7 +931,9 @@ namespace DailyArena.DeckAdvisor
 								foreach (dynamic deck in json)
 								{
 									string name = deck["name"];
-									int commanderId = (deck["commandZoneGRPIds"] == null) ? 0 : deck["commandZoneGRPIds"][0];
+									int[] commanders = deck["commandZoneGRPIds"] == null ? new int[0] : deck["commandZoneGRPIds"].ToObject<int[]>();
+									/* TODO: handle commanders more like mainDeck/sideboard */
+									int commanderId = commanders.Length == 0 ? 0 : commanders[0];
 									int[] mainDeck = deck["mainDeck"].ToObject<int[]>();
 									int[] sideboard = deck["sideboard"].ToObject<int[]>();
 									Guid id = Guid.Parse((string)deck["id"]);

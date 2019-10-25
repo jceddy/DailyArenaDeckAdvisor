@@ -12,6 +12,6 @@ using System.Reflection;
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
 
-[assembly: AssemblyVersion("1.0.4.5")]
-[assembly: AssemblyFileVersion("1.0.4.5")]
+[assembly: AssemblyVersion("1.0.4.6")]
+[assembly: AssemblyFileVersion("1.0.4.6")]
 [assembly: AssemblyCopyright("© 2019 DailyArena")]
