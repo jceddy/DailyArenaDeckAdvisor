@@ -121,7 +121,7 @@ namespace DailyArenaDeckAdvisorLauncher
 									{
 										if(filePath.EndsWith("DailyArenaDeckAdvisorUpdater.resources.dll"))
 										{
-											File.Delete(path);
+											File.Delete(filePath);
 										}
 									}
 								}
