@@ -801,6 +801,7 @@ namespace DailyArena.DeckAdvisor
 			_logger.Debug("Processing Player Collection");
 
 			var logFolder = GetLogFolderLocation();
+			bool playerInventoryFound = false;
 			using (var fs = new FileStream(logFolder + "\\output_log.txt", FileMode.Open, FileAccess.Read, FileShare.ReadWrite | FileShare.Delete))
 			{
 				using (var reader = new StreamReader(fs))
@@ -867,6 +868,7 @@ namespace DailyArena.DeckAdvisor
 						}
 						else if (line.Contains("PlayerInventory.GetPlayerInventory"))
 						{
+							playerInventoryFound = true;
 							_wildcardsOwned[CardRarity.Common] = 0;
 							_wildcardsOwned[CardRarity.Uncommon] = 0;
 							_wildcardsOwned[CardRarity.Rare] = 0;
@@ -1284,6 +1286,18 @@ namespace DailyArena.DeckAdvisor
 					}
 				}
 			}
+
+			if(!playerInventoryFound)
+			{
+				_logger.Debug("Player Inventory not found in MTGA log, show an information screen");
+				Dispatcher.Invoke(() =>
+				{
+					LoadingScreen.Visibility = Visibility.Collapsed;
+					DetailedLoggingScreen.Visibility = Visibility.Visible;
+				});
+				return;
+			}
+
 			Archetype.WildcardsOwned = new ReadOnlyDictionary<CardRarity, int>(_wildcardsOwned);
 
 			LoadingValue.Value = 100;
@@ -2753,6 +2767,7 @@ namespace DailyArena.DeckAdvisor
 		/// <param name="e">Arguments regarding the event that triggered the callback.</param>
 		private void ShowFilters_Click(object sender, RoutedEventArgs e)
 		{
+			_logger.Debug("ShowFilters_Click() Called - {0}", "Main Application");
 			FiltersDialog filtersDialog = new FiltersDialog()
 			{
 				Owner = this
@@ -2767,8 +2782,20 @@ namespace DailyArena.DeckAdvisor
 		/// <param name="e">Arguments regarding the event that triggered the callback.</param>
 		private void Hyperlink_RequestNavigate(object sender, RequestNavigateEventArgs e)
 		{
+			_logger.Debug("Hyperlink_RequestNavigate() Called - {0}", "Main Application");
 			Process.Start(new ProcessStartInfo(e.Uri.AbsoluteUri));
 			e.Handled = true;
+		}
+
+		/// <summary>
+		/// Handle clicks of the Close Button.
+		/// </summary>
+		/// <param name="sender">The button that was clicked.</param>
+		/// <param name="e">The routed event arguments.</param>
+		private void Close_Click(object sender, RoutedEventArgs e)
+		{
+			_logger.Debug("Close_Click() Called - {0}", "Main Application");
+			Close();
 		}
 	}
 }

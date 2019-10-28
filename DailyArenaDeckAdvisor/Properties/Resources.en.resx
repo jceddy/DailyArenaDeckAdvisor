@@ -377,6 +377,10 @@
     <value>Meta Report</value>
     <comment>String for the Meta Report tab.</comment>
   </data>
+  <data name="TextBlock_EnableDetailed" xml:space="preserve">
+    <value>Please turn on detailed logging in Arena by going to Settings-&gt;View Account and checking "Detailed Logs(Plugin Support)", and browse to your collection screen before running Daily Arena Deck Advisor. You may need to restart Arena for the setting change to take effect.</value>
+    <comment>String for Enabled Detailed Logging message.</comment>
+  </data>
   <data name="Title_CloseConfirmation" xml:space="preserve">
     <value>Close Confirmation</value>
     <comment>Title for Filters close button confirmation.</comment>

@@ -186,7 +186,7 @@
     <comment>Main Deck header for Deck Details view.</comment>
   </data>
   <data name="Deck_NextBooster" xml:space="preserve">
-    <value>Рекомендован к покупке бустер из выпускы</value>
+    <value>Рекомендован к покупке бустер из выпуска</value>
     <comment>Next Booster Set header for Deck Details view.</comment>
   </data>
   <data name="Deck_Sideboard" xml:space="preserve">
@@ -202,7 +202,7 @@
     <comment>Wildcards Needed header for Deck Details view.</comment>
   </data>
   <data name="Deck_WinLoss" xml:space="preserve">
-    <value>Статистика побед/поражений</value>
+    <value>Статистика Побед/Поражений</value>
     <comment>Win/Loss Record header for Deck Details view.</comment>
   </data>
   <data name="Item_ArenaStandard" xml:space="preserve">
@@ -210,19 +210,19 @@
     <comment>The string for Arena Standard in the Format ComboBox.</comment>
   </data>
   <data name="Item_Ascending" xml:space="preserve">
-    <value>Восходящий</value>
+    <value>По восходящей</value>
     <comment>The string for Ascending in the Sort Dir ComboBox.</comment>
   </data>
   <data name="Item_BoosterCost" xml:space="preserve">
-    <value>Стоимость бустера</value>
+    <value>По стоимости в бустерах</value>
     <comment>The string for Booster Cost in the Sort ComboBox.</comment>
   </data>
   <data name="Item_BoosterCostIgnoringCollection" xml:space="preserve">
-    <value>Повышение стоимости (игнорирование коллекции)</value>
+    <value>По стоимости в бустерах (без учета Коллекции)</value>
     <comment>The string for Booster Cost (Ignoring Collection) in the Sort ComboBox.</comment>
   </data>
   <data name="Item_BoosterCostIgnoringWildcards" xml:space="preserve">
-    <value>Стоимость бустера (Игнорирование подстановочных знаков)</value>
+    <value>По стоимости в бустерах (без учета Джокеров)</value>
     <comment>The string for Booster Cost (Ignoring Wildcards) in the Sort ComboBox.</comment>
   </data>
   <data name="Item_Brawl" xml:space="preserve">
@@ -230,7 +230,7 @@
     <comment>The string for Brawl in the Format ComboBox.</comment>
   </data>
   <data name="Item_CommonCount" xml:space="preserve">
-    <value>Обычные граф</value>
+    <value>По кол-ву Обычных карт</value>
     <comment>The string for Common Count in the Sort ComboBox.</comment>
   </data>
   <data name="Item_Default" xml:space="preserve">
@@ -238,7 +238,7 @@
     <comment>The string for Default in the Sort/Dir ComboBox.</comment>
   </data>
   <data name="Item_Descending" xml:space="preserve">
-    <value>нисходящий</value>
+    <value>По нисходящей</value>
     <comment>The string for Descending in the Sort Dir ComboBox.</comment>
   </data>
   <data name="Item_Historic_Bo1" xml:space="preserve">
@@ -250,11 +250,11 @@
     <comment>The string for Historic (Bo3) in the Format ComboBox.</comment>
   </data>
   <data name="Item_MythicRareCount" xml:space="preserve">
-    <value>Раритетные Граф</value>
+    <value>По кол-ву Раритетных карт</value>
     <comment>The string for Mythic Rare Count in the Sort ComboBox.</comment>
   </data>
   <data name="Item_RareCount" xml:space="preserve">
-    <value>Редкие граф</value>
+    <value>По кол-ву Редких карт</value>
     <comment>The string for Rare Count in the Sort ComboBox.</comment>
   </data>
   <data name="Item_Standard" xml:space="preserve">
@@ -262,15 +262,15 @@
     <comment>The string for Standard in the Format ComboBox.</comment>
   </data>
   <data name="Item_UncommonCount" xml:space="preserve">
-    <value>Необычные граф</value>
+    <value>По кол-ву Необычных карт</value>
     <comment>The string for Uncommon Count in the Sort ComboBox.</comment>
   </data>
   <data name="Item_WinRate" xml:space="preserve">
-    <value>Статистика побед/поражений</value>
+    <value>По статистике побед/поражений</value>
     <comment>The string for Win/Loss Record in the Sort ComboBox.</comment>
   </data>
   <data name="Label_Cards" xml:space="preserve">
-    <value> картами</value>
+    <value>карт</value>
     <comment>"Cards" label for filters.</comment>
   </data>
   <data name="Label_FontSize" xml:space="preserve">
@@ -290,15 +290,15 @@
     <comment>Label for filter to hide decks with missing cards that the user doesn't have good replacements for.</comment>
   </data>
   <data name="Label_HideMissingCards" xml:space="preserve">
-    <value>Скрыть колоды на которые не хватает карт</value>
+    <value>Скрыть колоды на которые не хватает карт в коллекции</value>
     <comment>Label for filter to hide decks the user is missing cards from.</comment>
   </data>
   <data name="Label_HideMissingWildcards" xml:space="preserve">
-    <value>Скрыть колоды, на которые у недостаточно Джокеров</value>
+    <value>Скрыть колоды на которые не достаточно Джокеров</value>
     <comment>Label for filter to hide decks the user doesn't have enough wildcards to complete.</comment>
   </data>
   <data name="Label_HideWithMore" xml:space="preserve">
-    <value>Скрыть колоды с более чем </value>
+    <value>Скрыть колоды содержащие более</value>
     <comment>Label for first part of filter that hides decks containing more than some number of a specific wildcard rarity.</comment>
   </data>
   <data name="Loading_ComputingDeckSuggestions" xml:space="preserve">
@@ -318,11 +318,11 @@
     <comment>The "processing collection from log" string for the loading screen.</comment>
   </data>
   <data name="Message_CloseConfirmation" xml:space="preserve">
-    <value>Фильтры не были применены, закрыть диалог?</value>
+    <value>Фильтры не были применены, закрыть окно выбора фильтров?</value>
     <comment>Confirmation message for Filters dialog close button.</comment>
   </data>
   <data name="Message_Created" xml:space="preserve">
-    <value>созданный</value>
+    <value>создан</value>
     <comment>The Created message.</comment>
   </data>
   <data name="Message_ErrorSendingData" xml:space="preserve">
@@ -342,11 +342,11 @@
     <comment>String for Export Successful message.</comment>
   </data>
   <data name="Message_GithubIssue" xml:space="preserve">
-    <value>Github проблема</value>
+    <value>Запрос в Github</value>
     <comment>The Github Issue message.</comment>
   </data>
   <data name="Meta_NextBooster" xml:space="preserve">
-    <value>Рекомендован к покупке бустер из выпускы</value>
+    <value>Рекомендован к покупке бустер из выпуска</value>
     <comment>Next Booster string for the Meta Report.</comment>
   </data>
   <data name="Meta_TopCards" xml:space="preserve">
@@ -358,24 +358,28 @@
     <comment>Top Decks string for the Meta Report.</comment>
   </data>
   <data name="Rarity_Common" xml:space="preserve">
-    <value>Обычные</value>
+    <value>Обычных</value>
     <comment>Common card rarity.</comment>
   </data>
   <data name="Rarity_Mythic" xml:space="preserve">
-    <value>Раритетные</value>
+    <value>Раритетных</value>
     <comment>Mythic Rare card rarity.</comment>
   </data>
   <data name="Rarity_Rare" xml:space="preserve">
-    <value>Редкие</value>
+    <value>Редких</value>
     <comment>Rare card rarity.</comment>
   </data>
   <data name="Rarity_Uncommon" xml:space="preserve">
-    <value>Необычные</value>
+    <value>Необычных</value>
     <comment>Uncommon card rarity.</comment>
   </data>
   <data name="Tab_MetaReport" xml:space="preserve">
     <value>Текущая мета</value>
     <comment>String for the Meta Report tab.</comment>
+  </data>
+  <data name="TextBlock_EnableDetailed" xml:space="preserve">
+    <value>Пожалуйста, включите подробный вход в Arena, зайдя в Настройки-&gt;Просмотр учетной записи и отметив «Подробные журналы (поддержка плагинов)», и перейдите к Сборник перед запуском Daily Arena Deck Advisor. Возможно, вам придется перезапустить Arena, чтобы изменения вступили в силу.</value>
+    <comment>String for Enabled Detailed Logging message.</comment>
   </data>
   <data name="Title_CloseConfirmation" xml:space="preserve">
     <value>Закрыть Подтверждение</value>

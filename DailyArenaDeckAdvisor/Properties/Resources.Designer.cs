@@ -646,6 +646,15 @@ namespace DailyArena.DeckAdvisor.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Please turn on detailed logging in Arena by going to Settings-&gt;View Account and checking &quot;Detailed Logs(Plugin Support)&quot;, and browse to your collection screen before running Daily Arena Deck Advisor. You may need to restart Arena for the setting change to take effect..
+        /// </summary>
+        public static string TextBlock_EnableDetailed {
+            get {
+                return ResourceManager.GetString("TextBlock_EnableDetailed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Close Confirmation.
         /// </summary>
         public static string Title_CloseConfirmation {

@@ -462,6 +462,17 @@
 				</Hyperlink>
 			</TextBlock>
 		</Grid>
+		<Grid x:Name="DetailedLoggingScreen" Grid.RowSpan="2" Visibility="Collapsed">
+			<Grid.RowDefinitions>
+				<RowDefinition Height="*" />
+				<RowDefinition Height="3*" />
+				<RowDefinition Height="*" />
+			</Grid.RowDefinitions>
+
+			<TextBlock Grid.Row="0" Grid.Column="0" FontSize="18" Margin="3" FontWeight="Bold" VerticalAlignment="Bottom" HorizontalAlignment="Center" TextAlignment="Center" TextWrapping="Wrap" Text="{x:Static p:Resources.TextBlock_EnableDetailed}" />
+			<Image Grid.Row="1" Grid.Column="0" Margin="3" Source="Resources/detailed_logs.png" Height="650" Width="538"  HorizontalAlignment="Center" RenderOptions.BitmapScalingMode="{Binding BitmapScalingMode}" />
+			<Button Grid.Row="2" Grid.Column="0" Margin="3" Padding="3" Click="Close_Click" VerticalAlignment="Top" HorizontalAlignment="Center" Content="{x:Static p:Resources.Button_Close}" />
+		</Grid>
 		<Border Grid.Row="0" x:Name="FilterPanel" Visibility="Collapsed" BorderThickness="0,0,0,1" BorderBrush="Gray">
 			<Grid>
 				<Grid.RowDefinitions>
