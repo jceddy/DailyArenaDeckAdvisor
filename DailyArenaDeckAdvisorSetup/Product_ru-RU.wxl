@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<WixLocalization Culture="ru-RU" Codepage="20866" xmlns="http://schemas.microsoft.com/wix/2006/localization">
+	<String Id="Language">1033</String>
+	<!-- Supported language and codepage codes can be found here: http://www.tramontana.co.hu/wix/lesson2.php#2.4 -->
+
+	<String Id="ApplicationName">DailyArenaDeckAdvisor</String>
+	<String Id="ManufacturerName">DailyArena</String>
+	<String Id="ManufacturerFullName">DailyArena</String>
+	<String Id="ProductDescription">MTGA Deck Advisor Компаньон приложение</String>
+	<String Id="Comments">Установлено DailyArenaDeckAdvisor</String>
+
+	<String Id="LicenseRtf" Overridable="yes">Eula-ru.rtf</String>
+
+	<String Id="OS2Old">Этот продукт требует как минимум Windows Vista / Server 2008.</String>
+	<String Id="NewerInstalled">Та же или более новая версия этого продукта уже установлена.</String>
+	<String Id="x64VersionRequired">Вам необходимо установить 64-bit версия этого продукта на 64-bit Windows.</String>
+	<String Id="x86VersionRequired">Вам необходимо установить 32-bit версия этого продукта на 32-bit Windows.</String>
+
+	<String Id="FeatureCompleteDescription">Полный пакет.</String>
+	<String Id="FeatureMainProgramDescription">Основная версия, включающая все зависимости.</String>
+	<String Id="FeatureMainProgramTitle">Основная программа</String>
+</WixLocalization>

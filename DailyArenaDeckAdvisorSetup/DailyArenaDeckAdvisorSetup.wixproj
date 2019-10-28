@@ -59,6 +59,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="Product_ru-RU.wxl" />
     <EmbeddedResource Include="Product_en-us.wxl" />
   </ItemGroup>
   <ItemGroup>
@@ -72,6 +73,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Eula-en.rtf" />
+    <Content Include="Eula-ru.rtf" />
     <Content Include="images\app.ico" />
     <Content Include="images\BannerTop.bmp" />
     <Content Include="images\Dialog.bmp" />
