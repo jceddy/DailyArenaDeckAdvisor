@@ -47,6 +47,11 @@ namespace DailyArena.DeckAdvisor
 		}
 
 		/// <summary>
+		/// Determines whether the tab for this archetype is clickable.
+		/// </summary>
+		public bool TabEnabled { get; private set; }
+
+		/// <summary>
 		///  Gets or sets a list of alternate deck configurations for the same archetype.
 		/// </summary>
 		public ReadOnlyCollection<Archetype> SimilarDecks { get; private set; }
@@ -250,6 +255,23 @@ namespace DailyArena.DeckAdvisor
 		private Regex _nonAlphaRegex = new Regex("^([-a-z ,']+)(.*)", RegexOptions.IgnoreCase);
 
 		/// <summary>
+		/// Archetype constructor for disabled "header"tabs.
+		/// </summary>
+		/// <param name="name">The name of the deck archetype section.</param>
+		/// <param name="isPlayerDeck">Boolean indicating whether decks in this section were imported from the player inventory.</param>
+		/// <param name="boosterCost">Double indicating whether decks in this section have a booster cost.</param>
+		/// <param name="totalWildcardsNeeded">Int indicating whether decks in this section need wildcards.</param>
+		/// <remarks>This is a little bit of a cludge, but works well enough that I'll probably just leave it.</remarks>
+		public Archetype(string name, bool isPlayerDeck, double boosterCost, int totalWildcardsNeeded)
+		{
+			TabEnabled = false;
+			Name = name;
+			IsPlayerDeck = isPlayerDeck;
+			_boosterCost = boosterCost;
+			_totalWildcardsNeeded = totalWildcardsNeeded;
+		}
+
+		/// <summary>
 		/// Archetype constructor.
 		/// </summary>
 		/// <param name="name">The name of the deck archetype.</param>
@@ -265,6 +287,7 @@ namespace DailyArena.DeckAdvisor
 		public Archetype(string name, Dictionary<string, int> mainDeck, Dictionary<string, int> sideboard, bool rotationProof, int win = -1, int loss = -1, bool isBrawl = false,
 			List<Archetype> similarDecks = null, bool isPlayerDeck = false, Dictionary<string, Dictionary<string, string>> setNameTranslations = null)
 		{
+			TabEnabled = true;
 			Name = name;
 			MainDeck = new ReadOnlyDictionary<string, int>(mainDeck);
 			Sideboard = new ReadOnlyDictionary<string, int>(sideboard);

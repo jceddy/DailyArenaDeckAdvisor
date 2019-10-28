@@ -46,6 +46,10 @@
 					<Setter Property="Background" TargetName="TabBorder" Value="Yellow" />
 					<Setter Property="BorderThickness" TargetName="TabBorder" Value="1" />
 				</DataTrigger>
+				<DataTrigger Binding="{Binding TabEnabled}" Value="false">
+					<Setter Property="FontWeight" TargetName="TabHeader" Value="Bold" />
+					<Setter Property="TextDecorations" TargetName="TabHeader" Value="Underline" />
+				</DataTrigger>
 			</DataTemplate.Triggers>
 		</DataTemplate>
 		<DataTemplate x:Key="ArchetypeContentTemplate" DataType="{x:Type local:Archetype}">
@@ -575,6 +579,17 @@
 					</Grid>
 				</ControlTemplate>
 			</TabControl.Template>
+			<TabControl.ItemContainerStyle>
+				<Style TargetType="{x:Type TabItem}">
+					<Style.Triggers>
+						<DataTrigger Binding="{Binding TabEnabled}" Value="false">
+							<Setter Property="IsHitTestVisible" Value="False" />
+							<Setter Property="Background" Value="PowderBlue" />
+							<Setter Property="KeyboardNavigation.IsTabStop" Value="False" />
+						</DataTrigger>
+					</Style.Triggers>
+				</Style>
+			</TabControl.ItemContainerStyle>
 		</TabControl>
 	</Grid>
 </Window>

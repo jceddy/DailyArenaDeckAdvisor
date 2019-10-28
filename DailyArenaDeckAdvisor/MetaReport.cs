@@ -75,6 +75,11 @@ namespace DailyArena.DeckAdvisor
 		}
 
 		/// <summary>
+		/// Get whether a tab for this item is enabled (always true for MetaReport).
+		/// </summary>
+		public bool TabEnabled { get; private set; } = true;
+
+		/// <summary>
 		/// Gets a list of all of the entries in the report.
 		/// </summary>
 		public List<MetaReportEntry> ReportEntries { get; private set; }

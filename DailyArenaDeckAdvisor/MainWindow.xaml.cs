@@ -2339,8 +2339,51 @@ namespace DailyArena.DeckAdvisor
 			{
 				_tabObjects.Clear();
 				_tabObjects.Add(_report);
+
+				/*
+				<DataTrigger Binding="{Binding TotalWildcardsNeeded}" Value="0">
+					<Setter Property="Foreground" TargetName="TabHeader" Value="Blue" />
+					<Setter Property="FontWeight" TargetName="TabHeader" Value="Bold" />
+				</DataTrigger>
+				<DataTrigger Binding="{Binding BoosterCost}" Value="0">
+					<Setter Property="Foreground" TargetName="TabHeader" Value="Green" />
+					<Setter Property="FontWeight" TargetName="TabHeader" Value="Bold" />
+					<Setter Property="FontStyle" TargetName="TabHeader" Value="Italic" />
+				</DataTrigger>
+				<DataTrigger Binding="{Binding IsPlayerDeck}" Value="true">
+					<Setter Property="Background" TargetName="TabBorder" Value="Yellow" />
+					<Setter Property="BorderThickness" TargetName="TabBorder" Value="1" />
+				 */
+
+				bool defaultSort = Sort.Value == Properties.Resources.Item_Default;
+				bool noWildcardsNeeded = false;
+				bool noCardsNeeded = false;
+				bool replacementsRequired = false;
+				bool playerDecks = false;
+
 				foreach (Archetype archetype in _orderedArchetypes)
 				{
+					if(defaultSort && !playerDecks && archetype.IsPlayerDeck)
+					{
+						_tabObjects.Add(new Archetype("Player Decks", true, 1, 1));
+						playerDecks = true;
+					}
+					else if(defaultSort && !noCardsNeeded && !archetype.IsPlayerDeck && archetype.BoosterCost == 0)
+					{
+						_tabObjects.Add(new Archetype("No Cards Needed", false, 0, 0));
+						noCardsNeeded = true;
+					}
+					else if(defaultSort && !noWildcardsNeeded && !archetype.IsPlayerDeck && archetype.BoosterCost != 0 && archetype.TotalWildcardsNeeded == 0)
+					{
+						_tabObjects.Add(new Archetype("No Wildcards Needed", false, 1, 0));
+						noWildcardsNeeded = true;
+					}
+					else if(defaultSort && !replacementsRequired && !archetype.IsPlayerDeck && archetype.BoosterCost != 0 && archetype.TotalWildcardsNeeded != 0)
+					{
+						_tabObjects.Add(new Archetype("Replacements Required", false, 1, 1));
+						replacementsRequired = true;
+					}
+
 					_tabObjects.Add(archetype);
 				}
 			});
