@@ -377,6 +377,22 @@
     <value>Meta Report</value>
     <comment>String for the Meta Report tab.</comment>
   </data>
+  <data name="Tab_NoCardsNeeded" xml:space="preserve">
+    <value>No Cards Needed</value>
+    <comment>No Cards Needed Tab section Header string.</comment>
+  </data>
+  <data name="Tab_NoWildcardsNeeded" xml:space="preserve">
+    <value>No Wildcards Needed</value>
+    <comment>No Wildcards Needed Tab section Header string.</comment>
+  </data>
+  <data name="Tab_PlayerDecks" xml:space="preserve">
+    <value>Player Decks</value>
+    <comment>Player Decks Tab section Header string.</comment>
+  </data>
+  <data name="Tab_ReplacementsRequired" xml:space="preserve">
+    <value>Replacements Required</value>
+    <comment>Replacements Required Tab section Header string.</comment>
+  </data>
   <data name="TextBlock_EnableDetailed" xml:space="preserve">
     <value>Please turn on detailed logging in Arena by going to Settings-&gt;View Account and checking "Detailed Logs(Plugin Support)", and browse to your collection screen before running Daily Arena Deck Advisor. You may need to restart Arena for the setting change to take effect.</value>
     <comment>String for Enabled Detailed Logging message.</comment>

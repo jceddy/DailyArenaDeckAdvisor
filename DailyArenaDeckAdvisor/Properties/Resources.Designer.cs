@@ -646,6 +646,42 @@ namespace DailyArena.DeckAdvisor.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to No Cards Needed.
+        /// </summary>
+        public static string Tab_NoCardsNeeded {
+            get {
+                return ResourceManager.GetString("Tab_NoCardsNeeded", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to No Wildcards Needed.
+        /// </summary>
+        public static string Tab_NoWildcardsNeeded {
+            get {
+                return ResourceManager.GetString("Tab_NoWildcardsNeeded", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Player Decks.
+        /// </summary>
+        public static string Tab_PlayerDecks {
+            get {
+                return ResourceManager.GetString("Tab_PlayerDecks", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Replacements Required.
+        /// </summary>
+        public static string Tab_ReplacementsRequired {
+            get {
+                return ResourceManager.GetString("Tab_ReplacementsRequired", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Please turn on detailed logging in Arena by going to Settings-&gt;View Account and checking &quot;Detailed Logs(Plugin Support)&quot;, and browse to your collection screen before running Daily Arena Deck Advisor. You may need to restart Arena for the setting change to take effect..
         /// </summary>
         public static string TextBlock_EnableDetailed {

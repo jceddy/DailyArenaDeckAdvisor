@@ -377,6 +377,22 @@
     <value>Текущая мета</value>
     <comment>String for the Meta Report tab.</comment>
   </data>
+  <data name="Tab_NoCardsNeeded" xml:space="preserve">
+    <value>Карты не нужны</value>
+    <comment>No Cards Needed Tab section Header string.</comment>
+  </data>
+  <data name="Tab_NoWildcardsNeeded" xml:space="preserve">
+    <value>Подстановочные знаки не нужны</value>
+    <comment>No Wildcards Needed Tab section Header string.</comment>
+  </data>
+  <data name="Tab_PlayerDecks" xml:space="preserve">
+    <value>Колоды игроков</value>
+    <comment>Player Decks Tab section Header string.</comment>
+  </data>
+  <data name="Tab_ReplacementsRequired" xml:space="preserve">
+    <value>Требуются замены</value>
+    <comment>Replacements Required Tab section Header string.</comment>
+  </data>
   <data name="TextBlock_EnableDetailed" xml:space="preserve">
     <value>Пожалуйста, включите подробный вход в Arena, зайдя в Настройки-&gt;Просмотр учетной записи и отметив «Подробные журналы (поддержка плагинов)», и перейдите к Сборник перед запуском Daily Arena Deck Advisor. Возможно, вам придется перезапустить Arena, чтобы изменения вступили в силу.</value>
     <comment>String for Enabled Detailed Logging message.</comment>
