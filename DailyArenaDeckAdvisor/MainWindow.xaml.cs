@@ -955,6 +955,7 @@ namespace DailyArena.DeckAdvisor
 									if (commanderId != 0)
 									{
 										name = cardsById[commanderId].Name;
+										mainDeckByName.Add(name, 1);
 										if (Format != Properties.Resources.Item_Brawl)
 										{
 											continue;
@@ -1126,6 +1127,7 @@ namespace DailyArena.DeckAdvisor
 								if (commanderId != 0)
 								{
 									name = cardsById[commanderId].Name;
+									mainDeckByName.Add(name, 1);
 									if (Format != Properties.Resources.Item_Brawl)
 									{
 										continue;
