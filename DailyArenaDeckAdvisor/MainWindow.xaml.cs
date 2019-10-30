@@ -486,10 +486,23 @@ namespace DailyArena.DeckAdvisor
 					}
 				}
 			}
+			/*******/
+			if(Format.Value == Properties.Resources.Item_Brawl)
+			{
+				loadDecksFromServer = true;
+			}
+			/*******/
 			if (loadDecksFromServer)
 			{
 				_logger.Debug("Loading deck data from server");
+
 				var archetypesUrl = $"https://clans.dailyarena.net/{mappedFormat.Item1}_decks.json?_c={Guid.NewGuid()}";
+				/*******/
+				if (Format.Value == Properties.Resources.Item_Brawl)
+				{
+					archetypesUrl = "https://clans.dailyarena.net/deck_scraper_experimental.php?format=brawl";
+				}
+				/*******/
 				var result = WebUtilities.FetchStringFromUrl(archetypesUrl, decksJson != null, out List<WebException> exceptions);
 
 				if (string.IsNullOrWhiteSpace(result))
@@ -525,6 +538,7 @@ namespace DailyArena.DeckAdvisor
 				bool badDeckDefinition = false;
 				string name = archetype["deck_name"];
 				_logger.Debug("Deck Name: {name}", name);
+				Dictionary<string, int> commandZone = new Dictionary<string, int>();
 				Dictionary<string, int> mainDeck = new Dictionary<string, int>();
 				Dictionary<string, int> sideboard = new Dictionary<string, int>();
 				if(RotationProof.Value)
@@ -711,7 +725,34 @@ namespace DailyArena.DeckAdvisor
 						sideboard.Add(cardName, cardQuantity);
 					}
 				}
-				var combinedCounts = mainDeck.Concat(sideboard).GroupBy(x => x.Key).Select(x => new { Name = x.Key, Count = x.Sum(y => y.Value) });
+				if (archetype["commandzone"] != null)
+				{
+					foreach (dynamic card in archetype["commandzone"])
+					{
+						string cardName = (string)card["name"];
+						int cardQuantity = (int)card["quantity"];
+
+						_logger.Debug("Processing commandZone card: {cardName}, {cardQuantity}", cardName, cardQuantity);
+						foreach (Card archetypeCard in cardsByName[cardName])
+						{
+							CardStats stats = _cardStats[archetypeCard];
+							if (!mainDeck.ContainsKey(cardName) && !sideboard.ContainsKey(cardName) && !commandZone.ContainsKey(cardName))
+							{
+								stats.DeckCount++;
+							}
+							stats.TotalCopies += cardQuantity;
+						}
+						if (commandZone.ContainsKey(cardName))
+						{
+							commandZone[cardName] += cardQuantity;
+						}
+						else
+						{
+							commandZone.Add(cardName, cardQuantity);
+						}
+					}
+				}
+				var combinedCounts = mainDeck.Concat(sideboard).Concat(commandZone).GroupBy(x => x.Key).Select(x => new { Name = x.Key, Count = x.Sum(y => y.Value) });
 				foreach (var cardCount in combinedCounts)
 				{
 					foreach (Card archetypeCard in cardsByName[cardCount.Name])
@@ -731,6 +772,7 @@ namespace DailyArena.DeckAdvisor
 					{
 						Dictionary<string, int> similarMainDeck = new Dictionary<string, int>();
 						Dictionary<string, int> similarSideboard = new Dictionary<string, int>();
+						Dictionary<string, int> similarCommandZone = new Dictionary<string, int>();
 
 						foreach (dynamic card in similarDeck["deck"]["deck_list"])
 						{
@@ -759,23 +801,58 @@ namespace DailyArena.DeckAdvisor
 							foreach (Card archetypeCard in cardsByName[cardName])
 							{
 								CardStats stats = _cardStats[archetypeCard];
-								if (!similarMainDeck.ContainsKey(cardName))
+								if (!similarMainDeck.ContainsKey(cardName) && !similarSideboard.ContainsKey(cardName))
 								{
 									stats.DeckCount++;
 								}
 								stats.TotalCopies += cardQuantity;
 							}
 
-							similarSideboard.Add(cardName, cardQuantity);
+							if (similarSideboard.ContainsKey(cardName))
+							{
+								similarSideboard[cardName] += cardQuantity;
+							}
+							else
+							{
+								similarSideboard.Add(cardName, cardQuantity);
+							}
 						}
-						Archetype similarArchetype = new Archetype(name, similarMainDeck, similarSideboard, RotationProof.Value, win, loss,
-							Format.Value == Properties.Resources.Item_Brawl, null, setNameTranslations: _setNameTranslations);
+						if (similarDeck["deck"]["commandzone"] != null)
+						{
+							foreach (dynamic card in similarDeck["deck"]["commandzone"])
+							{
+								string cardName = (string)card["name"];
+								int cardQuantity = (int)card["quantity"];
+								_logger.Debug("Processing alternate commandZone card: {cardName}, {cardQuantity}", cardName, cardQuantity);
+
+								foreach (Card archetypeCard in cardsByName[cardName])
+								{
+									CardStats stats = _cardStats[archetypeCard];
+									if (!similarMainDeck.ContainsKey(cardName) && !similarSideboard.ContainsKey(cardName) && !similarCommandZone.ContainsKey(cardName))
+									{
+										stats.DeckCount++;
+									}
+									stats.TotalCopies += cardQuantity;
+								}
+
+								if (similarCommandZone.ContainsKey(cardName))
+								{
+
+								}
+								else
+								{
+									similarCommandZone.Add(cardName, cardQuantity);
+								}
+							}
+						}
+						Archetype similarArchetype = new Archetype(name, similarMainDeck, similarSideboard, similarCommandZone, RotationProof.Value, win, loss, null,
+							setNameTranslations: _setNameTranslations);
 						CardStats.UpdateDeckAssociations(similarArchetype);
 						similarDecks.Add(similarArchetype);
 					}
 				}
 
-				Archetype newArchetype = new Archetype(name, mainDeck, sideboard, RotationProof.Value, win, loss, Format.Value == Properties.Resources.Item_Brawl, similarDecks,
+				Archetype newArchetype = new Archetype(name, mainDeck, sideboard, commandZone, RotationProof.Value, win, loss, similarDecks,
 					setNameTranslations: _setNameTranslations);
 				CardStats.UpdateDeckAssociations(newArchetype);
 				_archetypes.Add(newArchetype);
@@ -939,9 +1016,7 @@ namespace DailyArena.DeckAdvisor
 								foreach (dynamic deck in json)
 								{
 									string name = deck["name"];
-									int[] commanders = deck["commandZoneGRPIds"] == null ? new int[0] : deck["commandZoneGRPIds"].ToObject<int[]>();
-									/* TODO: handle commanders more like mainDeck/sideboard */
-									int commanderId = commanders.Length == 0 ? 0 : commanders[0];
+									int[] commandZone = deck["commandZoneGRPIds"] == null ? new int[0] : deck["commandZoneGRPIds"].ToObject<int[]>();
 									int[] mainDeck = deck["mainDeck"].ToObject<int[]>();
 									int[] sideboard = deck["sideboard"].ToObject<int[]>();
 									Guid id = Guid.Parse((string)deck["id"]);
@@ -951,17 +1026,9 @@ namespace DailyArena.DeckAdvisor
 									}
 									Dictionary<string, int> mainDeckByName = new Dictionary<string, int>();
 									Dictionary<string, int> sideboardByName = new Dictionary<string, int>();
+									Dictionary<string, int> commandZoneByName = new Dictionary<string, int>();
 
-									if (commanderId != 0)
-									{
-										name = cardsById[commanderId].Name;
-										mainDeckByName.Add(name, 1);
-										if (Format != Properties.Resources.Item_Brawl)
-										{
-											continue;
-										}
-									}
-									else if (Format == Properties.Resources.Item_Brawl)
+									if (Format == Properties.Resources.Item_Brawl && commandZone.Length == 0)
 									{
 										continue;
 									}
@@ -1000,6 +1067,19 @@ namespace DailyArena.DeckAdvisor
 											sideboardByName.Add(cardName, cardQuantity);
 										}
 									}
+									for (int i = 0; i < commandZone.Length; i += 2)
+									{
+										string cardName = cardsById[commandZone[i]].Name;
+										int cardQuantity = commandZone[i + 1];
+										if (commandZoneByName.ContainsKey(cardName))
+										{
+											commandZoneByName[cardName] += cardQuantity;
+										}
+										else
+										{
+											commandZoneByName.Add(cardName, cardQuantity);
+										}
+									}
 
 									if (RotationProof.Value)
 									{
@@ -1026,6 +1106,23 @@ namespace DailyArena.DeckAdvisor
 												string cardName = card.Key;
 
 												_logger.Debug("Checking sideboard card: {cardName}", cardName);
+
+												if (cardsByName[cardName].Count(x => x.Set.RotationSafe) == 0)
+												{
+													_logger.Debug("{cardName} is rotating soon, ignore this deck", cardName);
+													ignoreDeck = true;
+													break;
+												}
+											}
+										}
+
+										if(!ignoreDeck)
+										{
+											foreach (var card in commandZoneByName)
+											{
+												string cardName = card.Key;
+
+												_logger.Debug("Checking command zone card: {cardName}", cardName);
 
 												if (cardsByName[cardName].Count(x => x.Set.RotationSafe) == 0)
 												{
@@ -1076,14 +1173,31 @@ namespace DailyArena.DeckAdvisor
 											}
 										}
 
+										if (!ignoreDeck)
+										{
+											foreach (var card in commandZoneByName)
+											{
+												string cardName = card.Key;
+
+												_logger.Debug("Checking command zone card: {cardName}", cardName);
+
+												if (cardsByName[cardName].Count(x => x.Set.StandardLegal) == 0)
+												{
+													_logger.Debug("{cardName} is not standard legal, ignore this deck", cardName);
+													ignoreDeck = true;
+													break;
+												}
+											}
+										}
+
 										if (ignoreDeck)
 										{
 											continue;
 										}
 									}
 
-									_playerDecks.Add(id, new Archetype(name, mainDeckByName, sideboardByName, RotationProof.Value, 
-										isBrawl: Format == Properties.Resources.Item_Brawl, isPlayerDeck: true, setNameTranslations: _setNameTranslations));
+									_playerDecks.Add(id, new Archetype(name, mainDeckByName, sideboardByName, commandZoneByName, RotationProof.Value, isPlayerDeck: true,
+										setNameTranslations: _setNameTranslations));
 								}
 							}
 
@@ -1111,9 +1225,7 @@ namespace DailyArena.DeckAdvisor
 								dynamic deck = JToken.Parse(deckListJson.ToString());
 
 								string name = deck["name"];
-								int[] commanders = deck["commandZoneGRPIds"] == null ? new int[0] : deck["commandZoneGRPIds"].ToObject<int[]>();
-								/* TODO: handle commanders more like mainDeck/sideboard */
-								int commanderId = commanders.Length == 0 ? 0 : commanders[0];
+								int[] commandZone = deck["commandZoneGRPIds"] == null ? new int[0] : deck["commandZoneGRPIds"].ToObject<int[]>();
 								int[] mainDeck = deck["mainDeck"].ToObject<int[]>();
 								int[] sideboard = deck["sideboard"].ToObject<int[]>();
 								Guid id = Guid.Parse((string)deck["id"]);
@@ -1123,17 +1235,9 @@ namespace DailyArena.DeckAdvisor
 								}
 								Dictionary<string, int> mainDeckByName = new Dictionary<string, int>();
 								Dictionary<string, int> sideboardByName = new Dictionary<string, int>();
+								Dictionary<string, int> commandZoneByName = new Dictionary<string, int>();
 
-								if (commanderId != 0)
-								{
-									name = cardsById[commanderId].Name;
-									mainDeckByName.Add(name, 1);
-									if (Format != Properties.Resources.Item_Brawl)
-									{
-										continue;
-									}
-								}
-								else if (Format == Properties.Resources.Item_Brawl)
+								if (Format == Properties.Resources.Item_Brawl && commandZone.Length == 0)
 								{
 									continue;
 								}
@@ -1172,6 +1276,19 @@ namespace DailyArena.DeckAdvisor
 										sideboardByName.Add(cardName, cardQuantity);
 									}
 								}
+								for (int i = 0; i < commandZone.Length; i += 2)
+								{
+									string cardName = cardsById[commandZone[i]].Name;
+									int cardQuantity = commandZone[i + 1];
+									if (commandZoneByName.ContainsKey(cardName))
+									{
+										commandZoneByName[cardName] += cardQuantity;
+									}
+									else
+									{
+										commandZoneByName.Add(cardName, cardQuantity);
+									}
+								}
 
 								if (RotationProof.Value)
 								{
@@ -1198,6 +1315,23 @@ namespace DailyArena.DeckAdvisor
 											string cardName = card.Key;
 
 											_logger.Debug("Checking sideboard card: {cardName}", cardName);
+
+											if (cardsByName[cardName].Count(x => x.Set.RotationSafe) == 0)
+											{
+												_logger.Debug("{cardName} is rotating soon, ignore this deck", cardName);
+												ignoreDeck = true;
+												break;
+											}
+										}
+									}
+
+									if (!ignoreDeck)
+									{
+										foreach (var card in commandZoneByName)
+										{
+											string cardName = card.Key;
+
+											_logger.Debug("Checking command zone card: {cardName}", cardName);
 
 											if (cardsByName[cardName].Count(x => x.Set.RotationSafe) == 0)
 											{
@@ -1248,14 +1382,31 @@ namespace DailyArena.DeckAdvisor
 										}
 									}
 
+									if (!ignoreDeck)
+									{
+										foreach (var card in commandZoneByName)
+										{
+											string cardName = card.Key;
+
+											_logger.Debug("Checking command zone card: {cardName}", cardName);
+
+											if (cardsByName[cardName].Count(x => x.Set.StandardLegal) == 0)
+											{
+												_logger.Debug("{cardName} is not standard legal, ignore this deck", cardName);
+												ignoreDeck = true;
+												break;
+											}
+										}
+									}
+
 									if (ignoreDeck)
 									{
 										continue;
 									}
 								}
 
-								_playerDecks.Add(id, new Archetype(name, mainDeckByName, sideboardByName, RotationProof.Value, isBrawl: Format == Properties.Resources.Item_Brawl,
-									isPlayerDeck: true, setNameTranslations: _setNameTranslations));
+								_playerDecks.Add(id, new Archetype(name, mainDeckByName, sideboardByName, commandZoneByName, RotationProof.Value, isPlayerDeck: true,
+									setNameTranslations: _setNameTranslations));
 							}
 
 							if (!(line.Contains("jsonrpc") || line.Contains("params")))
@@ -1318,30 +1469,13 @@ namespace DailyArena.DeckAdvisor
 				Dictionary<string, int> haveCards = new Dictionary<string, int>();
 				Dictionary<int, int> mainDeckCards = new Dictionary<int, int>();
 				Dictionary<int, int> sideboardCards = new Dictionary<int, int>();
+				Dictionary<int, int> commandZoneCards = new Dictionary<int, int>();
 				Dictionary<int, int> mainDeckToCollect = new Dictionary<int, int>();
 				Dictionary<int, int> sideboardToCollect = new Dictionary<int, int>();
+				Dictionary<int, int> commandZoneToCollect = new Dictionary<int, int>();
 
-				var leftJoin =
-					from main in archetype.MainDeck
-					join side in archetype.Sideboard on main.Key equals side.Key into temp
-					from side in temp.DefaultIfEmpty()
-					select new
-					{
-						Name = main.Key,
-						Quantity = main.Value + side.Value
-					};
-
-				var rightJoin =
-					from side in archetype.Sideboard
-					join main in archetype.MainDeck on side.Key equals main.Key into temp
-					from main in temp.DefaultIfEmpty()
-					select new
-					{
-						Name = side.Key,
-						Quantity = side.Value + main.Value
-					};
-
-				var cardsNeededForArchetype = leftJoin.Union(rightJoin);
+				var cardsNeededForArchetype = archetype.MainDeck.Concat(archetype.Sideboard).Concat(archetype.CommandZone).
+					GroupBy(x => x.Key).Select(y => new { Name = y.Key, Quantity = y.Sum(z => z.Value) });
 
 				Dictionary<int, int> playerInventory = new Dictionary<int, int>(_playerInventory.Select(x => new { Id = x.Key, Count = x.Value }).ToDictionary(x => x.Id, y => y.Count));
 
@@ -1350,6 +1484,7 @@ namespace DailyArena.DeckAdvisor
 				{
 					int neededForMain = archetype.MainDeck.ContainsKey(neededCard.Name) ? archetype.MainDeck[neededCard.Name] : 0;
 					int neededForSideboard = archetype.Sideboard.ContainsKey(neededCard.Name) ? archetype.Sideboard[neededCard.Name] : 0;
+					int neededForCommandZone = archetype.CommandZone.ContainsKey(neededCard.Name) ? archetype.CommandZone[neededCard.Name] : 0;
 
 					int neededCards = neededCard.Quantity;
 					if (_anyNumber.Contains(neededCard.Name))
@@ -1375,10 +1510,15 @@ namespace DailyArena.DeckAdvisor
 								{
 									sideboardCards.Add(printing.ArenaId, neededForSideboard);
 								}
+								if(neededForCommandZone > 0)
+								{
+									commandZoneCards.Add(printing.ArenaId, neededForCommandZone);
+								}
 								haveCards[printing.Name] += neededCards;
 								neededCards = 0;
 								neededForMain = 0;
 								neededForSideboard = 0;
+								neededForCommandZone = 0;
 							}
 							else if (playerOwns >= neededCards)
 							{
@@ -1390,11 +1530,16 @@ namespace DailyArena.DeckAdvisor
 								{
 									sideboardCards.Add(printing.ArenaId, neededForSideboard);
 								}
+								if(neededForCommandZone > 0)
+								{
+									commandZoneCards.Add(printing.ArenaId, neededForCommandZone);
+								}
 								haveCards[printing.Name] += neededCards;
 								playerInventory[printing.ArenaId] -= neededCards;
 								neededCards = 0;
 								neededForMain = 0;
 								neededForSideboard = 0;
+								neededForCommandZone = 0;
 							}
 							else if (playerOwns > 0)
 							{
@@ -1421,6 +1566,18 @@ namespace DailyArena.DeckAdvisor
 										sideboardCards[printing.ArenaId]++;
 										owned--;
 										neededForSideboard--;
+									}
+								}
+								if(owned > 0 && neededForCommandZone > 0)
+								{
+									commandZoneCards.Add(printing.ArenaId, 1);
+									owned--;
+									neededForCommandZone--;
+									while(owned > 0 && neededForCommandZone > 0)
+									{
+										commandZoneCards[printing.ArenaId]++;
+										owned--;
+										neededForCommandZone--;
 									}
 								}
 								haveCards[printing.Name] += playerOwns;
@@ -1451,17 +1608,31 @@ namespace DailyArena.DeckAdvisor
 								}
 							}
 						}
+						if(neededForCommandZone > 0)
+						{
+							foreach(Card printing in printings)
+							{
+								if(printing.Rarity == rarity)
+								{
+									commandZoneToCollect.Add(printing.ArenaId, neededForCommandZone);
+									break;
+								}
+							}
+						}
 					}
 				}
 
 				_logger.Debug("Generating replacement suggestions for missing cards");
-				List<Tuple<int, int, int>> suggestedReplacements = GenerateReplacements(archetype, mainDeckToCollect, sideboardToCollect, playerInventory, cardsByName, cardsById);
+				List<Tuple<int, int, int>> suggestedReplacements = GenerateReplacements(archetype, mainDeckToCollect, sideboardToCollect, commandZoneToCollect, playerInventory,
+					cardsByName, cardsById);
 
 				_logger.Debug("Updating Archetype objects with suggestions");
 				archetype.SuggestedMainDeck = new ReadOnlyDictionary<int, int>(mainDeckCards);
 				archetype.SuggestedSideboard = new ReadOnlyDictionary<int, int>(sideboardCards);
+				archetype.SuggestedCommandZone = new ReadOnlyDictionary<int, int>(commandZoneCards);
 				archetype.MainDeckToCollect = new ReadOnlyDictionary<int, int>(mainDeckToCollect);
 				archetype.SideboardToCollect = new ReadOnlyDictionary<int, int>(sideboardToCollect);
+				archetype.CommandZoneToCollect = new ReadOnlyDictionary<int, int>(commandZoneToCollect);
 				archetype.SuggestedReplacements = suggestedReplacements.AsReadOnly();
 
 				_logger.Debug("Processing Alternate Deck Configurations");
@@ -1473,30 +1644,13 @@ namespace DailyArena.DeckAdvisor
 						haveCards = new Dictionary<string, int>();
 						mainDeckCards = new Dictionary<int, int>();
 						sideboardCards = new Dictionary<int, int>();
+						commandZoneCards = new Dictionary<int, int>();
 						mainDeckToCollect = new Dictionary<int, int>();
 						sideboardToCollect = new Dictionary<int, int>();
+						commandZoneToCollect = new Dictionary<int, int>();
 
-						leftJoin =
-							from main in similarArchetype.MainDeck
-							join side in similarArchetype.Sideboard on main.Key equals side.Key into temp
-							from side in temp.DefaultIfEmpty()
-							select new
-							{
-								Name = main.Key,
-								Quantity = main.Value + side.Value
-							};
-
-						rightJoin =
-							from side in similarArchetype.Sideboard
-							join main in similarArchetype.MainDeck on side.Key equals main.Key into temp
-							from main in temp.DefaultIfEmpty()
-							select new
-							{
-								Name = side.Key,
-								Quantity = side.Value + main.Value
-							};
-
-						cardsNeededForArchetype = leftJoin.Union(rightJoin);
+						cardsNeededForArchetype = similarArchetype.MainDeck.Concat(similarArchetype.Sideboard).Concat(similarArchetype.CommandZone).
+							GroupBy(x => x.Key).Select(y => new { Name = y.Key, Quantity = y.Sum(z => z.Value) });
 
 						playerInventory = new Dictionary<int, int>(_playerInventory.Select(x => new { Id = x.Key, Count = x.Value }).ToDictionary(x => x.Id, y => y.Count));
 
@@ -1505,6 +1659,7 @@ namespace DailyArena.DeckAdvisor
 						{
 							int neededForMain = similarArchetype.MainDeck.ContainsKey(neededCard.Name) ? similarArchetype.MainDeck[neededCard.Name] : 0;
 							int neededForSideboard = similarArchetype.Sideboard.ContainsKey(neededCard.Name) ? similarArchetype.Sideboard[neededCard.Name] : 0;
+							int neededForCommandZone = similarArchetype.CommandZone.ContainsKey(neededCard.Name) ? similarArchetype.CommandZone[neededCard.Name] : 0;
 
 							int neededCards = neededCard.Quantity;
 							if (_anyNumber.Contains(neededCard.Name))
@@ -1530,10 +1685,15 @@ namespace DailyArena.DeckAdvisor
 										{
 											sideboardCards.Add(printing.ArenaId, neededForSideboard);
 										}
+										if(neededForCommandZone > 0)
+										{
+											commandZoneCards.Add(printing.ArenaId, neededForCommandZone);
+										}
 										haveCards[printing.Name] += neededCards;
 										neededCards = 0;
 										neededForMain = 0;
 										neededForSideboard = 0;
+										neededForCommandZone = 0;
 									}
 									else if (playerOwns >= neededCards)
 									{
@@ -1545,11 +1705,16 @@ namespace DailyArena.DeckAdvisor
 										{
 											sideboardCards.Add(printing.ArenaId, neededForSideboard);
 										}
+										if(neededForCommandZone > 0)
+										{
+											commandZoneCards.Add(printing.ArenaId, neededForCommandZone);
+										}
 										haveCards[printing.Name] += neededCards;
 										playerInventory[printing.ArenaId] -= neededCards;
 										neededCards = 0;
 										neededForMain = 0;
 										neededForSideboard = 0;
+										neededForCommandZone = 0;
 									}
 									else if (playerOwns > 0)
 									{
@@ -1576,6 +1741,18 @@ namespace DailyArena.DeckAdvisor
 												sideboardCards[printing.ArenaId]++;
 												owned--;
 												neededForSideboard--;
+											}
+										}
+										if(owned > 0 && neededForCommandZone > 0)
+										{
+											commandZoneCards.Add(printing.ArenaId, 1);
+											owned--;
+											neededForCommandZone--;
+											while(owned > 0 && neededForCommandZone > 0)
+											{
+												commandZoneCards[printing.ArenaId]++;
+												owned--;
+												neededForCommandZone--;
 											}
 										}
 										haveCards[printing.Name] += playerOwns;
@@ -1606,17 +1783,31 @@ namespace DailyArena.DeckAdvisor
 										}
 									}
 								}
+								if(neededForCommandZone > 0)
+								{
+									foreach (Card printing in printings)
+									{
+										if (printing.Rarity == rarity)
+										{
+											commandZoneToCollect.Add(printing.ArenaId, neededForCommandZone);
+											break;
+										}
+									}
+								}
 							}
 						}
 
 						_logger.Debug("Generating replacement suggestions for missing cards");
-						suggestedReplacements = GenerateReplacements(similarArchetype, mainDeckToCollect, sideboardToCollect, playerInventory, cardsByName, cardsById);
+						suggestedReplacements = GenerateReplacements(similarArchetype, mainDeckToCollect, sideboardToCollect, commandZoneToCollect, playerInventory, cardsByName,
+							cardsById);
 
 						_logger.Debug("Updating Archetype objects with suggestions");
 						similarArchetype.SuggestedMainDeck = new ReadOnlyDictionary<int, int>(mainDeckCards);
 						similarArchetype.SuggestedSideboard = new ReadOnlyDictionary<int, int>(sideboardCards);
+						similarArchetype.SuggestedCommandZone = new ReadOnlyDictionary<int, int>(commandZoneCards);
 						similarArchetype.MainDeckToCollect = new ReadOnlyDictionary<int, int>(mainDeckToCollect);
 						similarArchetype.SideboardToCollect = new ReadOnlyDictionary<int, int>(sideboardToCollect);
+						similarArchetype.CommandZoneToCollect = new ReadOnlyDictionary<int, int>(commandZoneToCollect);
 						similarArchetype.SuggestedReplacements = suggestedReplacements.AsReadOnly();
 					}
 
@@ -1633,30 +1824,13 @@ namespace DailyArena.DeckAdvisor
 				Dictionary<string, int> haveCards = new Dictionary<string, int>();
 				Dictionary<int, int> mainDeckCards = new Dictionary<int, int>();
 				Dictionary<int, int> sideboardCards = new Dictionary<int, int>();
+				Dictionary<int, int> commandZoneCards = new Dictionary<int, int>();
 				Dictionary<int, int> mainDeckToCollect = new Dictionary<int, int>();
 				Dictionary<int, int> sideboardToCollect = new Dictionary<int, int>();
+				Dictionary<int, int> commandZoneToCollect = new Dictionary<int, int>();
 
-				var leftJoin =
-					from main in playerDeck.MainDeck
-					join side in playerDeck.Sideboard on main.Key equals side.Key into temp
-					from side in temp.DefaultIfEmpty()
-					select new
-					{
-						Name = main.Key,
-						Quantity = main.Value + side.Value
-					};
-
-				var rightJoin =
-					from side in playerDeck.Sideboard
-					join main in playerDeck.MainDeck on side.Key equals main.Key into temp
-					from main in temp.DefaultIfEmpty()
-					select new
-					{
-						Name = side.Key,
-						Quantity = side.Value + main.Value
-					};
-
-				var cardsNeededForArchetype = leftJoin.Union(rightJoin);
+				var cardsNeededForArchetype = playerDeck.MainDeck.Concat(playerDeck.Sideboard).Concat(playerDeck.CommandZone).
+					GroupBy(x => x.Key).Select(y => new { Name = y.Key, Quantity = y.Sum(z => z.Value) });
 
 				Dictionary<int, int> playerInventory = new Dictionary<int, int>(_playerInventory.Select(x => new { Id = x.Key, Count = x.Value }).ToDictionary(x => x.Id, y => y.Count));
 
@@ -1665,6 +1839,7 @@ namespace DailyArena.DeckAdvisor
 				{
 					int neededForMain = playerDeck.MainDeck.ContainsKey(neededCard.Name) ? playerDeck.MainDeck[neededCard.Name] : 0;
 					int neededForSideboard = playerDeck.Sideboard.ContainsKey(neededCard.Name) ? playerDeck.Sideboard[neededCard.Name] : 0;
+					int neededForCommandZone = playerDeck.CommandZone.ContainsKey(neededCard.Name) ? playerDeck.CommandZone[neededCard.Name] : 0;
 
 					int neededCards = neededCard.Quantity;
 					if (_anyNumber.Contains(neededCard.Name))
@@ -1690,10 +1865,15 @@ namespace DailyArena.DeckAdvisor
 								{
 									sideboardCards.Add(printing.ArenaId, neededForSideboard);
 								}
+								if(neededForCommandZone > 0)
+								{
+									commandZoneCards.Add(printing.ArenaId, neededForCommandZone);
+								}
 								haveCards[printing.Name] += neededCards;
 								neededCards = 0;
 								neededForMain = 0;
 								neededForSideboard = 0;
+								neededForCommandZone = 0;
 							}
 							else if (playerOwns >= neededCards)
 							{
@@ -1705,11 +1885,16 @@ namespace DailyArena.DeckAdvisor
 								{
 									sideboardCards.Add(printing.ArenaId, neededForSideboard);
 								}
+								if(neededForCommandZone > 0)
+								{
+									commandZoneCards.Add(printing.ArenaId, neededForCommandZone);
+								}
 								haveCards[printing.Name] += neededCards;
 								playerInventory[printing.ArenaId] -= neededCards;
 								neededCards = 0;
 								neededForMain = 0;
 								neededForSideboard = 0;
+								neededForCommandZone = 0;
 							}
 							else if (playerOwns > 0)
 							{
@@ -1734,6 +1919,18 @@ namespace DailyArena.DeckAdvisor
 									while (owned > 0 && neededForSideboard > 0)
 									{
 										sideboardCards[printing.ArenaId]++;
+										owned--;
+										neededForSideboard--;
+									}
+								}
+								if(owned > 0 && neededForCommandZone > 0)
+								{
+									commandZoneCards.Add(printing.ArenaId, 1);
+									owned--;
+									neededForCommandZone--;
+									while(owned > 0 && neededForCommandZone > 0)
+									{
+										commandZoneCards[printing.ArenaId]++;
 										owned--;
 										neededForSideboard--;
 									}
@@ -1766,17 +1963,31 @@ namespace DailyArena.DeckAdvisor
 								}
 							}
 						}
+						if (neededForCommandZone > 0)
+						{
+							foreach (Card printing in printings)
+							{
+								if (printing.Rarity == rarity)
+								{
+									commandZoneToCollect.Add(printing.ArenaId, neededForCommandZone);
+									break;
+								}
+							}
+						}
 					}
 				}
 
 				_logger.Debug("Generating replacement suggestions for missing cards");
-				List<Tuple<int, int, int>> suggestedReplacements = GenerateReplacements(playerDeck, mainDeckToCollect, sideboardToCollect, playerInventory, cardsByName, cardsById);
+				List<Tuple<int, int, int>> suggestedReplacements = GenerateReplacements(playerDeck, mainDeckToCollect, sideboardToCollect, commandZoneToCollect, playerInventory,
+					cardsByName, cardsById);
 
 				_logger.Debug("Updating Player Deck objects with suggestions");
 				playerDeck.SuggestedMainDeck = new ReadOnlyDictionary<int, int>(mainDeckCards);
 				playerDeck.SuggestedSideboard = new ReadOnlyDictionary<int, int>(sideboardCards);
+				playerDeck.SuggestedCommandZone = new ReadOnlyDictionary<int, int>(commandZoneCards);
 				playerDeck.MainDeckToCollect = new ReadOnlyDictionary<int, int>(mainDeckToCollect);
 				playerDeck.SideboardToCollect = new ReadOnlyDictionary<int, int>(sideboardToCollect);
+				playerDeck.CommandZoneToCollect = new ReadOnlyDictionary<int, int>(commandZoneToCollect);
 				playerDeck.SuggestedReplacements = suggestedReplacements.AsReadOnly();
 
 				if(playerDeck.BoosterCost > 0)
@@ -1841,12 +2052,13 @@ namespace DailyArena.DeckAdvisor
 		/// <param name="archetype">The deck to generate replacements suggestions for.</param>
 		/// <param name="mainDeckToCollect">The main deck cards for the deck that the player hasn't collected yet.</param>
 		/// <param name="sideboardToCollect">The sideboard cards for the deck that the player hasn't collected yet.</param>
+		/// <param name="commandZoneToCollect">The command zone cards for the deck that the player hasn't collected yet.</param>
 		/// <param name="playerInventory">The player's card inventory/collection.</param>
 		/// <param name="cardsByName">A dictionary mapping card names to lists of Card objects.</param>
 		/// <param name="cardsById">A dictioanry mapping arena ids to Card objects.</param>
 		/// <returns>A list of Tuple&lt;int, int, int&gt; with Item1 = card to be replaced, Item2 = suggested replacement, Item3 = number of times to make this replacement</returns>
 		private List<Tuple<int, int, int>> GenerateReplacements(Archetype archetype, Dictionary<int, int> mainDeckToCollect, Dictionary<int, int> sideboardToCollect,
-			Dictionary<int, int> playerInventory, IDictionary<string, List<Card>> cardsByName, IDictionary<int, Card> cardsById)
+			Dictionary<int, int> commandZoneToCollect, Dictionary<int, int> playerInventory, IDictionary<string, List<Card>> cardsByName, IDictionary<int, Card> cardsById)
 		{
 			_logger.Debug("GenerateReplacements() Called for Archetype {archetypeName}", archetype.Name);
 
@@ -1854,9 +2066,10 @@ namespace DailyArena.DeckAdvisor
 			CardColors identity = null;
 			if (Format.Value == Properties.Resources.Item_Brawl)
 			{
-				identity = cardsByName[archetype.CommanderName].First().ColorIdentity;
+				identity = archetype.CommanderColorIdentity;
 			}
-			var replacementsToFind = mainDeckToCollect.Concat(sideboardToCollect).GroupBy(x => x.Key).Select(x => new { Id = x.Key, Count = x.Sum(y => y.Value) });
+			var replacementsToFind = mainDeckToCollect.Concat(sideboardToCollect).Concat(commandZoneToCollect).GroupBy(x => x.Key).
+				Select(x => new { Id = x.Key, Count = x.Sum(y => y.Value) });
 			foreach (var find in replacementsToFind)
 			{
 				_logger.Debug("Generating replacements suggestions for card with Arena Id: {0} (need {1})", find.Id, find.Count);
@@ -1923,7 +2136,7 @@ namespace DailyArena.DeckAdvisor
 				}
 				else
 				{
-					bool isCommander = Format.Value == Properties.Resources.Item_Brawl && cardToReplace.Name == archetype.CommanderName;
+					bool isCommander = archetype.CommandZone.ContainsKey(cardToReplace.Name);
 
 					_logger.Debug("Processing Candidates based on Type and Cost");
 					var candidates = playerInventory.Select(x => new { Card = cardsById[x.Key], Quantity = x.Value }).

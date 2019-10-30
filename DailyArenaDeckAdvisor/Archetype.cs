@@ -120,9 +120,14 @@ namespace DailyArena.DeckAdvisor
 		public ReadOnlyDictionary<string, int> MainDeck { get; private set; }
 
 		/// <summary>
-		/// Gets readonly dictionary containing the names and quantities of cards in the sideboard.
+		/// Gets a readonly dictionary containing the names and quantities of cards in the sideboard.
 		/// </summary>
 		public ReadOnlyDictionary<string, int> Sideboard { get; private set; }
+
+		/// <summary>
+		/// Gets a readonly dictionary containing the names and quanitites of cards in the command zone.
+		/// </summary>
+		public ReadOnlyDictionary<string, int> CommandZone { get; private set; }
 
 		/// <summary>
 		/// The Arena Ids and quantities of cards still to be collected for the main deck list.
@@ -179,50 +184,41 @@ namespace DailyArena.DeckAdvisor
 		}
 
 		/// <summary>
+		/// The Arena Ids and quantities of cards still to be collected for the command zone.
+		/// </summary>
+		private ReadOnlyDictionary<int, int> _commandZoneToCollect = null;
+
+		/// <summary>
+		/// Gets or sets the Arena Ids and quantities of cards still to be collected for the command zone.
+		/// </summary>
+		public ReadOnlyDictionary<int, int> CommandZoneToCollect
+		{
+			get
+			{
+				return _commandZoneToCollect;
+			}
+			set
+			{
+				if(_commandZoneToCollect == null)
+				{
+					_commandZoneToCollect = value;
+				}
+				else
+				{
+					throw new InvalidOperationException("CommandZoneToCollect can only be set once.");
+				}
+			}
+		}
+
+		/// <summary>
 		/// Gets a unique identifier for the deck archetype.
 		/// </summary>
 		public long Index { get; private set; } = NextIndex++;
 
 		/// <summary>
-		/// Gets or sets the deck archetype's Commander name (for Brawl).
-		/// </summary>
-		public string CommanderName { get; private set; }
-
-		/// <summary>
 		/// Whether commander info should be shown.
 		/// </summary>
 		public Visibility CommanderVisibility { get; private set; }
-
-		/// <summary>
-		/// A view-friendly version of the commander card (for Brawl).
-		/// </summary>
-		private CardView _commanderCard = null;
-
-		/// <summary>
-		/// Gets a view-friendly version of the commander card (for Brawl).
-		/// </summary>
-		public CardView CommanderCard
-		{
-			get
-			{
-				if(CommanderName == null)
-				{
-					return null;
-				}
-
-				if (_commanderCard == null && _mainDeckToCollect != null && _suggestedMainDeck != null)
-				{
-					ReadOnlyDictionary<int, Card> cardsById = Card.CardsById;
-					_commanderCard = _mainDeckToCollect.Where(x => cardsById[x.Key].Name == CommanderName).
-						Select(x => new CardView() { Card = cardsById[x.Key], Quantity = x.Value, Collected = false, Stats = CardStats[cardsById[x.Key]], RotationProof = RotationProof }).
-						Concat(_suggestedMainDeck.Where(x => cardsById[x.Key].Name == CommanderName)
-							.Select(x => new CardView() { Card = cardsById[x.Key], Quantity = x.Value, Collected = true, Stats = CardStats[cardsById[x.Key]], RotationProof = RotationProof })
-						).
-						First();
-				}
-				return _commanderCard;
-			}
-		}
 
 		/// <summary>
 		/// The commander's color identity (for Brawl).
@@ -236,9 +232,32 @@ namespace DailyArena.DeckAdvisor
 		{
 			get
 			{
-				if (_commanderColorIdentity == null && CommanderCard != null)
+				if (_commanderColorIdentity == null)
 				{
-					_commanderColorIdentity = CommanderCard.Card.ColorIdentity;
+					ReadOnlyDictionary<string, List<Card>> cardsByName = Card.CardsByName;
+					Dictionary<string, bool> colorsInIdentity = new Dictionary<string, bool>()
+					{
+						{ "W", false },
+						{ "U", false },
+						{ "B", false },
+						{ "R", false },
+						{ "G", false }
+					};
+					foreach(string cardName in CommandZone.Keys)
+					{
+						CardColors colorIdentity = cardsByName[cardName][0].ColorIdentity;
+						colorsInIdentity["W"] = colorsInIdentity["W"] || colorIdentity.IsWhite;
+						colorsInIdentity["U"] = colorsInIdentity["U"] || colorIdentity.IsBlue;
+						colorsInIdentity["B"] = colorsInIdentity["B"] || colorIdentity.IsBlack;
+						colorsInIdentity["R"] = colorsInIdentity["R"] || colorIdentity.IsRed;
+						colorsInIdentity["G"] = colorsInIdentity["G"] || colorIdentity.IsGreen;
+					}
+					string colorString = (colorsInIdentity["W"] ? "W" : string.Empty) +
+						(colorsInIdentity["U"] ? "U" : string.Empty) +
+						(colorsInIdentity["B"] ? "B" : string.Empty) +
+						(colorsInIdentity["R"] ? "R" : string.Empty) +
+						(colorsInIdentity["G"] ? "G" : string.Empty);
+					_commanderColorIdentity = CardColors.CardColorFromString(colorString);
 				}
 				return _commanderColorIdentity;
 			}
@@ -248,11 +267,6 @@ namespace DailyArena.DeckAdvisor
 		/// Gets a boolean indicating whether this deck was imported from the player's inventory.
 		/// </summary>
 		public bool IsPlayerDeck { get; private set; }
-
-		/// <summary>
-		/// Regex used to parse commander name out of archetype name for Brawl.
-		/// </summary>
-		private Regex _nonAlphaRegex = new Regex("^([-a-z ,']+)(.*)", RegexOptions.IgnoreCase);
 
 		/// <summary>
 		/// Archetype constructor for disabled "header"tabs.
@@ -277,20 +291,21 @@ namespace DailyArena.DeckAdvisor
 		/// <param name="name">The name of the deck archetype.</param>
 		/// <param name="mainDeck">The names and quantities of cards in the the main deck list.</param>
 		/// <param name="sideboard">The names and quantities of cards in the sideboard.</param>
+		/// <param name="commandZone">The names and quanitities of cards in the command zone.</param>
 		/// <param name="rotationProof">Whether we favor "rotation-proof" cards.</param>
 		/// <param name="win">The number of recorded wins for this archetype (if available).</param>
 		/// <param name="loss">The number of recorded losses for this archetype (if available).</param>
-		/// <param name="isBrawl">Whether the selected format is Brawl.</param>
 		/// <param name="similarDecks">List of alternate deck configurations for this archetype.</param>
 		/// <param name="isPlayerDeck">Boolean indicating whether this is a deck that was imported from the player inventory.</param>
 		/// <param name="setNameTranslations">A dictionary containing set name translations for various languages.</param>
-		public Archetype(string name, Dictionary<string, int> mainDeck, Dictionary<string, int> sideboard, bool rotationProof, int win = -1, int loss = -1, bool isBrawl = false,
-			List<Archetype> similarDecks = null, bool isPlayerDeck = false, Dictionary<string, Dictionary<string, string>> setNameTranslations = null)
+		public Archetype(string name, Dictionary<string, int> mainDeck, Dictionary<string, int> sideboard, Dictionary<string, int> commandZone, bool rotationProof, int win = -1,
+			int loss = -1, List<Archetype> similarDecks = null, bool isPlayerDeck = false, Dictionary<string, Dictionary<string, string>> setNameTranslations = null)
 		{
 			TabEnabled = true;
 			Name = name;
 			MainDeck = new ReadOnlyDictionary<string, int>(mainDeck);
 			Sideboard = new ReadOnlyDictionary<string, int>(sideboard);
+			CommandZone = new ReadOnlyDictionary<string, int>(commandZone);
 			RotationProof = rotationProof;
 			Win = win;
 			Loss = loss;
@@ -307,11 +322,9 @@ namespace DailyArena.DeckAdvisor
 				WinLossVisibility = Visibility.Visible;
 			}
 
-			if(isBrawl)
+			if(commandZone.Count > 0)
 			{
 				CommanderVisibility = Visibility.Visible;
-				var m = _nonAlphaRegex.Match(name);
-				CommanderName = m.Groups[1].Value.Trim();
 			}
 			else
 			{
@@ -350,13 +363,15 @@ namespace DailyArena.DeckAdvisor
 		{
 			get
 			{
-				if (_totalBoosterCost < 0 && _mainDeckToCollect != null && _sideboardToCollect != null)
+				if (_totalBoosterCost < 0 && _mainDeckToCollect != null && _sideboardToCollect != null && _commandZoneToCollect != null)
 				{
 					ReadOnlyDictionary<int, Card> cardsById = Card.CardsById;
 					_totalBoosterCost = _mainDeckToCollect.Sum(x => cardsById[x.Key].BoosterCost * Math.Min(x.Value, 4)) +
 						_sideboardToCollect.Sum(x => cardsById[x.Key].BoosterCost * Math.Min(x.Value, 4)) +
+						_commandZoneToCollect.Sum(x => cardsById[x.Key].BoosterCost * Math.Min(x.Value, 4)) +
 						_suggestedMainDeck.Sum(x => cardsById[x.Key].BoosterCost * Math.Min(x.Value, 4)) +
-						_suggestedSideboard.Sum(x => cardsById[x.Key].BoosterCost * Math.Min(x.Value, 4));
+						_suggestedSideboard.Sum(x => cardsById[x.Key].BoosterCost * Math.Min(x.Value, 4)) +
+						_suggestedCommandZone.Sum(x => cardsById[x.Key].BoosterCost * Math.Min(x.Value, 4));
 				}
 				return _totalBoosterCost;
 			}
@@ -374,11 +389,12 @@ namespace DailyArena.DeckAdvisor
 		{
 			get
 			{
-				if(_boosterCost < 0 && _mainDeckToCollect != null && _sideboardToCollect != null)
+				if(_boosterCost < 0 && _mainDeckToCollect != null && _sideboardToCollect != null && _suggestedCommandZone != null)
 				{
 					ReadOnlyDictionary<int, Card> cardsById = Card.CardsById;
 					_boosterCost = _mainDeckToCollect.Sum(x => cardsById[x.Key].BoosterCost * Math.Min(x.Value, 4)) +
-						_sideboardToCollect.Sum(x => cardsById[x.Key].BoosterCost * Math.Min(x.Value, 4));
+						_sideboardToCollect.Sum(x => cardsById[x.Key].BoosterCost * Math.Min(x.Value, 4)) +
+						_commandZoneToCollect.Sum(x => cardsById[x.Key].BoosterCost * Math.Min(x.Value, 4));
 				}
 				return _boosterCost;
 			}
@@ -396,11 +412,12 @@ namespace DailyArena.DeckAdvisor
 		{
 			get
 			{
-				if (_boosterCostAfterWC < 0 && _mainDeckToCollect != null && _sideboardToCollect != null && _wildcardsOwned != null)
+				if (_boosterCostAfterWC < 0 && _mainDeckToCollect != null && _sideboardToCollect != null && _commandZoneToCollect != null && _wildcardsOwned != null)
 				{
 					ReadOnlyDictionary<int, Card> cardsById = Card.CardsById;
 					var cardsToSelect = _mainDeckToCollect.Select(x => new { cardsById[x.Key].Rarity, Card = cardsById[x.Key], Count = Math.Min(x.Value, 4) }).
 						Concat(_sideboardToCollect.Select(x => new { cardsById[x.Key].Rarity, Card = cardsById[x.Key], Count = Math.Min(x.Value, 4) })).
+						Concat(_commandZoneToCollect.Select(x => new { cardsById[x.Key].Rarity, Card = cardsById[x.Key], Count = Math.Min(x.Value, 4) })).
 						GroupBy(x => x.Rarity).
 						Select(x => new { Rarity = x.Key, Cards = x.SelectMany(y => Enumerable.Repeat(y.Card, y.Count)).OrderBy(z => z.BoosterCost).ToList() }).
 						ToDictionary(x => x.Rarity, y => y.Cards);
@@ -477,8 +494,9 @@ namespace DailyArena.DeckAdvisor
 					_suggestedMainDeck != null && _suggestedSideboard != null && _anyNumber != null)
 				{
 					ReadOnlyDictionary<int, Card> cardsById = Card.CardsById;
-					_wildcardsNeeded = _mainDeckToCollect.Select(x => new { cardsById[x.Key].Rarity, Count = _anyNumber.Contains(cardsById[x.Key].Name) ? Math.Min(x.Value, 4) - (_suggestedMainDeck.Where(y => y.Key == x.Key).Count() + _suggestedSideboard.Where(z => z.Key == x.Key).Count()) : x.Value }).
-						Concat(_sideboardToCollect.Select(x => new { cardsById[x.Key].Rarity, Count = _anyNumber.Contains(cardsById[x.Key].Name) ? Math.Min(x.Value, 4) - (_suggestedMainDeck.Where(y => y.Key == x.Key).Count() + _suggestedSideboard.Where(z => z.Key == x.Key).Count()) : x.Value })).
+					_wildcardsNeeded = _mainDeckToCollect.Select(x => new { cardsById[x.Key].Rarity, Count = _anyNumber.Contains(cardsById[x.Key].Name) ? Math.Min(x.Value, 4) - (_suggestedMainDeck.Where(y => y.Key == x.Key).Count() + _suggestedSideboard.Where(z => z.Key == x.Key).Count() + _suggestedCommandZone.Where(z => z.Key == x.Key).Count()) : x.Value }).
+						Concat(_sideboardToCollect.Select(x => new { cardsById[x.Key].Rarity, Count = _anyNumber.Contains(cardsById[x.Key].Name) ? Math.Min(x.Value, 4) - (_suggestedMainDeck.Where(y => y.Key == x.Key).Count() + _suggestedSideboard.Where(z => z.Key == x.Key).Count() + _suggestedCommandZone.Where(z => z.Key == x.Key).Count()) : x.Value })).
+						Concat(_commandZoneToCollect.Select(x => new { cardsById[x.Key].Rarity, Count = _anyNumber.Contains(cardsById[x.Key].Name) ? Math.Min(x.Value, 4) - (_suggestedMainDeck.Where(y => y.Key == x.Key).Count() + _suggestedSideboard.Where(z => z.Key == x.Key).Count() + _suggestedCommandZone.Where(z => z.Key == x.Key).Count()) : x.Value })).
 						GroupBy(x => x.Rarity).
 						Select(x => new Tuple<CardRarity, int, int>(x.Key, x.Sum(y => y.Count), _wildcardsOwned[x.Key])).
 						OrderByDescending(x => x.Item1).ToList();
@@ -528,10 +546,12 @@ namespace DailyArena.DeckAdvisor
 				if(_mainDeckToCollect != null && _sideboardToCollect != null)
 				{
 					ReadOnlyDictionary<int, Card> cardsById = Card.CardsById;
-					_rarityCounts = _mainDeckToCollect.Select(x => new { cardsById[x.Key].Rarity, Count = _anyNumber.Contains(cardsById[x.Key].Name) ? Math.Min(x.Value, 4) - (_suggestedMainDeck.Where(y => y.Key == x.Key).Count() + _suggestedSideboard.Where(z => z.Key == x.Key).Count()) : x.Value }).
-						Concat(_sideboardToCollect.Select(x => new { cardsById[x.Key].Rarity, Count = _anyNumber.Contains(cardsById[x.Key].Name) ? Math.Min(x.Value, 4) - (_suggestedMainDeck.Where(y => y.Key == x.Key).Count() + _suggestedSideboard.Where(z => z.Key == x.Key).Count()) : x.Value })).
+					_rarityCounts = _mainDeckToCollect.Select(x => new { cardsById[x.Key].Rarity, Count = _anyNumber.Contains(cardsById[x.Key].Name) ? Math.Min(x.Value, 4) - (_suggestedMainDeck.Where(y => y.Key == x.Key).Count() + _suggestedSideboard.Where(z => z.Key == x.Key).Count() + _suggestedCommandZone.Where(z => z.Key == x.Key).Count()) : x.Value }).
+						Concat(_sideboardToCollect.Select(x => new { cardsById[x.Key].Rarity, Count = _anyNumber.Contains(cardsById[x.Key].Name) ? Math.Min(x.Value, 4) - (_suggestedMainDeck.Where(y => y.Key == x.Key).Count() + _suggestedSideboard.Where(z => z.Key == x.Key).Count() + _suggestedCommandZone.Where(z => z.Key == x.Key).Count()) : x.Value })).
+						Concat(_commandZoneToCollect.Select(x => new { cardsById[x.Key].Rarity, Count = _anyNumber.Contains(cardsById[x.Key].Name) ? Math.Min(x.Value, 4) - (_suggestedMainDeck.Where(y => y.Key == x.Key).Count() + _suggestedSideboard.Where(z => z.Key == x.Key).Count() + _suggestedCommandZone.Where(z => z.Key == x.Key).Count()) : x.Value })).
 						Concat(_suggestedMainDeck.Select(x => new { cardsById[x.Key].Rarity, Count = Math.Min(x.Value, 4) })).
 						Concat(_suggestedSideboard.Select(x => new { cardsById[x.Key].Rarity, Count = Math.Min(x.Value, 4) })).
+						Concat(_suggestedCommandZone.Select(x => new { cardsById[x.Key].Rarity, Count = Math.Min(x.Value, 4) })).
 						Concat(new List<CardRarity>() { CardRarity.MythicRare, CardRarity.Rare, CardRarity.Uncommon, CardRarity.Common }.Select(x => new { Rarity = x, Count = 0 })).
 						GroupBy(x => x.Rarity).
 						ToDictionary(x => x.Key, x => x.Sum(y => y.Count));
@@ -595,6 +615,33 @@ namespace DailyArena.DeckAdvisor
 				else
 				{
 					throw new InvalidOperationException("SuggestedSideboard can only be set once.");
+				}
+			}
+		}
+
+		/// <summary>
+		/// The Arena Ids and quantities of suggested cards to use in the command zone.
+		/// </summary>
+		private ReadOnlyDictionary<int, int> _suggestedCommandZone = null;
+
+		/// <summary>
+		/// Gets or sets the Arena Ids and quantities of suggested cards to use in the command zone.
+		/// </summary>
+		public ReadOnlyDictionary<int, int> SuggestedCommandZone
+		{
+			get
+			{
+				return _suggestedCommandZone;
+			}
+			set
+			{
+				if (_suggestedCommandZone == null)
+				{
+					_suggestedCommandZone = value;
+				}
+				else
+				{
+					throw new InvalidOperationException("SuggestedCommandZone can only be set once.");
 				}
 			}
 		}
@@ -746,6 +793,29 @@ namespace DailyArena.DeckAdvisor
 		}
 
 		/// <summary>
+		/// A list of objects representing a view into the command zone, for Xaml binding.
+		/// </summary>
+		private IReadOnlyList<CardView> _commandZoneView = null;
+
+		/// <summary>
+		/// Gets a list of objects representing a view into the command zone, for Xaml binding.
+		/// </summary>
+		public IReadOnlyList<CardView> CommandZoneView
+		{
+			get
+			{
+				if(_commandZoneView == null && _commandZoneToCollect != null && _suggestedCommandZone != null)
+				{
+					ReadOnlyDictionary<int, Card> cardsById = Card.CardsById;
+					_commandZoneView = _commandZoneToCollect.Select(x => new CardView() { Card = cardsById[x.Key], Quantity = x.Value, Collected = false, Stats = CardStats[cardsById[x.Key]], RotationProof = RotationProof }).
+						Concat(_suggestedCommandZone.Select(x => new CardView() { Card = cardsById[x.Key], Quantity = x.Value, Collected = true, Stats = CardStats[cardsById[x.Key]], RotationProof = RotationProof }))
+						.ToList().AsReadOnly();
+				}
+				return _commandZoneView;
+			}
+		}
+
+		/// <summary>
 		/// The string containing the deck in Arena import/export format.
 		/// </summary>
 		private string _exportList = null;
@@ -761,19 +831,21 @@ namespace DailyArena.DeckAdvisor
 				{
 					StringBuilder exportList = new StringBuilder();
 
-					if (_commanderCard != null)
-					{
-						exportList.AppendFormat("Commander{0}1 {1} ({2}) {3}{0}{0}", Environment.NewLine, _commanderCard.Card.Name, _commanderCard.Card.Set.ArenaCode, _commanderCard.Card.CollectorNumber);
-					}
-
 					ReadOnlyDictionary<int, Card> cardsById = Card.CardsById;
-					var mainDeck = SuggestedMainDeck.Concat(MainDeckToCollect).Where(x => _commanderCard == null || x.Key != _commanderCard.Card.ArenaId).GroupBy(x => x.Key).
+					var commandZone = SuggestedCommandZone.Concat(CommandZoneToCollect).GroupBy(x => x.Key).
+						Select(x => new { Card = cardsById[x.Key], Quantity = x.Sum(y => y.Value) }).
+						Select(x => $"{x.Quantity} {x.Card.Name} ({x.Card.Set.ArenaCode}) {x.Card.CollectorNumber}");
+					var mainDeck = SuggestedMainDeck.Concat(MainDeckToCollect).GroupBy(x => x.Key).
 						Select(x => new { Card = cardsById[x.Key], Quantity = x.Sum(y => y.Value) }).
 						Select(x => $"{x.Quantity} {x.Card.Name} ({x.Card.Set.ArenaCode}) {x.Card.CollectorNumber}");
 					var sideboard = SuggestedSideboard.Concat(SideboardToCollect).GroupBy(x => x.Key).
 						Select(x => new { Card = cardsById[x.Key], Quantity = x.Sum(y => y.Value) }).
 						Select(x => $"{x.Quantity} {x.Card.Name} ({x.Card.Set.ArenaCode}) {x.Card.CollectorNumber}");
 
+					if(commandZone.Count() > 0)
+					{
+						exportList.AppendFormat("Commander{0}{1}{0}{0}", Environment.NewLine, string.Join(Environment.NewLine, commandZone));
+					}
 					exportList.AppendFormat("Deck{0}{1}", Environment.NewLine, string.Join(Environment.NewLine, mainDeck));
 					if(sideboard.Count() > 0)
 					{
@@ -800,22 +872,10 @@ namespace DailyArena.DeckAdvisor
 				if (_exportListSuggested == null)
 				{
 					StringBuilder exportList = new StringBuilder();
-					int finalCommanderCardId = 0;
-					if(_commanderCard != null)
-					{
-						List<int> commanderReplacement = SuggestedReplacements.Where(x => x.Item1 == _commanderCard.Card.ArenaId).Select(x => x.Item2).ToList();
-						if(commanderReplacement.Count > 0)
-						{
-							finalCommanderCardId = commanderReplacement[0];
-						}
-						else
-						{
-							finalCommanderCardId = _commanderCard.Card.ArenaId;
-						}
-					}
 
 					Dictionary<int, int> mainDeckReplacements = new Dictionary<int, int>();
 					Dictionary<int, int> sideboardReplacements = new Dictionary<int, int>();
+					Dictionary<int, int> commandZoneReplacements = new Dictionary<int, int>();
 					foreach (Tuple<int, int, int> replacement in SuggestedReplacements)
 					{
 						int replacementCount = replacement.Item3;
@@ -846,6 +906,33 @@ namespace DailyArena.DeckAdvisor
 								replacementCount -= MainDeckToCollect[replacement.Item1];
 							}
 						}
+						if(replacementCount > 0 && CommandZoneToCollect.ContainsKey(replacement.Item1))
+						{
+							if (CommandZoneToCollect[replacement.Item1] >= replacementCount)
+							{
+								if (commandZoneReplacements.ContainsKey(replacement.Item2))
+								{
+									commandZoneReplacements[replacement.Item2] += replacementCount;
+								}
+								else
+								{
+									commandZoneReplacements.Add(replacement.Item2, replacementCount);
+								}
+								replacementCount = 0;
+							}
+							else
+							{
+								if (commandZoneReplacements.ContainsKey(replacement.Item2))
+								{
+									commandZoneReplacements[replacement.Item2] += CommandZoneToCollect[replacement.Item1];
+								}
+								else
+								{
+									commandZoneReplacements.Add(replacement.Item2, CommandZoneToCollect[replacement.Item1]);
+								}
+								replacementCount -= CommandZoneToCollect[replacement.Item1];
+							}
+						}
 						if (replacementCount > 0)
 						{
 							if (sideboardReplacements.ContainsKey(replacement.Item2))
@@ -861,19 +948,20 @@ namespace DailyArena.DeckAdvisor
 
 					ReadOnlyDictionary<int, Card> cardsById = Card.CardsById;
 
-					if (finalCommanderCardId != 0)
-					{
-						Card commanderCard = cardsById[finalCommanderCardId];
-						exportList.AppendFormat("Commander{0}1 {1} ({2}) {3}{0}{0}", Environment.NewLine, commanderCard.Name, commanderCard.Set.ArenaCode, commanderCard.CollectorNumber);
-					}
-
-					var mainDeck = SuggestedMainDeck.Concat(mainDeckReplacements).Where(x => finalCommanderCardId == 0 || x.Key != finalCommanderCardId).GroupBy(x => x.Key).
+					var mainDeck = SuggestedMainDeck.Concat(mainDeckReplacements).GroupBy(x => x.Key).
 						Select(x => new { Card = cardsById[x.Key], Quantity = x.Sum(y => y.Value) }).
 						Select(x => $"{x.Quantity} {x.Card.Name} ({x.Card.Set.ArenaCode}) {x.Card.CollectorNumber}");
 					var sideboard = SuggestedSideboard.Concat(sideboardReplacements).GroupBy(x => x.Key).
 						Select(x => new { Card = cardsById[x.Key], Quantity = x.Sum(y => y.Value) }).
 						Select(x => $"{x.Quantity} {x.Card.Name} ({x.Card.Set.ArenaCode}) {x.Card.CollectorNumber}");
+					var commandZone = SuggestedCommandZone.Concat(commandZoneReplacements).GroupBy(x => x.Key).
+						Select(x => new { Card = cardsById[x.Key], Quantity = x.Sum(y => y.Value) }).
+						Select(x => $"{x.Quantity} {x.Card.Name} ({x.Card.Set.ArenaCode}) {x.Card.CollectorNumber}");
 
+					if (commandZone.Count() > 0)
+					{
+						exportList.AppendFormat("Commander{0}{1}{0}{0}", Environment.NewLine, string.Join(Environment.NewLine, commandZone));
+					}
 					exportList.AppendFormat("Deck{0}{1}", Environment.NewLine, string.Join(Environment.NewLine, mainDeck));
 					if (sideboard.Count() > 0)
 					{
@@ -907,6 +995,7 @@ namespace DailyArena.DeckAdvisor
 					ReadOnlyDictionary<int, Card> cardsById = Card.CardsById;
 					var orderedSets = MainDeckToCollect.Select(x => new { Card = cardsById[x.Key], Quantity = x.Value }).
 						Concat(SideboardToCollect.Select(x => new { Card = cardsById[x.Key], Quantity = x.Value })).
+						Concat(CommandZoneToCollect.Select(x => new { Card = cardsById[x.Key], Quantity = x.Value })).
 						Where(x => x.Card.RotationSafe || !RotationProof).
 						Select(x => new { SetName = x.Card.Set.Name, BoosterCost = x.Card.BoosterCost * x.Quantity }).
 						GroupBy(x => x.SetName).
