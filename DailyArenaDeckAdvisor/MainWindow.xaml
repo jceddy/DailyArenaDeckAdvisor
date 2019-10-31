@@ -68,7 +68,8 @@
 									<StackPanel Orientation="Horizontal">
 										<TextBlock Text="{Binding Quantity}" Width="15" TextAlignment="Right" />
 										<TextBlock Text="x " />
-										<TextBlock x:Name="CardName" FontWeight="Bold" Text="{Binding Card.PrintedName}" Foreground="Green" FontStyle="Italic" ToolTipService.ShowDuration="600000">
+										<TextBlock x:Name="CardName" FontWeight="Bold" Text="{Binding Card.PrintedName}" Foreground="Green" FontStyle="Italic" ToolTipService.ShowDuration="600000"
+												Tag="{Binding RelativeSource={RelativeSource AncestorType={x:Type Window}}}">
 											<TextBlock.ToolTip>
 												<ToolTip Background="Transparent" BorderThickness="0">
 													<Grid MaxHeight="340" MaxWidth="488">
@@ -77,7 +78,7 @@
 															<TextBlock Text="{Binding Card.FullName}" Margin="3" />
 														</Border>
 														<Image Source="{Binding Card.ImageUri, Converter={StaticResource NullImageConverter}}"
-															   Stretch="Uniform" StretchDirection="Both">
+															   Stretch="Uniform" StretchDirection="Both" RenderOptions.BitmapScalingMode="{Binding RelativeSource={RelativeSource AncestorType=ToolTip}, Path=PlacementTarget.Tag.DataContext.BitmapScalingMode}">
 														</Image>
 													</Grid>
 												</ToolTip>
@@ -127,7 +128,8 @@
 									<StackPanel Orientation="Horizontal">
 										<TextBlock Text="{Binding Quantity}" Width="15" TextAlignment="Right" />
 										<TextBlock Text="x " />
-										<TextBlock x:Name="CardName" FontWeight="Bold" Text="{Binding Card.PrintedName}" Foreground="Green" FontStyle="Italic" ToolTipService.ShowDuration="600000">
+										<TextBlock x:Name="CardName" FontWeight="Bold" Text="{Binding Card.PrintedName}" Foreground="Green" FontStyle="Italic" ToolTipService.ShowDuration="600000"
+												   Tag="{Binding RelativeSource={RelativeSource AncestorType={x:Type Window}}}">
 											<TextBlock.ToolTip>
 												<ToolTip Background="Transparent" BorderThickness="0">
 													<Grid MaxHeight="340" MaxWidth="488">
@@ -136,7 +138,7 @@
 															<TextBlock Text="{Binding Card.FullName}" Margin="3" />
 														</Border>
 														<Image Source="{Binding Card.ImageUri, Converter={StaticResource NullImageConverter}}"
-															   Stretch="Uniform" StretchDirection="Both" RenderOptions.BitmapScalingMode="{Binding BitmapScalingMode}">
+															   Stretch="Uniform" StretchDirection="Both" RenderOptions.BitmapScalingMode="{Binding RelativeSource={RelativeSource AncestorType=ToolTip}, Path=PlacementTarget.Tag.DataContext.BitmapScalingMode}">
 														</Image>
 													</Grid>
 												</ToolTip>
@@ -185,7 +187,8 @@
 									<StackPanel Orientation="Horizontal">
 										<TextBlock Text="{Binding Quantity}" Width="15" TextAlignment="Right" />
 										<TextBlock Text="x " />
-										<TextBlock x:Name="CardName" FontWeight="Bold" Text="{Binding Card.PrintedName}" Foreground="Green" FontStyle="Italic" ToolTipService.ShowDuration="600000">
+										<TextBlock x:Name="CardName" FontWeight="Bold" Text="{Binding Card.PrintedName}" Foreground="Green" FontStyle="Italic" ToolTipService.ShowDuration="600000"
+												   Tag="{Binding RelativeSource={RelativeSource AncestorType={x:Type Window}}}">
 											<TextBlock.ToolTip>
 												<ToolTip Background="Transparent" BorderThickness="0">
 													<Grid MaxHeight="340" MaxWidth="488">
@@ -194,7 +197,7 @@
 															<TextBlock Text="{Binding Card.FullName}" Margin="3" />
 														</Border>
 														<Image Source="{Binding Card.ImageUri, Converter={StaticResource NullImageConverter}}"
-															   Stretch="Uniform" StretchDirection="Both">
+															   Stretch="Uniform" StretchDirection="Both" RenderOptions.BitmapScalingMode="{Binding RelativeSource={RelativeSource AncestorType=ToolTip}, Path=PlacementTarget.Tag.DataContext.BitmapScalingMode}">
 														</Image>
 													</Grid>
 												</ToolTip>
@@ -304,7 +307,8 @@
 									<StackPanel Orientation="Horizontal">
 										<TextBlock Text="{Binding Item3}" Width="15" TextAlignment="Right" />
 										<TextBlock Text="x " />
-										<TextBlock Text="{Binding Item1}" ToolTipService.ShowDuration="600000">
+										<TextBlock Text="{Binding Item1}" ToolTipService.ShowDuration="600000"
+												   Tag="{Binding RelativeSource={RelativeSource AncestorType={x:Type Window}}}">
 											<TextBlock.ToolTip>
 												<ToolTip Background="Transparent" BorderThickness="0">
 													<Grid MaxHeight="340" MaxWidth="488">
@@ -313,14 +317,15 @@
 															<TextBlock Text="{Binding Item4.FullName}" Margin="3" />
 														</Border>
 														<Image Source="{Binding Item4.ImageUri, Converter={StaticResource NullImageConverter}}"
-															   Stretch="Uniform" StretchDirection="Both">
+															   Stretch="Uniform" StretchDirection="Both" RenderOptions.BitmapScalingMode="{Binding RelativeSource={RelativeSource AncestorType=ToolTip}, Path=PlacementTarget.Tag.DataContext.BitmapScalingMode}">
 														</Image>
 													</Grid>
 												</ToolTip>
 											</TextBlock.ToolTip>
 										</TextBlock>
 										<TextBlock Text=" => " />
-										<TextBlock Text="{Binding Item2}" ToolTipService.ShowDuration="600000">
+										<TextBlock Text="{Binding Item2}" ToolTipService.ShowDuration="600000"
+												   Tag="{Binding RelativeSource={RelativeSource AncestorType={x:Type Window}}}">
 											<TextBlock.ToolTip>
 												<ToolTip Background="Transparent" BorderThickness="0">
 													<Grid MaxHeight="340" MaxWidth="488">
@@ -329,7 +334,7 @@
 															<TextBlock Text="{Binding Item5.FullName}" Margin="3" />
 														</Border>
 														<Image Source="{Binding Item5.ImageUri, Converter={StaticResource NullImageConverter}}"
-															   Stretch="Uniform" StretchDirection="Both">
+															   Stretch="Uniform" StretchDirection="Both" RenderOptions.BitmapScalingMode="{Binding RelativeSource={RelativeSource AncestorType=ToolTip}, Path=PlacementTarget.Tag.DataContext.BitmapScalingMode}">
 														</Image>
 													</Grid>
 												</ToolTip>
@@ -408,7 +413,8 @@
 								<StackPanel Orientation="Horizontal">
 									<TextBlock Text="{Binding TotalCopiesNeeded}" Width="15" TextAlignment="Right" />
 									<TextBlock Text="x " />
-									<TextBlock FontWeight="Bold" Text="{Binding Card.PrintedName}" ToolTipService.ShowDuration="600000">
+									<TextBlock FontWeight="Bold" Text="{Binding Card.PrintedName}" ToolTipService.ShowDuration="600000"
+											   Tag="{Binding RelativeSource={RelativeSource AncestorType={x:Type Window}}}">
 										<TextBlock.ToolTip>
 											<ToolTip Background="Transparent" BorderThickness="0">
 												<Grid MaxHeight="340" MaxWidth="488">
@@ -417,7 +423,7 @@
 														<TextBlock Text="{Binding Card.FullName}" Margin="3" />
 													</Border>
 													<Image Source="{Binding Card.ImageUri, Converter={StaticResource NullImageConverter}}"
-															   Stretch="Uniform" StretchDirection="Both">
+															   Stretch="Uniform" StretchDirection="Both" RenderOptions.BitmapScalingMode="{Binding RelativeSource={RelativeSource AncestorType=ToolTip}, Path=PlacementTarget.Tag.DataContext.BitmapScalingMode}">
 													</Image>
 												</Grid>
 											</ToolTip>
