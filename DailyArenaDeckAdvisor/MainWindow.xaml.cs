@@ -1020,11 +1020,11 @@ namespace DailyArena.DeckAdvisor
 									{
 										continue;
 									}
-									else if((Format == Properties.Resources.Item_Standard || Format == Properties.Resources.Item_Historic_Bo3) && sideboard.Length == 0)
+									else if((Format == Properties.Resources.Item_Standard || Format == Properties.Resources.Item_Historic_Bo3) && (sideboard.Length == 0 || commandZone.Length > 0))
 									{
 										continue;
 									}
-									else if((Format == Properties.Resources.Item_ArenaStandard || Format == Properties.Resources.Item_Historic_Bo1) && sideboard.Length > 0)
+									else if((Format == Properties.Resources.Item_ArenaStandard || Format == Properties.Resources.Item_Historic_Bo1) && (sideboard.Length > 0 || commandZone.Length > 0))
 									{
 										continue;
 									}
@@ -1229,11 +1229,11 @@ namespace DailyArena.DeckAdvisor
 								{
 									continue;
 								}
-								else if ((Format == Properties.Resources.Item_Standard || Format == Properties.Resources.Item_Historic_Bo3) && sideboard.Length == 0)
+								else if ((Format == Properties.Resources.Item_Standard || Format == Properties.Resources.Item_Historic_Bo3) && (sideboard.Length == 0 || commandZone.Length > 0))
 								{
 									continue;
 								}
-								else if ((Format == Properties.Resources.Item_ArenaStandard || Format == Properties.Resources.Item_Historic_Bo1) && sideboard.Length > 0)
+								else if ((Format == Properties.Resources.Item_ArenaStandard || Format == Properties.Resources.Item_Historic_Bo1) && (sideboard.Length > 0 || commandZone.Length > 0))
 								{
 									continue;
 								}
