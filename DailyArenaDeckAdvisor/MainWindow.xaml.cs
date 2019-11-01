@@ -825,7 +825,7 @@ namespace DailyArena.DeckAdvisor
 
 								if (similarCommandZone.ContainsKey(cardName))
 								{
-
+									similarCommandZone[cardName] += cardQuantity;
 								}
 								else
 								{
@@ -852,7 +852,7 @@ namespace DailyArena.DeckAdvisor
 			foreach (Card card in cardsById.Values)
 			{
 				CardStats stats = _cardStats[card];
-				stats.DeckPercentage = (double)stats.DeckCount / _archetypes.Count;
+				stats.DeckPercentage = (double)stats.DeckCount / (_archetypes.Count + _archetypes.Sum(x => x.SimilarDecks == null ? 0 : x.SimilarDecks.Count()));
 			}
 			Archetype.CardStats = new ReadOnlyDictionary<Card, CardStats>(_cardStats);
 
