@@ -85,7 +85,7 @@ namespace DailyArena.DeckAdvisor
 		Dictionary<Card, CardStats> _cardStats = new Dictionary<Card, CardStats>();
 
 		/// <summary>
-		/// List of deck archetypes, ordered by the estimated "booster cost" of each deck after wildcards, and then byt the average "booster cost" disregarding wildcards.
+		/// List of deck archetypes, ordered by the estimated "booster cost" of each deck after wildcards, and then by the average "booster cost" disregarding wildcards.
 		/// </summary>
 		IOrderedEnumerable<Archetype> _orderedArchetypes;
 
