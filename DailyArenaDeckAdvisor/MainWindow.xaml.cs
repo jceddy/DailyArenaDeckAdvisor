@@ -486,23 +486,11 @@ namespace DailyArena.DeckAdvisor
 					}
 				}
 			}
-			/*******/
-			if(Format.Value == Properties.Resources.Item_Brawl)
-			{
-				loadDecksFromServer = true;
-			}
-			/*******/
 			if (loadDecksFromServer)
 			{
 				_logger.Debug("Loading deck data from server");
 
 				var archetypesUrl = $"https://clans.dailyarena.net/{mappedFormat.Item1}_decks.json?_c={Guid.NewGuid()}";
-				/*******/
-				if (Format.Value == Properties.Resources.Item_Brawl)
-				{
-					archetypesUrl = "https://clans.dailyarena.net/deck_scraper_experimental.php?format=brawl";
-				}
-				/*******/
 				var result = WebUtilities.FetchStringFromUrl(archetypesUrl, decksJson != null, out List<WebException> exceptions);
 
 				if (string.IsNullOrWhiteSpace(result))
