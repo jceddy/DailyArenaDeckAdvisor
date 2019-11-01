@@ -92,7 +92,7 @@ namespace DailyArena.DeckAdvisor
 		/// <summary>
 		/// A list of names of cards in Arena that allow a player to include any number of copies.
 		/// </summary>
-		List<string> _anyNumber = new List<string>() { "Persistent Petitioners", "Rat Colony" };
+		List<string> _anyNumber = new List<string>() { "Persistent Petitioners", "Rat Colony", "Seven Dwarves" };
 
 		/// <summary>
 		/// A dictionary mapping basic land names to a Card of that type the player owns.
