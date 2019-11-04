@@ -988,112 +988,98 @@ namespace DailyArena.DeckAdvisor
 								deckListJson.AppendLine("[");
 							}
 							line = reader.ReadLine();
-							while (line != "]")
+							if (line != "[]")
 							{
-								if (line.Contains("jsonrpc") || line.Contains("params"))
+								while (line != "]")
 								{
-									break;
+									if (line.Contains("jsonrpc") || line.Contains("params"))
+									{
+										break;
+									}
+									deckListJson.AppendLine(line);
+									line = reader.ReadLine();
 								}
-								deckListJson.AppendLine(line);
-								line = reader.ReadLine();
-							}
-							if (line == "]")
-							{
-								deckListJson.AppendLine(line);
-								dynamic json = JToken.Parse(deckListJson.ToString());
-								foreach (dynamic deck in json)
+								if (line == "]")
 								{
-									string name = deck["name"];
-									int[] commandZone = deck["commandZoneGRPIds"] == null ? new int[0] : deck["commandZoneGRPIds"].ToObject<int[]>();
-									int[] mainDeck = deck["mainDeck"].ToObject<int[]>();
-									int[] sideboard = deck["sideboard"].ToObject<int[]>();
-									Guid id = Guid.Parse((string)deck["id"]);
-									if (_playerDecks.ContainsKey(id))
+									deckListJson.AppendLine(line);
+									dynamic json = JToken.Parse(deckListJson.ToString());
+									foreach (dynamic deck in json)
 									{
-										_playerDecks.Remove(id);
-									}
-									Dictionary<string, int> mainDeckByName = new Dictionary<string, int>();
-									Dictionary<string, int> sideboardByName = new Dictionary<string, int>();
-									Dictionary<string, int> commandZoneByName = new Dictionary<string, int>();
+										string name = deck["name"];
+										int[] commandZone = deck["commandZoneGRPIds"] == null ? new int[0] : deck["commandZoneGRPIds"].ToObject<int[]>();
+										int[] mainDeck = deck["mainDeck"].ToObject<int[]>();
+										int[] sideboard = deck["sideboard"].ToObject<int[]>();
+										Guid id = Guid.Parse((string)deck["id"]);
+										if (_playerDecks.ContainsKey(id))
+										{
+											_playerDecks.Remove(id);
+										}
+										Dictionary<string, int> mainDeckByName = new Dictionary<string, int>();
+										Dictionary<string, int> sideboardByName = new Dictionary<string, int>();
+										Dictionary<string, int> commandZoneByName = new Dictionary<string, int>();
 
-									if (Format == Properties.Resources.Item_Brawl && commandZone.Length == 0)
-									{
-										continue;
-									}
-									else if((Format == Properties.Resources.Item_Standard || Format == Properties.Resources.Item_Historic_Bo3) && (sideboard.Length == 0 || commandZone.Length > 0))
-									{
-										continue;
-									}
-									else if((Format == Properties.Resources.Item_ArenaStandard || Format == Properties.Resources.Item_Historic_Bo1) && (sideboard.Length > 0 || commandZone.Length > 0))
-									{
-										continue;
-									}
+										if (Format == Properties.Resources.Item_Brawl && commandZone.Length == 0)
+										{
+											continue;
+										}
+										else if ((Format == Properties.Resources.Item_Standard || Format == Properties.Resources.Item_Historic_Bo3) && (sideboard.Length == 0 || commandZone.Length > 0))
+										{
+											continue;
+										}
+										else if ((Format == Properties.Resources.Item_ArenaStandard || Format == Properties.Resources.Item_Historic_Bo1) && (sideboard.Length > 0 || commandZone.Length > 0))
+										{
+											continue;
+										}
 
-									for (int i = 0; i < mainDeck.Length; i += 2)
-									{
-										string cardName = cardsById[mainDeck[i]].Name;
-										int cardQuantity = mainDeck[i + 1];
-										if (mainDeckByName.ContainsKey(cardName))
+										for (int i = 0; i < mainDeck.Length; i += 2)
 										{
-											mainDeckByName[cardName] += cardQuantity;
-										}
-										else
-										{
-											mainDeckByName.Add(cardName, cardQuantity);
-										}
-									}
-									for (int i = 0; i < sideboard.Length; i += 2)
-									{
-										string cardName = cardsById[sideboard[i]].Name;
-										int cardQuantity = sideboard[i + 1];
-										if (sideboardByName.ContainsKey(cardName))
-										{
-											sideboardByName[cardName] += cardQuantity;
-										}
-										else
-										{
-											sideboardByName.Add(cardName, cardQuantity);
-										}
-									}
-									for (int i = 0; i < commandZone.Length; i += 2)
-									{
-										string cardName = cardsById[commandZone[i]].Name;
-										int cardQuantity = commandZone[i + 1];
-										if (commandZoneByName.ContainsKey(cardName))
-										{
-											commandZoneByName[cardName] += cardQuantity;
-										}
-										else
-										{
-											commandZoneByName.Add(cardName, cardQuantity);
-										}
-									}
-
-									if (RotationProof.Value)
-									{
-										// check whether there are any cards in the deck that aren't rotation-proof...if so, ignore this deck
-										_logger.Debug(@"Doing ""rotation-proof"" check...");
-										bool ignoreDeck = false;
-										foreach (var card in mainDeckByName)
-										{
-											string cardName = card.Key;
-											_logger.Debug("Checking main deck card: {cardName}", cardName);
-
-											if (cardsByName[cardName].Count(x => x.Set.RotationSafe) == 0)
+											string cardName = cardsById[mainDeck[i]].Name;
+											int cardQuantity = mainDeck[i + 1];
+											if (mainDeckByName.ContainsKey(cardName))
 											{
-												_logger.Debug("{cardName} is rotating soon, ignore this deck", cardName);
-												ignoreDeck = true;
-												break;
+												mainDeckByName[cardName] += cardQuantity;
+											}
+											else
+											{
+												mainDeckByName.Add(cardName, cardQuantity);
+											}
+										}
+										for (int i = 0; i < sideboard.Length; i += 2)
+										{
+											string cardName = cardsById[sideboard[i]].Name;
+											int cardQuantity = sideboard[i + 1];
+											if (sideboardByName.ContainsKey(cardName))
+											{
+												sideboardByName[cardName] += cardQuantity;
+											}
+											else
+											{
+												sideboardByName.Add(cardName, cardQuantity);
+											}
+										}
+										for (int i = 0; i < commandZone.Length; i += 2)
+										{
+											string cardName = cardsById[commandZone[i]].Name;
+											int cardQuantity = commandZone[i + 1];
+											if (commandZoneByName.ContainsKey(cardName))
+											{
+												commandZoneByName[cardName] += cardQuantity;
+											}
+											else
+											{
+												commandZoneByName.Add(cardName, cardQuantity);
 											}
 										}
 
-										if (!ignoreDeck)
+										if (RotationProof.Value)
 										{
-											foreach (var card in sideboardByName)
+											// check whether there are any cards in the deck that aren't rotation-proof...if so, ignore this deck
+											_logger.Debug(@"Doing ""rotation-proof"" check...");
+											bool ignoreDeck = false;
+											foreach (var card in mainDeckByName)
 											{
 												string cardName = card.Key;
-
-												_logger.Debug("Checking sideboard card: {cardName}", cardName);
+												_logger.Debug("Checking main deck card: {cardName}", cardName);
 
 												if (cardsByName[cardName].Count(x => x.Set.RotationSafe) == 0)
 												{
@@ -1102,55 +1088,55 @@ namespace DailyArena.DeckAdvisor
 													break;
 												}
 											}
-										}
 
-										if(!ignoreDeck)
-										{
-											foreach (var card in commandZoneByName)
+											if (!ignoreDeck)
 											{
-												string cardName = card.Key;
-
-												_logger.Debug("Checking command zone card: {cardName}", cardName);
-
-												if (cardsByName[cardName].Count(x => x.Set.RotationSafe) == 0)
+												foreach (var card in sideboardByName)
 												{
-													_logger.Debug("{cardName} is rotating soon, ignore this deck", cardName);
-													ignoreDeck = true;
-													break;
+													string cardName = card.Key;
+
+													_logger.Debug("Checking sideboard card: {cardName}", cardName);
+
+													if (cardsByName[cardName].Count(x => x.Set.RotationSafe) == 0)
+													{
+														_logger.Debug("{cardName} is rotating soon, ignore this deck", cardName);
+														ignoreDeck = true;
+														break;
+													}
 												}
 											}
-										}
 
-										if (ignoreDeck)
-										{
-											continue;
-										}
-									}
-									else if (Format != Properties.Resources.Item_Historic_Bo1 && Format != Properties.Resources.Item_Historic_Bo3)
-									{
-										// check whether there are any cards in the deck that aren't in standard...if so, ignore this deck
-										_logger.Debug(@"Doing Standard legality check...");
-										bool ignoreDeck = false;
-										foreach (var card in mainDeckByName)
-										{
-											string cardName = card.Key;
-											_logger.Debug("Checking main deck card: {cardName}", cardName);
-
-											if (cardsByName[cardName].Count(x => x.Set.StandardLegal) == 0)
+											if (!ignoreDeck)
 											{
-												_logger.Debug("{cardName} is not standard legal, ignore this deck", cardName);
-												ignoreDeck = true;
-												break;
+												foreach (var card in commandZoneByName)
+												{
+													string cardName = card.Key;
+
+													_logger.Debug("Checking command zone card: {cardName}", cardName);
+
+													if (cardsByName[cardName].Count(x => x.Set.RotationSafe) == 0)
+													{
+														_logger.Debug("{cardName} is rotating soon, ignore this deck", cardName);
+														ignoreDeck = true;
+														break;
+													}
+												}
+											}
+
+											if (ignoreDeck)
+											{
+												continue;
 											}
 										}
-
-										if (!ignoreDeck)
+										else if (Format != Properties.Resources.Item_Historic_Bo1 && Format != Properties.Resources.Item_Historic_Bo3)
 										{
-											foreach (var card in sideboardByName)
+											// check whether there are any cards in the deck that aren't in standard...if so, ignore this deck
+											_logger.Debug(@"Doing Standard legality check...");
+											bool ignoreDeck = false;
+											foreach (var card in mainDeckByName)
 											{
 												string cardName = card.Key;
-
-												_logger.Debug("Checking sideboard card: {cardName}", cardName);
+												_logger.Debug("Checking main deck card: {cardName}", cardName);
 
 												if (cardsByName[cardName].Count(x => x.Set.StandardLegal) == 0)
 												{
@@ -1159,33 +1145,50 @@ namespace DailyArena.DeckAdvisor
 													break;
 												}
 											}
-										}
 
-										if (!ignoreDeck)
-										{
-											foreach (var card in commandZoneByName)
+											if (!ignoreDeck)
 											{
-												string cardName = card.Key;
-
-												_logger.Debug("Checking command zone card: {cardName}", cardName);
-
-												if (cardsByName[cardName].Count(x => x.Set.StandardLegal) == 0)
+												foreach (var card in sideboardByName)
 												{
-													_logger.Debug("{cardName} is not standard legal, ignore this deck", cardName);
-													ignoreDeck = true;
-													break;
+													string cardName = card.Key;
+
+													_logger.Debug("Checking sideboard card: {cardName}", cardName);
+
+													if (cardsByName[cardName].Count(x => x.Set.StandardLegal) == 0)
+													{
+														_logger.Debug("{cardName} is not standard legal, ignore this deck", cardName);
+														ignoreDeck = true;
+														break;
+													}
 												}
+											}
+
+											if (!ignoreDeck)
+											{
+												foreach (var card in commandZoneByName)
+												{
+													string cardName = card.Key;
+
+													_logger.Debug("Checking command zone card: {cardName}", cardName);
+
+													if (cardsByName[cardName].Count(x => x.Set.StandardLegal) == 0)
+													{
+														_logger.Debug("{cardName} is not standard legal, ignore this deck", cardName);
+														ignoreDeck = true;
+														break;
+													}
+												}
+											}
+
+											if (ignoreDeck)
+											{
+												continue;
 											}
 										}
 
-										if (ignoreDeck)
-										{
-											continue;
-										}
+										_playerDecks.Add(id, new Archetype(name, mainDeckByName, sideboardByName, commandZoneByName, RotationProof.Value, isPlayerDeck: true,
+											setNameTranslations: _setNameTranslations));
 									}
-
-									_playerDecks.Add(id, new Archetype(name, mainDeckByName, sideboardByName, commandZoneByName, RotationProof.Value, isPlayerDeck: true,
-										setNameTranslations: _setNameTranslations));
 								}
 							}
 
