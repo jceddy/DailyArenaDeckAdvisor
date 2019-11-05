@@ -867,6 +867,7 @@ namespace DailyArena.DeckAdvisor
 
 			var logFolder = GetLogFolderLocation();
 			bool playerInventoryFound = false;
+			bool playerCardsFound = false;
 			using (var fs = new FileStream(logFolder + "\\output_log.txt", FileMode.Open, FileAccess.Read, FileShare.ReadWrite | FileShare.Delete))
 			{
 				using (var reader = new StreamReader(fs))
@@ -882,7 +883,7 @@ namespace DailyArena.DeckAdvisor
 
 						if (line.Contains("PlayerInventory.GetPlayerCardsV3"))
 						{
-							playerInventoryFound = true;
+							playerCardsFound = true;
 							_playerInventory.Clear();
 							_basicLands.Clear();
 							_playerInventoryCounts.Clear();
@@ -1432,9 +1433,9 @@ namespace DailyArena.DeckAdvisor
 				}
 			}
 
-			if(!playerInventoryFound)
+			if(!(playerInventoryFound && playerCardsFound))
 			{
-				_logger.Debug("Player Inventory not found in MTGA log, show an information screen");
+				_logger.Debug("Player Inventory or Cards not found in MTGA log, show an information screen [{playerInventoryFound}, {playerCardsFound}]", playerInventoryFound, playerCardsFound);
 				Dispatcher.Invoke(() =>
 				{
 					LoadingScreen.Visibility = Visibility.Collapsed;
