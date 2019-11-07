@@ -536,7 +536,7 @@
 
 					<Grid>
 						<TextBox x:Name="CardTextFilter" Margin="3" Padding="3" Text="{Binding CardText.Value, Mode=TwoWay}" VerticalContentAlignment="Center" 
-							 MinWidth="200" MaxWidth="400" KeyUp="TextBox_KeyEnterUpdate"/>
+							 MinWidth="170" MaxWidth="340" KeyUp="TextBox_KeyEnterUpdate"/>
 						<TextBlock IsHitTestVisible="False" Text="{x:Static p:Resources.Filter_EnterCardText}" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="10,0,0,0" Foreground="DarkGray">
 							<TextBlock.Style>
 								<Style TargetType="{x:Type TextBlock}">

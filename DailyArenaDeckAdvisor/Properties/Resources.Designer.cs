@@ -259,7 +259,7 @@ namespace DailyArena.DeckAdvisor.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Enter Card Text Filter.
+        ///   Looks up a localized string similar to Enter Card Name Filter.
         /// </summary>
         public static string Filter_EnterCardText {
             get {

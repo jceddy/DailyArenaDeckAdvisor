@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -1127,13 +1128,37 @@ namespace DailyArena.DeckAdvisor
 		public bool HasCardText(string cardText)
 		{
 			ReadOnlyDictionary<int, Card> cardsById = Card.CardsById;
-			return SuggestedMainDeck.Any(x => cardsById[x.Key].Name.Contains(cardText) || cardsById[x.Key].PrintedName.Contains(cardText)) ||
-				MainDeckToCollect.Any(x => cardsById[x.Key].Name.Contains(cardText) || cardsById[x.Key].PrintedName.Contains(cardText)) ||
-				SuggestedSideboard.Any(x => cardsById[x.Key].Name.Contains(cardText) || cardsById[x.Key].PrintedName.Contains(cardText)) ||
-				SideboardToCollect.Any(x => cardsById[x.Key].Name.Contains(cardText) || cardsById[x.Key].PrintedName.Contains(cardText)) ||
-				SuggestedCommandZone.Any(x => cardsById[x.Key].Name.Contains(cardText) || cardsById[x.Key].PrintedName.Contains(cardText)) ||
-				CommandZoneToCollect.Any(x => cardsById[x.Key].Name.Contains(cardText) || cardsById[x.Key].PrintedName.Contains(cardText)) ||
-				SuggestedReplacements.Any(x => cardsById[x.Item2].Name.Contains(cardText) || cardsById[x.Item2].PrintedName.Contains(cardText));
+
+			try
+			{
+				if (cardText.StartsWith("/") && cardText.EndsWith("/"))
+				{
+					Regex cardTextRegex = new Regex(cardText.Substring(1, cardText.Length - 2), RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
+
+					return SuggestedMainDeck.Any(x => cardTextRegex.IsMatch(cardsById[x.Key].Name) || cardTextRegex.IsMatch(cardsById[x.Key].PrintedName)) ||
+						MainDeckToCollect.Any(x => cardTextRegex.IsMatch(cardsById[x.Key].Name) || cardTextRegex.IsMatch(cardsById[x.Key].PrintedName)) ||
+						SuggestedSideboard.Any(x => cardTextRegex.IsMatch(cardsById[x.Key].Name) || cardTextRegex.IsMatch(cardsById[x.Key].PrintedName)) ||
+						SideboardToCollect.Any(x => cardTextRegex.IsMatch(cardsById[x.Key].Name) || cardTextRegex.IsMatch(cardsById[x.Key].PrintedName)) ||
+						SuggestedCommandZone.Any(x => cardTextRegex.IsMatch(cardsById[x.Key].Name) || cardTextRegex.IsMatch(cardsById[x.Key].PrintedName)) ||
+						CommandZoneToCollect.Any(x => cardTextRegex.IsMatch(cardsById[x.Key].Name) || cardTextRegex.IsMatch(cardsById[x.Key].PrintedName)) ||
+						SuggestedReplacements.Any(x => cardTextRegex.IsMatch(cardsById[x.Item2].Name) || cardTextRegex.IsMatch(cardsById[x.Item2].PrintedName));
+				}
+			}
+			catch (Exception)
+			{
+				// if regex fails, just return true
+				return true;
+			}
+
+			CultureInfo culture = CultureInfo.CurrentCulture;
+			CultureInfo english = CultureInfo.GetCultureInfo("en-US");
+			return SuggestedMainDeck.Any(x => english.CompareInfo.IndexOf(cardsById[x.Key].Name, cardText, CompareOptions.IgnoreCase) > -1 || culture.CompareInfo.IndexOf(cardsById[x.Key].PrintedName, cardText, CompareOptions.IgnoreCase) > -1) ||
+				MainDeckToCollect.Any(x => english.CompareInfo.IndexOf(cardsById[x.Key].Name, cardText, CompareOptions.IgnoreCase) > -1 || culture.CompareInfo.IndexOf(cardsById[x.Key].PrintedName, cardText, CompareOptions.IgnoreCase) > -1) ||
+				SuggestedSideboard.Any(x => english.CompareInfo.IndexOf(cardsById[x.Key].Name, cardText, CompareOptions.IgnoreCase) > -1 || culture.CompareInfo.IndexOf(cardsById[x.Key].PrintedName, cardText, CompareOptions.IgnoreCase) > -1) ||
+				SideboardToCollect.Any(x => english.CompareInfo.IndexOf(cardsById[x.Key].Name, cardText, CompareOptions.IgnoreCase) > -1 || culture.CompareInfo.IndexOf(cardsById[x.Key].PrintedName, cardText, CompareOptions.IgnoreCase) > -1) ||
+				SuggestedCommandZone.Any(x => english.CompareInfo.IndexOf(cardsById[x.Key].Name, cardText, CompareOptions.IgnoreCase) > -1 || culture.CompareInfo.IndexOf(cardsById[x.Key].PrintedName, cardText, CompareOptions.IgnoreCase) > -1) ||
+				CommandZoneToCollect.Any(x => english.CompareInfo.IndexOf(cardsById[x.Key].Name, cardText, CompareOptions.IgnoreCase) > -1 || culture.CompareInfo.IndexOf(cardsById[x.Key].PrintedName, cardText, CompareOptions.IgnoreCase) > -1) ||
+				SuggestedReplacements.Any(x => english.CompareInfo.IndexOf(cardsById[x.Item2].Name, cardText, CompareOptions.IgnoreCase) > -1 || culture.CompareInfo.IndexOf(cardsById[x.Item2].PrintedName, cardText, CompareOptions.IgnoreCase) > -1);
 		}
 
 		/// <summary>
