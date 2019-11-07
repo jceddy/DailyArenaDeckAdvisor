@@ -15,6 +15,18 @@ https://github.com/jceddy/DailyArenaDeckAdvisor/wiki/Getting-Started:-Developing
 Libraries used by this project:  
 https://github.com/jceddy/DailyArenaCommon
 
+# Release 1.0.5.6 Changes
+ - Tab List Headings
+ - Localization Support/Russian
+ - Minor and Under-the-Hood Changes
+   - Command Zone
+   - No Player Inventory Info Screen
+   - Bitmap Scaling
+   - Brawl Player Decks
+   - Seven Dwarves
+   - Card Meta-Stats
+   - Fixed typose in comments
+
 # Release 1.0.5.2 Changes
  - Deck Sorting
  - Brawl Commander Replacement Suggestions
