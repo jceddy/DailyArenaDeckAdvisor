@@ -36,7 +36,7 @@ namespace DailyArena.DeckAdvisor
 			{
 				application.State.Filters.SetAllFields(Filters);
 				application.SaveState();
-				((MainWindow)Owner).Refresh(false);
+				((MainWindow)Owner).ApplyFilters(Filters);
 			}
 			Close();
 		}

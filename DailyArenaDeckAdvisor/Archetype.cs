@@ -1120,6 +1120,23 @@ namespace DailyArena.DeckAdvisor
 		}
 
 		/// <summary>
+		/// Check if this deck archetype contains a card with the specified text in any of its fields (MainDeck, Sideboard, CommandZone, Suggestions)
+		/// </summary>
+		/// <param name="cardText">The text to search for.</param>
+		/// <returns>True if the deck archetype contains the specified card text, false otherwise.</returns>
+		public bool HasCardText(string cardText)
+		{
+			ReadOnlyDictionary<int, Card> cardsById = Card.CardsById;
+			return SuggestedMainDeck.Any(x => cardsById[x.Key].Name.Contains(cardText) || cardsById[x.Key].PrintedName.Contains(cardText)) ||
+				MainDeckToCollect.Any(x => cardsById[x.Key].Name.Contains(cardText) || cardsById[x.Key].PrintedName.Contains(cardText)) ||
+				SuggestedSideboard.Any(x => cardsById[x.Key].Name.Contains(cardText) || cardsById[x.Key].PrintedName.Contains(cardText)) ||
+				SideboardToCollect.Any(x => cardsById[x.Key].Name.Contains(cardText) || cardsById[x.Key].PrintedName.Contains(cardText)) ||
+				SuggestedCommandZone.Any(x => cardsById[x.Key].Name.Contains(cardText) || cardsById[x.Key].PrintedName.Contains(cardText)) ||
+				CommandZoneToCollect.Any(x => cardsById[x.Key].Name.Contains(cardText) || cardsById[x.Key].PrintedName.Contains(cardText)) ||
+				SuggestedReplacements.Any(x => cardsById[x.Item2].Name.Contains(cardText) || cardsById[x.Item2].PrintedName.Contains(cardText));
+		}
+
+		/// <summary>
 		/// Static field containing the unique index to be used for the next deck archetype object created.
 		/// </summary>
 		private static long NextIndex { get; set; } = 0;

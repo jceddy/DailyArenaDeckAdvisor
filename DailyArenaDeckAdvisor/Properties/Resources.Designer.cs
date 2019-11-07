@@ -259,6 +259,15 @@ namespace DailyArena.DeckAdvisor.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Enter Card Text Filter.
+        /// </summary>
+        public static string Filter_EnterCardText {
+            get {
+                return ResourceManager.GetString("Filter_EnterCardText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Arena Standard.
         /// </summary>
         public static string Item_ArenaStandard {

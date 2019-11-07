@@ -205,6 +205,10 @@
     <value>Статистика Побед/Поражений</value>
     <comment>Win/Loss Record header for Deck Details view.</comment>
   </data>
+  <data name="Filter_EnterCardText" xml:space="preserve">
+    <value>Введите текстовый фильтр карты</value>
+    <comment>Placeholder string for card text filter.</comment>
+  </data>
   <data name="Item_ArenaStandard" xml:space="preserve">
     <value>Арена Стандарт</value>
     <comment>The string for Arena Standard in the Format ComboBox.</comment>

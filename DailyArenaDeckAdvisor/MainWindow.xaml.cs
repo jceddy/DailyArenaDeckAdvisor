@@ -23,7 +23,9 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Data;
 using System.Windows.Documents;
+using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Navigation;
 
@@ -85,6 +87,11 @@ namespace DailyArena.DeckAdvisor
 		Dictionary<Card, CardStats> _cardStats = new Dictionary<Card, CardStats>();
 
 		/// <summary>
+		/// List of deck archetypes after filters are applied.
+		/// </summary>
+		List<Archetype> _filteredArchetypes;
+
+		/// <summary>
 		/// List of deck archetypes, ordered by the estimated "booster cost" of each deck after wildcards, and then by the average "booster cost" disregarding wildcards.
 		/// </summary>
 		IOrderedEnumerable<Archetype> _orderedArchetypes;
@@ -130,6 +137,11 @@ namespace DailyArena.DeckAdvisor
 		/// Gets or sets the selected deck sort direction.
 		/// </summary>
 		public Bindable<string> SortDir { get; private set; } = new Bindable<string>();
+
+		/// <summary>
+		/// Gets or sets the card text filter value.
+		/// </summary>
+		public Bindable<string> CardText { get; private set; } = new Bindable<string>() { Value = string.Empty };
 
 		/// <summary>
 		/// Gets or sets the state of the "Rotation" toggle button.
@@ -1992,32 +2004,7 @@ namespace DailyArena.DeckAdvisor
 			LoadingValue.Value = 75;
 
 			_logger.Debug("Sorting Archetypes and generating Meta Report");
-			if(filters.HideMissingWildcards)
-			{
-				_archetypes = _archetypes.Where(x => x.TotalWildcardsNeeded == 0).ToList();
-			}
-			if(filters.HideMissingCards)
-			{
-				_archetypes = _archetypes.Where(x => x.BoosterCost == 0).ToList();
-			}
-			if(filters.HideIncompleteReplacements)
-			{
-				_archetypes = _archetypes.Where(
-					x => x.MainDeckToCollect.Sum(y => y.Value) + x.SideboardToCollect.Sum(y => y.Value) == x.SuggestedReplacements.Sum(y => y.Item3)
-				).ToList();
-			}
-			if(filters.HideMythic || filters.HideRare || filters.HideUncommon || filters.HideCommon)
-			{
-				_archetypes = _archetypes.Where(
-					x =>
-						(!filters.HideMythic || RarityCount(x.MainDeck.Concat(x.Sideboard), CardRarity.MythicRare, cardsByName) <= filters.MythicCount) &&
-						(!filters.HideRare || RarityCount(x.MainDeck.Concat(x.Sideboard), CardRarity.Rare, cardsByName) <= filters.RareCount) &&
-						(!filters.HideUncommon || RarityCount(x.MainDeck.Concat(x.Sideboard), CardRarity.Uncommon, cardsByName) <= filters.UncommonCount) &&
-						(!filters.HideCommon || RarityCount(x.MainDeck.Concat(x.Sideboard), CardRarity.Common, cardsByName) <= filters.CommonCount)
-				).ToList();
-			}
-			
-			_report = new MetaReport(cardsByName, _cardStats, cardsById, _playerInventoryCounts, _archetypes, RotationProof.Value, _setNameTranslations);
+			FilterArchetypes(filters);
 
 			LoadingValue.Value = 90;
 			SortArchetypes();
@@ -2036,6 +2023,55 @@ namespace DailyArena.DeckAdvisor
 			});
 
 			_logger.Debug("ReloadAndCrunchAllData() Finished");
+		}
+
+		/// <summary>
+		/// Apply the archetype filters and store the filtered list in _filteredArchetypes.
+		/// </summary>
+		/// <param name="filters">The deck filters to apply.</param>
+		/// <param name="sort">Whether to sort the list after applying filters (Defaults to false).</param>
+		private void FilterArchetypes(DeckFilters filters, bool sort = false)
+		{
+			_logger.Debug("FilterArchetypes() Called, sort={sort}", sort);
+			ReadOnlyDictionary<string, List<Card>> cardsByName = Card.CardsByName;
+			ReadOnlyDictionary<int, Card> cardsById = Card.CardsById;
+			_filteredArchetypes = _archetypes;
+
+			if (filters.HideMissingWildcards)
+			{
+				_filteredArchetypes = _filteredArchetypes.Where(x => x.TotalWildcardsNeeded == 0).ToList();
+			}
+			if (filters.HideMissingCards)
+			{
+				_filteredArchetypes = _filteredArchetypes.Where(x => x.BoosterCost == 0).ToList();
+			}
+			if (filters.HideIncompleteReplacements)
+			{
+				_filteredArchetypes = _filteredArchetypes.Where(
+					x => x.MainDeckToCollect.Sum(y => y.Value) + x.SideboardToCollect.Sum(y => y.Value) == x.SuggestedReplacements.Sum(y => y.Item3)
+				).ToList();
+			}
+			if (filters.HideMythic || filters.HideRare || filters.HideUncommon || filters.HideCommon)
+			{
+				_filteredArchetypes = _filteredArchetypes.Where(
+					x =>
+						(!filters.HideMythic || RarityCount(x.MainDeck.Concat(x.Sideboard), CardRarity.MythicRare, cardsByName) <= filters.MythicCount) &&
+						(!filters.HideRare || RarityCount(x.MainDeck.Concat(x.Sideboard), CardRarity.Rare, cardsByName) <= filters.RareCount) &&
+						(!filters.HideUncommon || RarityCount(x.MainDeck.Concat(x.Sideboard), CardRarity.Uncommon, cardsByName) <= filters.UncommonCount) &&
+						(!filters.HideCommon || RarityCount(x.MainDeck.Concat(x.Sideboard), CardRarity.Common, cardsByName) <= filters.CommonCount)
+				).ToList();
+			}
+			if(!string.IsNullOrEmpty(CardText.Value))
+			{
+				_filteredArchetypes = _filteredArchetypes.Where(x => x.HasCardText(CardText.Value)).ToList();
+			}
+
+			_report = new MetaReport(cardsByName, _cardStats, cardsById, _playerInventoryCounts, _archetypes, RotationProof.Value, _setNameTranslations);
+
+			if(sort)
+			{
+				SortArchetypes();
+			}
 		}
 
 		/// <summary>
@@ -2359,6 +2395,9 @@ namespace DailyArena.DeckAdvisor
 			RotationProof.Value = application.State.RotationProof;
 			RotationProof.PropertyChanged += RotationProof_PropertyChanged;
 
+			CardText.Value = application.State.CardTextFilter;
+			CardText.PropertyChanged += CardText_PropertyChanged;
+
 			int fontSize = application.State.FontSize;
 			if (fontSize < 8 || fontSize > 24)
 			{
@@ -2556,11 +2595,11 @@ namespace DailyArena.DeckAdvisor
 			if (Format == Properties.Resources.Item_ArenaStandard)
 			{
 				// for Arena Standard, use slightly different ordering, favoring win rate over estimated booster cost
-				_orderedArchetypes = _archetypes.OrderBy(orderFunc).ThenBy(x => x.IsPlayerDeck ? 0 : 1).ThenBy(x => x.BoosterCost == 0 ? 0 : (x.BoosterCostAfterWC == 0 ? 1 : 2)).ThenByDescending(x => x.BoosterCostAfterWC == 0 ? x.WinRate : x.BoosterCostAfterWC).ThenBy(x => x.BoosterCostAfterWC).ThenBy(x => x.BoosterCost);
+				_orderedArchetypes = _filteredArchetypes.OrderBy(orderFunc).ThenBy(x => x.IsPlayerDeck ? 0 : 1).ThenBy(x => x.BoosterCost == 0 ? 0 : (x.BoosterCostAfterWC == 0 ? 1 : 2)).ThenByDescending(x => x.BoosterCostAfterWC == 0 ? x.WinRate : x.BoosterCostAfterWC).ThenBy(x => x.BoosterCostAfterWC).ThenBy(x => x.BoosterCost);
 			}
 			else
 			{
-				_orderedArchetypes = _archetypes.OrderBy(orderFunc).ThenBy(x => x.IsPlayerDeck ? 0 : 1).ThenBy(x => x.BoosterCostAfterWC).ThenBy(x => x.BoosterCost);
+				_orderedArchetypes = _filteredArchetypes.OrderBy(orderFunc).ThenBy(x => x.IsPlayerDeck ? 0 : 1).ThenBy(x => x.BoosterCostAfterWC).ThenBy(x => x.BoosterCost);
 			}
 
 			Dispatcher.Invoke(() =>
@@ -2660,6 +2699,64 @@ namespace DailyArena.DeckAdvisor
 				TaskContinuationOptions.OnlyOnFaulted
 			);
 			sortTask.Start();
+		}
+
+		/// <summary>
+		/// Apply archetype filters.
+		/// </summary>
+		/// <param name="filters">Filters to apply.</param>
+		public void ApplyFilters(DeckFilters filters)
+		{
+			_logger.Debug("ApplyFilters() Called");
+
+			Task filterTask = new Task(() => {
+				FilterArchetypes(filters, true);
+			});
+			filterTask.ContinueWith(t =>
+			{
+				if (t.Exception != null)
+				{
+					_logger.Error(t.Exception, "Exception in {0} ({1} - {2})", "filterTask", "ApplyFilters", "Main Application");
+
+					ReportException("filterTask", "ApplyFilters", t.Exception);
+				}
+			},
+				TaskContinuationOptions.OnlyOnFaulted
+			);
+			filterTask.Start();
+		}
+
+		/// <summary>
+		/// Callback that is triggered when the user changes the value in the card text filter box.
+		/// </summary>
+		/// <param name="sender">The object that triggered the callback.</param>
+		/// <param name="e">Arguments regarding the event that triggered the callback.</param>
+		private void CardText_PropertyChanged(object sender, PropertyChangedEventArgs e)
+		{
+			_logger.Debug("CardText Changed, CardText={0}", CardText.Value);
+
+			App application = (App)Application.Current;
+			application.State.CardTextFilter = CardText.Value;
+			application.SaveState();
+
+			ApplyFilters(application.State.Filters);
+		}
+
+		/// <summary>
+		/// When the user hit enter in the text box, update the text value binding.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
+		private void TextBox_KeyEnterUpdate(object sender, KeyEventArgs e)
+		{
+			if (e.Key == Key.Enter)
+			{
+				TextBox tBox = (TextBox)sender;
+				DependencyProperty prop = TextBox.TextProperty;
+
+				BindingExpression binding = BindingOperations.GetBindingExpression(tBox, prop);
+				if (binding != null) { binding.UpdateSource(); }
+			}
 		}
 
 		/// <summary>

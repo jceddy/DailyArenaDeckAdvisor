@@ -33,13 +33,18 @@ namespace DailyArena.DeckAdvisor
 		public int FontSize { get; set; }
 
 		/// <summary>
-		/// Fingerprint for usage stats.
+		/// Gets or sets the fingerprint for usage stats.
 		/// </summary>
 		public Guid Fingerprint { get; set; } = Guid.NewGuid();
 
 		/// <summary>
-		/// Deck filter values set by the user.
+		/// Gets or sets the deck filter values set by the user.
 		/// </summary>
 		public DeckFilters Filters { get; set; } = new DeckFilters();
+
+		/// <summary>
+		/// Gets or sets the card text filter value.
+		/// </summary>
+		public string CardTextFilter { get; set; } = string.Empty;
 	}
 }

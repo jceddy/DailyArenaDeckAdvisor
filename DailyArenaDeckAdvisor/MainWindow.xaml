@@ -534,6 +534,23 @@
 
 					<Button x:Name="ShowFilters" Content="{x:Static p:Resources.Button_Filters}" ToolTip="{x:Static p:Resources.Tooltip_ShowFilters}" Margin="3" Padding="3" Click="ShowFilters_Click" />
 
+					<Grid>
+						<TextBox x:Name="CardTextFilter" Margin="3" Padding="3" Text="{Binding CardText.Value, Mode=TwoWay}" VerticalContentAlignment="Center" 
+							 MinWidth="200" MaxWidth="400" KeyUp="TextBox_KeyEnterUpdate"/>
+						<TextBlock IsHitTestVisible="False" Text="{x:Static p:Resources.Filter_EnterCardText}" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="10,0,0,0" Foreground="DarkGray">
+							<TextBlock.Style>
+								<Style TargetType="{x:Type TextBlock}">
+									<Setter Property="Visibility" Value="Collapsed"/>
+									<Style.Triggers>
+										<DataTrigger Binding="{Binding Text, ElementName=CardTextFilter}" Value="">
+											<Setter Property="Visibility" Value="Visible"/>
+										</DataTrigger>
+									</Style.Triggers>
+								</Style>
+							</TextBlock.Style>
+						</TextBlock>
+					</Grid>
+
 					<Label Margin="3" FontWeight="Bold" VerticalContentAlignment="Center" Content="Sort Decks:" />
 					<ComboBox x:Name="SelectedSort" SelectedValue="{Binding Sort.Value, Mode=TwoWay}" SelectedValuePath="Content"
 						  Margin="3" VerticalContentAlignment="Center">
