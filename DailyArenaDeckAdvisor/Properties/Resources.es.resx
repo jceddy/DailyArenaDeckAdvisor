@@ -118,7 +118,7 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="Archetype_Loss" xml:space="preserve">
-    <value>Loss</value>
+    <value>Pérdidas</value>
     <comment>Loss string for Archetype.</comment>
   </data>
   <data name="Archetype_Total" xml:space="preserve">
@@ -126,329 +126,329 @@
     <comment>Total string for Archetype.</comment>
   </data>
   <data name="Archetype_Win" xml:space="preserve">
-    <value>Win</value>
+    <value>Victorias</value>
     <comment>Win string for Archetype.</comment>
   </data>
   <data name="Button_Apply" xml:space="preserve">
-    <value>Apply</value>
+    <value>Aplicar</value>
     <comment>The string for the Apply button.</comment>
   </data>
   <data name="Button_Close" xml:space="preserve">
-    <value>Close</value>
+    <value>Cerrar</value>
     <comment>String for the Close button on the settings dialog.</comment>
   </data>
   <data name="Button_Code" xml:space="preserve">
-    <value>Code</value>
+    <value>Prefijo</value>
     <comment>String for the Code button on the settings dialog.</comment>
   </data>
   <data name="Button_Export" xml:space="preserve">
-    <value>Export Deck</value>
+    <value>Exportar la Baraja</value>
     <comment>Export Deck button for Deck Details view.</comment>
   </data>
   <data name="Button_ExportReplacements" xml:space="preserve">
-    <value>Export w/Replacements</value>
+    <value>Exportar con Reemplazos</value>
     <comment>Export w/Replacements button for Deck Details view.</comment>
   </data>
   <data name="Button_Filters" xml:space="preserve">
-    <value>Filters</value>
+    <value>Filtros</value>
     <comment>The string for the Filters button.</comment>
   </data>
   <data name="Button_Issues" xml:space="preserve">
-    <value>Issues</value>
+    <value>Problemas</value>
     <comment>String for the Issues button on the settings dialog.</comment>
   </data>
   <data name="Button_RotationAgnostic" xml:space="preserve">
-    <value>Rotation Agnostic</value>
+    <value>Agnóstico a la Alternación</value>
     <comment>The string for the Rotation Agnostic button.</comment>
   </data>
   <data name="Button_RotationProof" xml:space="preserve">
-    <value>Rotation Proof</value>
+    <value>A Prueba de la Alternación</value>
     <comment>The string for the Rotation Proof button.</comment>
   </data>
   <data name="Deck_AlternateConfigurations" xml:space="preserve">
-    <value>Alternate Configurations</value>
+    <value>Configuraciones Alternas</value>
     <comment>Alternate Configurations header for Deck Details view.</comment>
   </data>
   <data name="Deck_BackToMain" xml:space="preserve">
-    <value>Back to Main Deck</value>
+    <value>Volver a la Baraja Principal</value>
     <comment>Back to Main deck string for deck details view.</comment>
   </data>
   <data name="Deck_Commander" xml:space="preserve">
-    <value>Commander</value>
+    <value>Comandante</value>
     <comment>Commander header for Deck Details view.</comment>
   </data>
   <data name="Deck_ExpectedCost" xml:space="preserve">
-    <value>Expected Booster Cost</value>
+    <value>Costo Esperado en Paquetes</value>
     <comment>Expected Booster Cost header for Deck Details view.</comment>
   </data>
   <data name="Deck_MainDeck" xml:space="preserve">
-    <value>Main Deck</value>
+    <value>Baraja Principal</value>
     <comment>Main Deck header for Deck Details view.</comment>
   </data>
   <data name="Deck_NextBooster" xml:space="preserve">
-    <value>Next Booster Set to Purchase</value>
+    <value>Próxima Expansión para Comprar</value>
     <comment>Next Booster Set header for Deck Details view.</comment>
   </data>
   <data name="Deck_Sideboard" xml:space="preserve">
-    <value>Sideboard</value>
+    <value>Aparador</value>
     <comment>Sideboard header for Deck Details view.</comment>
   </data>
   <data name="Deck_SuggestedReplacements" xml:space="preserve">
-    <value>Suggested Replacements</value>
+    <value>Reemplazos Sugeridos</value>
     <comment>Suggested Replacements for Deck Details view.</comment>
   </data>
   <data name="Deck_WildcardsNeeded" xml:space="preserve">
-    <value>Wildcards Needed</value>
+    <value>Comodines Necesarios</value>
     <comment>Wildcards Needed header for Deck Details view.</comment>
   </data>
   <data name="Deck_WinLoss" xml:space="preserve">
-    <value>Win/Loss Record</value>
+    <value>Registro de Victorias/Pérdidas</value>
     <comment>Win/Loss Record header for Deck Details view.</comment>
   </data>
   <data name="Filter_EnterCardText" xml:space="preserve">
-    <value>Enter Card Name Filter</value>
+    <value>El Filtro de Nombre de Carta</value>
     <comment>Placeholder string for card text filter.</comment>
   </data>
   <data name="Item_ArenaStandard" xml:space="preserve">
-    <value>Arena Standard</value>
+    <value>Arena Estándar</value>
     <comment>The string for Arena Standard in the Format ComboBox.</comment>
   </data>
   <data name="Item_Ascending" xml:space="preserve">
-    <value>Ascending</value>
+    <value>Ascendente</value>
     <comment>The string for Ascending in the Sort Dir ComboBox.</comment>
   </data>
   <data name="Item_BoosterCost" xml:space="preserve">
-    <value>Booster Cost</value>
+    <value>Costo en Paquetes</value>
     <comment>The string for Booster Cost in the Sort ComboBox.</comment>
   </data>
   <data name="Item_BoosterCostIgnoringCollection" xml:space="preserve">
-    <value>Booster Cost (Ignoring Collection)</value>
+    <value>Costo en Paquetes (Ignorando la Colección)</value>
     <comment>The string for Booster Cost (Ignoring Collection) in the Sort ComboBox.</comment>
   </data>
   <data name="Item_BoosterCostIgnoringWildcards" xml:space="preserve">
-    <value>Booster Cost (Ignoring Wildcards)</value>
+    <value>Costo en Paquetes (Ignorando los Comodines)</value>
     <comment>The string for Booster Cost (Ignoring Wildcards) in the Sort ComboBox.</comment>
   </data>
   <data name="Item_Brawl" xml:space="preserve">
-    <value>Brawl</value>
+    <value>Pelea</value>
     <comment>The string for Brawl in the Format ComboBox.</comment>
   </data>
   <data name="Item_CommonCount" xml:space="preserve">
-    <value>Common Count</value>
+    <value>Conde de los Comunes</value>
     <comment>The string for Common Count in the Sort ComboBox.</comment>
   </data>
   <data name="Item_Default" xml:space="preserve">
-    <value>Default</value>
+    <value>Defecto</value>
     <comment>The string for Default in the Sort/Dir ComboBox.</comment>
   </data>
   <data name="Item_Descending" xml:space="preserve">
-    <value>Descending</value>
+    <value>Descendente</value>
     <comment>The string for Descending in the Sort Dir ComboBox.</comment>
   </data>
   <data name="Item_Historic_Bo1" xml:space="preserve">
-    <value>Historic (Bo1)</value>
+    <value>Histórica (Bo1)</value>
     <comment>The string for Historic (Bo1) in the Format ComboBox.</comment>
   </data>
   <data name="Item_Historic_Bo3" xml:space="preserve">
-    <value>Historic (Bo3)</value>
+    <value>Histórica (Bo3)</value>
     <comment>The string for Historic (Bo3) in the Format ComboBox.</comment>
   </data>
   <data name="Item_MythicRareCount" xml:space="preserve">
-    <value>Mythic Rare Count</value>
+    <value>Conde de Raras Míticas</value>
     <comment>The string for Mythic Rare Count in the Sort ComboBox.</comment>
   </data>
   <data name="Item_RareCount" xml:space="preserve">
-    <value>Rare Count</value>
+    <value>Conde de Raras</value>
     <comment>The string for Rare Count in the Sort ComboBox.</comment>
   </data>
   <data name="Item_Standard" xml:space="preserve">
-    <value>Standard</value>
+    <value>Estándar</value>
     <comment>The string for Standard in the Format ComboBox.</comment>
   </data>
   <data name="Item_UncommonCount" xml:space="preserve">
-    <value>Uncommon Count</value>
+    <value>Cuenta de Infrecuentes</value>
     <comment>The string for Uncommon Count in the Sort ComboBox.</comment>
   </data>
   <data name="Item_WinRate" xml:space="preserve">
-    <value>Win/Loss Record</value>
+    <value>Registro de Victorias/Pérdidas</value>
     <comment>The string for Win/Loss Record in the Sort ComboBox.</comment>
   </data>
   <data name="Label_Cards" xml:space="preserve">
-    <value> cards</value>
+    <value> cartas</value>
     <comment>"Cards" label for filters.</comment>
   </data>
   <data name="Label_FontSize" xml:space="preserve">
-    <value>Font Size:</value>
+    <value>Tamaño de Tipo de Letra:</value>
     <comment>Font size label for the settings dialog.</comment>
   </data>
   <data name="Label_Format" xml:space="preserve">
-    <value>Format:</value>
+    <value>Formato:</value>
     <comment>The string for the Format label.</comment>
   </data>
   <data name="Label_HideFromCollection" xml:space="preserve">
-    <value>Hide decks from my collection</value>
+    <value>Ocultar barajas de mi colección</value>
     <comment>Label for filter to hide decks from the user's collection on the GUI.</comment>
   </data>
   <data name="Label_HideIncompleteReplacements" xml:space="preserve">
-    <value>Hide decks with incomplete replacement suggestions</value>
+    <value>Ocultar barajas con sugerencias de reemplazo incompletas</value>
     <comment>Label for filter to hide decks with missing cards that the user doesn't have good replacements for.</comment>
   </data>
   <data name="Label_HideMissingCards" xml:space="preserve">
-    <value>Hide decks I don't have cards to complete</value>
+    <value>Ocultar barajas que no tengo cartas para completar</value>
     <comment>Label for filter to hide decks the user is missing cards from.</comment>
   </data>
   <data name="Label_HideMissingWildcards" xml:space="preserve">
-    <value>Hide decks I don't have wildcards to complete</value>
+    <value>Ocultar barajas que no tengo comodines para completar</value>
     <comment>Label for filter to hide decks the user doesn't have enough wildcards to complete.</comment>
   </data>
   <data name="Label_HideWithMore" xml:space="preserve">
-    <value>Hide decks with more than </value>
+    <value>Ocultar barajas con más de </value>
     <comment>Label for first part of filter that hides decks containing more than some number of a specific wildcard rarity.</comment>
   </data>
   <data name="Loading_ComputingDeckSuggestions" xml:space="preserve">
-    <value>Computing deck suggestions...</value>
+    <value>Calculando sugerencias de barajas...</value>
     <comment>The "computing deck suggestions" string for the loading screen.</comment>
   </data>
   <data name="Loading_LoadingCardDatabase" xml:space="preserve">
-    <value>Loading card database...</value>
+    <value>Cargando base de datos de cartas...</value>
     <comment>The "loading card database" string for the loading screen.</comment>
   </data>
   <data name="Loading_LoadingDeckArchetypes" xml:space="preserve">
-    <value>Loading deck archetypes...</value>
+    <value>Cargando arquetipos de barajas...</value>
     <comment>The "loading deck archetypes" string for the loading screen.</comment>
   </data>
   <data name="Loading_ProcessingCollectionFromLog" xml:space="preserve">
-    <value>Processing collection from log...</value>
+    <value>Procesando colección desde el registro...</value>
     <comment>The "processing collection from log" string for the loading screen.</comment>
   </data>
   <data name="Message_CloseConfirmation" xml:space="preserve">
-    <value>Filters have not been applied, close dialog?</value>
+    <value>No se han aplicado filtros, ¿cerrar diálogo?</value>
     <comment>Confirmation message for Filters dialog close button.</comment>
   </data>
   <data name="Message_Created" xml:space="preserve">
-    <value>Created</value>
+    <value>Creada</value>
     <comment>The Created message.</comment>
   </data>
   <data name="Message_ErrorSendingData" xml:space="preserve">
-    <value>Error Sending Data to Server</value>
+    <value>Error que al Enviar Datos al Servidor</value>
     <comment>The string to report an error when creating a Github issue.</comment>
   </data>
   <data name="Message_Exists" xml:space="preserve">
-    <value>Exists</value>
+    <value>Existe</value>
     <comment>The Exists message.</comment>
   </data>
   <data name="Message_ExportReplacementsSuccessful" xml:space="preserve">
-    <value>Export (with Replacements) Successful</value>
+    <value>La Exportación (con Reemplazos) fue Exitosa</value>
     <comment>String for Export (with Replacements) Successful message.</comment>
   </data>
   <data name="Message_ExportSuccessful" xml:space="preserve">
-    <value>Export Successful</value>
+    <value>La Exportación fue Exitosa</value>
     <comment>String for Export Successful message.</comment>
   </data>
   <data name="Message_GithubIssue" xml:space="preserve">
-    <value>Github Issue</value>
+    <value>Problema de Github</value>
     <comment>The Github Issue message.</comment>
   </data>
   <data name="Meta_NextBooster" xml:space="preserve">
-    <value>Next Booster Set to Purchase</value>
+    <value>Próxima Expansión para Comprar</value>
     <comment>Next Booster string for the Meta Report.</comment>
   </data>
   <data name="Meta_TopCards" xml:space="preserve">
-    <value>Top Cards to Collect/Craft</value>
+    <value>Las Mejores Cartas para Coleccionar/Crear</value>
     <comment>Top Cards string for the Meta Report.</comment>
   </data>
   <data name="Meta_TopDecks" xml:space="preserve">
-    <value>Top Decks to Build for Meta</value>
+    <value>Los Mejores Barajas para Construir para el Meta</value>
     <comment>Top Decks string for the Meta Report.</comment>
   </data>
   <data name="Rarity_Common" xml:space="preserve">
-    <value>Common</value>
+    <value>Común</value>
     <comment>Common card rarity.</comment>
   </data>
   <data name="Rarity_Mythic" xml:space="preserve">
-    <value>Mythic Rare</value>
+    <value>Raro Mítico</value>
     <comment>Mythic Rare card rarity.</comment>
   </data>
   <data name="Rarity_Rare" xml:space="preserve">
-    <value>Rare</value>
+    <value>Rara</value>
     <comment>Rare card rarity.</comment>
   </data>
   <data name="Rarity_Uncommon" xml:space="preserve">
-    <value>Uncommon</value>
+    <value>Infrecuente</value>
     <comment>Uncommon card rarity.</comment>
   </data>
   <data name="Tab_MetaReport" xml:space="preserve">
-    <value>Meta Report</value>
+    <value>Informe del Meta</value>
     <comment>String for the Meta Report tab.</comment>
   </data>
   <data name="Tab_NoCardsNeeded" xml:space="preserve">
-    <value>No Cards Needed</value>
+    <value>No se Necesitan Cartas</value>
     <comment>No Cards Needed Tab section Header string.</comment>
   </data>
   <data name="Tab_NoWildcardsNeeded" xml:space="preserve">
-    <value>No Wildcards Needed</value>
+    <value>No se Necesitan Comodines</value>
     <comment>No Wildcards Needed Tab section Header string.</comment>
   </data>
   <data name="Tab_PlayerDecks" xml:space="preserve">
-    <value>Player Decks</value>
+    <value>Barajas de Jugador</value>
     <comment>Player Decks Tab section Header string.</comment>
   </data>
   <data name="Tab_ReplacementsRequired" xml:space="preserve">
-    <value>Replacements Required</value>
+    <value>Se Requieren Reemplazos</value>
     <comment>Replacements Required Tab section Header string.</comment>
   </data>
   <data name="TextBlock_EnableDetailed" xml:space="preserve">
-    <value>Please turn on detailed logging in Arena by going to Settings-&gt;View Account and checking "Detailed Logs(Plugin Support)", and browse to your collection screen before running Daily Arena Deck Advisor. You may need to restart Arena for the setting change to take effect.</value>
+    <value>Active el registro detallado en Arena yendo a Configuración-&gt; Ver cuenta y marcando "Registros detallados (soporte de complementos)", y navegue hasta la pantalla de su colección antes de ejecutar el Asesor de cubierta diario de Arena. Es posible que deba reiniciar Arena para que el cambio de configuración surta efecto.</value>
     <comment>String for Enabled Detailed Logging message.</comment>
   </data>
   <data name="Title_CloseConfirmation" xml:space="preserve">
-    <value>Close Confirmation</value>
+    <value>Confirmación de Cierre</value>
     <comment>Title for Filters close button confirmation.</comment>
   </data>
   <data name="Tooltip_Code" xml:space="preserve">
-    <value>View the Code on Github</value>
+    <value>Ver el Código en Github</value>
     <comment>String for Code tooltip on the settings dialog.</comment>
   </data>
   <data name="Tooltip_HardRefresh" xml:space="preserve">
-    <value>Refresh Player Inventory and Check Server for Changes, then Recalculate</value>
+    <value>Actualice el Inventario del Jugador y Verifique los Cambios en el Servidor, luego Vuelva a Calcular</value>
     <comment>The string for the Hard Refresh tooltip.</comment>
   </data>
   <data name="Tooltip_Issues" xml:space="preserve">
-    <value>View Issues on Github</value>
+    <value>Ver Problemas en Github</value>
     <comment>String for the Issues tooltip on the settings dialog.</comment>
   </data>
   <data name="Tooltip_MTGAZone" xml:space="preserve">
-    <value>Visit MTG Arena Zone</value>
+    <value>Visita MTG Arena Zone</value>
     <comment>String for the MTGAZone tooltip on the settings dialog.</comment>
   </data>
   <data name="Tooltip_Patreon" xml:space="preserve">
-    <value>Visit the Daily Arena Patreon Page</value>
+    <value>Visita la Página de Patreon del Daily Arena</value>
     <comment>String for the Patreon tooltip on the settings dialog.</comment>
   </data>
   <data name="Tooltip_Refresh" xml:space="preserve">
-    <value>Refresh Player Inventory, then Recalculate</value>
+    <value>Actualizar el Inventario del Jugador, luego Volver a Calcular</value>
     <comment>The string for the Refresh tooltip.</comment>
   </data>
   <data name="Tooltip_RotationAgnostic" xml:space="preserve">
-    <value>Currently showing all cards, regardless of pending rotation.
-Click to toggle to "Rotation Proof"</value>
+    <value>Actualmente se muestran todas las cartas, independientemente de la alternación pendiente.
+Haga clic para alternar a "Prueba de Alternación"</value>
     <comment>The string for the Rotation Agnostic tooltip.</comment>
   </data>
   <data name="Tooltip_RotationProof" xml:space="preserve">
-    <value>Ignoring cards in collection that will rotate soon and suggesting replacements for them.
-Click to toggle to "Rotation Agnostic"</value>
+    <value>Ignorando las tarjetas en la colección que alternar pronto y sugiriendo reemplazos para ellas.
+Haga clic para alternar a "Agnóstico de Alternación"</value>
     <comment>The string for the Rotation Proof tooltip.</comment>
   </data>
   <data name="Tooltip_Settings" xml:space="preserve">
-    <value>Settings</value>
+    <value>Configuraciones</value>
     <comment>The string for the Settings tooltip.</comment>
   </data>
   <data name="Tooltip_ShowFilters" xml:space="preserve">
-    <value>Show filters dialog</value>
+    <value>Mostrar diálogo de filtros</value>
     <comment>The string for the Fillters tooltip.</comment>
   </data>
   <data name="Tooltip_Wiki" xml:space="preserve">
-    <value>View the Wiki on Github</value>
+    <value>Ver el Wiki en Github</value>
     <comment>String for the Wiki tooltip on the settings dialog.</comment>
   </data>
 </root>

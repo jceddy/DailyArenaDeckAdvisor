@@ -773,7 +773,7 @@ namespace DailyArena.DeckAdvisor.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Ignoring cards in collection that will rotate soon an suggesting replacements for them.
+        ///   Looks up a localized string similar to Ignoring cards in collection that will rotate soon and suggesting replacements for them.
         ///Click to toggle to &quot;Rotation Agnostic&quot;.
         /// </summary>
         public static string Tooltip_RotationProof {

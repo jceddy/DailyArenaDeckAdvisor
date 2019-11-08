@@ -435,7 +435,7 @@ Click to toggle to "Rotation Proof"</value>
     <comment>The string for the Rotation Agnostic tooltip.</comment>
   </data>
   <data name="Tooltip_RotationProof" xml:space="preserve">
-    <value>Ignoring cards in collection that will rotate soon an suggesting replacements for them.
+    <value>Ignoring cards in collection that will rotate soon and suggesting replacements for them.
 Click to toggle to "Rotation Agnostic"</value>
     <comment>The string for the Rotation Proof tooltip.</comment>
   </data>
