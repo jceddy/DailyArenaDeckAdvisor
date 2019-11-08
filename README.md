@@ -15,6 +15,12 @@ https://github.com/jceddy/DailyArenaDeckAdvisor/wiki/Getting-Started:-Developing
 Libraries used by this project:  
 https://github.com/jceddy/DailyArenaCommon
 
+# Release 1.0.5.9 Changes
+ - Card Name Filter
+ - Minor and Under-the-Hood Changes
+   - Arena Log
+   - Bug Fixes
+
 # Release 1.0.5.6 Changes
  - Tab List Headings
  - Localization Support/Russian
