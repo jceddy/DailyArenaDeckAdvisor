@@ -62,6 +62,11 @@ namespace DailyArena.DeckAdvisor
 		Dictionary<string, CardColors> _colorsByLand = new Dictionary<string, CardColors>();
 
 		/// <summary>
+		/// List containing names of cards that were banned in Standard.
+		/// </summary>
+		List<string> _standardBannings = new List<string>();
+
+		/// <summary>
 		/// Dictionary that stores set name translations for other languages.
 		/// </summary>
 		Dictionary<string, Dictionary<string, string>> _setNameTranslations = new Dictionary<string, Dictionary<string, string>>();
@@ -245,6 +250,86 @@ namespace DailyArena.DeckAdvisor
 		private CardRarity LowestRarity(CardRarity r1, CardRarity r2)
 		{
 			return r1.CompareTo(r2) > 0 ? r2 : r1;
+		}
+
+		/// <summary>
+		/// Loads a list of names of cards that are banned in Standard.
+		/// </summary>
+		/// <returns>The updated cache timestamp in a sortable string format.</returns>
+		private string LoadStandardBannings()
+		{
+			_logger.Debug("LoadStandardBannings() Called");
+			string cacheTimestamp = "1970-01-01T00:00:00Z";
+
+			if (File.Exists("standard_bannings.json"))
+			{
+				string json = File.ReadAllText("standard_bannings.json");
+				dynamic data = JsonConvert.DeserializeObject(json);
+
+				try
+				{
+					_standardBannings = data.Bannings.ToObject<List<string>>();
+
+					// set cache timestamp after loading colors object to force a re-download if an exception happens
+					cacheTimestamp = data.LastUpdate;
+				}
+				catch (Exception e)
+				{
+					_logger.Error(e, "Exception in LoadStandardBannings() - need to re-download");
+				}
+			}
+
+			_logger.Debug("LoadStandardBannings() Finished - cacheTimestamp={0)", cacheTimestamp);
+			return cacheTimestamp;
+		}
+
+		/// <summary>
+		/// Save data on ards banned in Standard to the local cache file.
+		/// </summary>
+		/// <param name="lastUpdate">The latest timestamp for the standard lands data that was pulled from the server.</param>
+		public void SaveStandardBannings(string lastUpdate)
+		{
+			_logger.Debug("SaveStandardBannings() Called - lastUpdate={0}", lastUpdate);
+			var data = new
+			{
+				LastUpdate = lastUpdate,
+				Bannings = _standardBannings
+			};
+
+			string json = JsonConvert.SerializeObject(data);
+			File.WriteAllText("standard_bannings.json", json);
+			_logger.Debug("SaveStandardBannings() Finished");
+		}
+
+		/// <summary>
+		/// Populate the _standardBannings dictionary.
+		/// </summary>
+		private void PopulateStandardBannings()
+		{
+			_logger.Debug("PopulateStandardBannings() Called");
+			string serverUpdateTime = CardDatabase.GetServerTimestamp("StandardBannings");
+			string cacheTimestamp = LoadStandardBannings();
+
+			if (string.Compare(serverUpdateTime, cacheTimestamp) > 0)
+			{
+				var banningsUrl = $"https://clans.dailyarena.net/standard_bannings.json?_c={Guid.NewGuid()}";
+				var result = WebUtilities.FetchStringFromUrl(banningsUrl, _standardBannings.Count != 0, out List<WebException> exceptions);
+
+				if (result == null)
+				{
+					foreach (WebException exception in exceptions)
+					{
+						_logger.Error(exception, "Exception from FetchStringFromUrl in {method}", "PopulateStandardBannings");
+					}
+				}
+				else
+				{
+					_standardBannings = JsonConvert.DeserializeObject<List<string>>(result.ToString());
+
+					SaveStandardBannings(serverUpdateTime);
+				}
+			}
+			_logger.Debug("PopulateStandardBannings() Finished");
 		}
 
 		/// <summary>
@@ -559,6 +644,12 @@ namespace DailyArena.DeckAdvisor
 								ignoreDeck = true;
 								break;
 							}
+							if (Format != Properties.Resources.Item_Historic_Bo1 && Format != Properties.Resources.Item_Historic_Bo3 && _standardBannings.Contains(cardName))
+							{
+								_logger.Debug("{cardName} is banned in standard, ignore this deck", cardName);
+								ignoreDeck = true;
+								break;
+							}
 						}
 						catch(KeyNotFoundException e)
 						{
@@ -568,6 +659,12 @@ namespace DailyArena.DeckAdvisor
 							if (cardsByName[cardName].Count(x => x.Set.RotationSafe) == 0)
 							{
 								_logger.Debug("{cardName} is rotating soon, ignore this deck", cardName);
+								ignoreDeck = true;
+								break;
+							}
+							if (Format != Properties.Resources.Item_Historic_Bo1 && Format != Properties.Resources.Item_Historic_Bo3 && _standardBannings.Contains(cardName))
+							{
+								_logger.Debug("{cardName} is banned in standard, ignore this deck", cardName);
 								ignoreDeck = true;
 								break;
 							}
@@ -585,6 +682,12 @@ namespace DailyArena.DeckAdvisor
 							if (cardsByName[cardName].Count(x => x.Set.RotationSafe) == 0)
 							{
 								_logger.Debug("{cardName} is rotating soon, ignore this deck", cardName);
+								ignoreDeck = true;
+								break;
+							}
+							if (Format != Properties.Resources.Item_Historic_Bo1 && Format != Properties.Resources.Item_Historic_Bo3 && _standardBannings.Contains(cardName))
+							{
+								_logger.Debug("{cardName} is banned in standard, ignore this deck", cardName);
 								ignoreDeck = true;
 								break;
 							}
@@ -608,7 +711,13 @@ namespace DailyArena.DeckAdvisor
 
 						try
 						{
-							if (cardsByName[cardName].Count(x => x.Set.StandardLegal) == 0)
+							if (_standardBannings.Contains(cardName))
+							{
+								_logger.Debug("{cardName} is banned in standard, ignore this deck", cardName);
+								ignoreDeck = true;
+								break;
+							}
+							else if (cardsByName[cardName].Count(x => x.Set.StandardLegal) == 0)
 							{
 								_logger.Debug("{cardName} is not standard legal, ignore this deck", cardName);
 								ignoreDeck = true;
@@ -620,7 +729,13 @@ namespace DailyArena.DeckAdvisor
 							Log.Error(e, "Card not found: {cardName}", cardName);
 							cardName = Regex.Split(cardName, " // ")[0].Trim();
 							cardName = Regex.Split(cardName, " <")[0].Trim();
-							if (cardsByName[cardName].Count(x => x.Set.StandardLegal) == 0)
+							if (_standardBannings.Contains(cardName))
+							{
+								_logger.Debug("{cardName} is banned in standard, ignore this deck", cardName);
+								ignoreDeck = true;
+								break;
+							}
+							else if (cardsByName[cardName].Count(x => x.Set.StandardLegal) == 0)
 							{
 								_logger.Debug("{cardName} is not standard legal, ignore this deck", cardName);
 								ignoreDeck = true;
@@ -637,7 +752,13 @@ namespace DailyArena.DeckAdvisor
 
 							_logger.Debug("Checking sideboard card: {cardName}", cardName);
 
-							if (cardsByName[cardName].Count(x => x.Set.StandardLegal) == 0)
+							if(_standardBannings.Contains(cardName))
+							{
+								_logger.Debug("{cardName} is banned in standard, ignore this deck", cardName);
+								ignoreDeck = true;
+								break;
+							}
+							else if (cardsByName[cardName].Count(x => x.Set.StandardLegal) == 0)
 							{
 								_logger.Debug("{cardName} is not standard legal, ignore this deck", cardName);
 								ignoreDeck = true;
@@ -651,6 +772,7 @@ namespace DailyArena.DeckAdvisor
 						continue;
 					}
 				}
+
 				foreach (dynamic card in archetype["deck_list"])
 				{
 					string cardName = ((string)card["name"]).Trim();
@@ -2417,7 +2539,10 @@ namespace DailyArena.DeckAdvisor
 				LoadingValue.Value = 20;
 
 				PopulateColorsByLand();
-				LoadingValue.Value = 35;
+				LoadingValue.Value = 30;
+
+				PopulateStandardBannings();
+				LoadingValue.Value = 40;
 
 				PopulateSetTranslations();
 				LoadingValue.Value = 50;
@@ -2948,9 +3073,10 @@ namespace DailyArena.DeckAdvisor
 					LoadingValue.Value = 20;
 
 					PopulateColorsByLand();
-					LoadingValue.Value = 35;
+					LoadingValue.Value = 30;
 
-					PopulateColorsByLand();
+					PopulateStandardBannings();
+					LoadingValue.Value = 40;
 				}
 
 				LoadingValue.Value = 50;
