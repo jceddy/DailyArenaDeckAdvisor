@@ -246,12 +246,19 @@ namespace DailyArena.DeckAdvisor
 					};
 					foreach(string cardName in CommandZone.Keys)
 					{
-						CardColors colorIdentity = cardsByName[cardName][0].ColorIdentity;
-						colorsInIdentity["W"] = colorsInIdentity["W"] || colorIdentity.IsWhite;
-						colorsInIdentity["U"] = colorsInIdentity["U"] || colorIdentity.IsBlue;
-						colorsInIdentity["B"] = colorsInIdentity["B"] || colorIdentity.IsBlack;
-						colorsInIdentity["R"] = colorsInIdentity["R"] || colorIdentity.IsRed;
-						colorsInIdentity["G"] = colorsInIdentity["G"] || colorIdentity.IsGreen;
+						try
+						{
+							CardColors colorIdentity = cardsByName[cardName][0].ColorIdentity;
+							colorsInIdentity["W"] = colorsInIdentity["W"] || colorIdentity.IsWhite;
+							colorsInIdentity["U"] = colorsInIdentity["U"] || colorIdentity.IsBlue;
+							colorsInIdentity["B"] = colorsInIdentity["B"] || colorIdentity.IsBlack;
+							colorsInIdentity["R"] = colorsInIdentity["R"] || colorIdentity.IsRed;
+							colorsInIdentity["G"] = colorsInIdentity["G"] || colorIdentity.IsGreen;
+						}
+						catch(NullReferenceException e)
+						{
+							throw new NullReferenceException($"NullReferenceExption in CommanderColorIdentity for Card {cardName}", e);
+						}
 					}
 					string colorString = (colorsInIdentity["W"] ? "W" : string.Empty) +
 						(colorsInIdentity["U"] ? "U" : string.Empty) +
