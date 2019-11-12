@@ -8,6 +8,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{661EA5CB-B016-4206-A05A-6454B21F77EC}"
 	ProjectSection(SolutionItems) = preProject
 		AssemblyVersion.cs = AssemblyVersion.cs
+		SolutionInfo.proj = SolutionInfo.proj
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DailyArenaDeckAdvisorLauncher", "DailyArenaDeckAdvisorLauncher\DailyArenaDeckAdvisorLauncher.csproj", "{1AA67122-ABBB-49DE-B260-3C658728AD4E}"
@@ -18,8 +19,13 @@ Project("{930C7802-8A8C-48F9-8165-68863BCCD9DD}") = "DailyArenaDeckAdvisorSetup"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "libraries", "libraries", "{DB7BDEFC-DD2B-4083-8B63-4A777E490E5C}"
 	ProjectSection(SolutionItems) = preProject
+		libraries\DailyArena.Common.Core.dll = libraries\DailyArena.Common.Core.dll
 		libraries\DailyArena.Common.dll = libraries\DailyArena.Common.dll
 	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DailyArenaDeckAdvisorConsole", "DailyArenaDeckAdvisorConsole\DailyArenaDeckAdvisorConsole.csproj", "{2FEB82DF-993C-4D1A-8306-7EB6A63BC397}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DailyArena.DeckAdvisor.Common", "DailyArena.DeckAdvisor.Common\DailyArena.DeckAdvisor.Common.csproj", "{CF1EE6D1-3ED2-4B73-A8DA-71FBBE22593E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -71,6 +77,30 @@ Global
 		{54173857-C11E-49C8-8CDC-46FD269E506A}.Release|x64.Build.0 = Release|x64
 		{54173857-C11E-49C8-8CDC-46FD269E506A}.Release|x86.ActiveCfg = Release|x86
 		{54173857-C11E-49C8-8CDC-46FD269E506A}.Release|x86.Build.0 = Release|x86
+		{2FEB82DF-993C-4D1A-8306-7EB6A63BC397}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2FEB82DF-993C-4D1A-8306-7EB6A63BC397}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2FEB82DF-993C-4D1A-8306-7EB6A63BC397}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{2FEB82DF-993C-4D1A-8306-7EB6A63BC397}.Debug|x64.Build.0 = Debug|Any CPU
+		{2FEB82DF-993C-4D1A-8306-7EB6A63BC397}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{2FEB82DF-993C-4D1A-8306-7EB6A63BC397}.Debug|x86.Build.0 = Debug|Any CPU
+		{2FEB82DF-993C-4D1A-8306-7EB6A63BC397}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2FEB82DF-993C-4D1A-8306-7EB6A63BC397}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2FEB82DF-993C-4D1A-8306-7EB6A63BC397}.Release|x64.ActiveCfg = Release|Any CPU
+		{2FEB82DF-993C-4D1A-8306-7EB6A63BC397}.Release|x64.Build.0 = Release|Any CPU
+		{2FEB82DF-993C-4D1A-8306-7EB6A63BC397}.Release|x86.ActiveCfg = Release|Any CPU
+		{2FEB82DF-993C-4D1A-8306-7EB6A63BC397}.Release|x86.Build.0 = Release|Any CPU
+		{CF1EE6D1-3ED2-4B73-A8DA-71FBBE22593E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CF1EE6D1-3ED2-4B73-A8DA-71FBBE22593E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CF1EE6D1-3ED2-4B73-A8DA-71FBBE22593E}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{CF1EE6D1-3ED2-4B73-A8DA-71FBBE22593E}.Debug|x64.Build.0 = Debug|Any CPU
+		{CF1EE6D1-3ED2-4B73-A8DA-71FBBE22593E}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{CF1EE6D1-3ED2-4B73-A8DA-71FBBE22593E}.Debug|x86.Build.0 = Debug|Any CPU
+		{CF1EE6D1-3ED2-4B73-A8DA-71FBBE22593E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CF1EE6D1-3ED2-4B73-A8DA-71FBBE22593E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CF1EE6D1-3ED2-4B73-A8DA-71FBBE22593E}.Release|x64.ActiveCfg = Release|Any CPU
+		{CF1EE6D1-3ED2-4B73-A8DA-71FBBE22593E}.Release|x64.Build.0 = Release|Any CPU
+		{CF1EE6D1-3ED2-4B73-A8DA-71FBBE22593E}.Release|x86.ActiveCfg = Release|Any CPU
+		{CF1EE6D1-3ED2-4B73-A8DA-71FBBE22593E}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

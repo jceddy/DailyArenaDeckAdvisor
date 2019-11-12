@@ -2,7 +2,7 @@
 using System.ComponentModel;
 using System.Linq.Expressions;
 
-namespace DailyArena.DeckAdvisor
+namespace DailyArena.DeckAdvisor.Common
 {
 	/// <summary>
 	/// Class for tracking user's select deck filters.
@@ -25,7 +25,7 @@ namespace DailyArena.DeckAdvisor
 			}
 			set
 			{
-				if(_hideFromCollection != value)
+				if (_hideFromCollection != value)
 				{
 					_hideFromCollection = value;
 					RaisePropertyChanged("HideFromCollection");
@@ -388,11 +388,11 @@ namespace DailyArena.DeckAdvisor
 		/// <returns>True if the object is a DeckFilter and all its fields are the same, false otherwise.</returns>
 		public override bool Equals(object obj)
 		{
-			if(obj == null)
+			if (obj == null)
 			{
 				return false;
 			}
-			else if(obj is DeckFilters)
+			else if (obj is DeckFilters)
 			{
 				return Equals((DeckFilters)obj);
 			}
@@ -430,7 +430,7 @@ namespace DailyArena.DeckAdvisor
 		/// <returns>True if the object's fields are all the same, false otherwise.</returns>
 		public bool Equals(DeckFilters other)
 		{
-			if(other is null)
+			if (other is null)
 			{
 				return false;
 			}

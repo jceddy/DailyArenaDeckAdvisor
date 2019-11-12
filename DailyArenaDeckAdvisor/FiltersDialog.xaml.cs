@@ -1,4 +1,6 @@
-﻿using System.Windows;
+﻿using DailyArena.DeckAdvisor.Common;
+using DailyArena.DeckAdvisor.Common.Extensions;
+using System.Windows;
 
 namespace DailyArena.DeckAdvisor
 {
@@ -31,7 +33,7 @@ namespace DailyArena.DeckAdvisor
 		/// <param name="e">The routed event arguments.</param>
 		private void Apply_Click(object sender, RoutedEventArgs e)
 		{
-			App application = (App)Application.Current;
+			IDeckAdvisorApp application = (IDeckAdvisorApp)Application.Current;
 			if (application.State.Filters != Filters)
 			{
 				application.State.Filters.SetAllFields(Filters);

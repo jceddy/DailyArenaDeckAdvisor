@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace DailyArena.DeckAdvisor
+namespace DailyArena.DeckAdvisor.Common
 {
 	/// <summary>
 	/// Class to Cache state information for the application.

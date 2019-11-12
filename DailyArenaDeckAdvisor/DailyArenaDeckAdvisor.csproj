@@ -66,8 +66,11 @@
     <Reference Include="DailyArena.Common">
       <HintPath>..\libraries\DailyArena.Common.dll</HintPath>
     </Reference>
+    <Reference Include="DailyArena.Common.Core">
+      <HintPath>..\libraries\DailyArena.Common.Core.dll</HintPath>
+    </Reference>
     <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\packages\Newtonsoft.Json.12.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <HintPath>..\packages\Newtonsoft.Json.12.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="Serilog, Version=2.0.0.0, Culture=neutral, PublicKeyToken=24c2f752a8e58a10, processorArchitecture=MSIL">
       <HintPath>..\packages\Serilog.2.9.0\lib\net46\Serilog.dll</HintPath>
@@ -120,8 +123,6 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="CachedState.cs" />
-    <Compile Include="DeckFilters.cs" />
     <Compile Include="MetaReport.cs" />
     <Compile Include="ContentTemplateSelector.cs" />
     <Compile Include="Properties\Resources.es.Designer.cs">
@@ -235,6 +236,12 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\detailed_logs.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\DailyArena.DeckAdvisor.Common\DailyArena.DeckAdvisor.Common.csproj">
+      <Project>{cf1ee6d1-3ed2-4b73-a8da-71fbbe22593e}</Project>
+      <Name>DailyArena.DeckAdvisor.Common</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -1,6 +1,8 @@
 ﻿using DailyArena.Common.Bindable;
 using DailyArena.Common.Database;
 using DailyArena.Common.Utility;
+using DailyArena.DeckAdvisor.Common;
+using DailyArena.DeckAdvisor.Common.Extensions;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Serilog;
@@ -2461,7 +2463,7 @@ namespace DailyArena.DeckAdvisor
 
 			Title = Title + $" - ({assemblyVersion}, {assemblyArchitecture})";
 
-			App application = (App)Application.Current;
+			IDeckAdvisorApp application = (IDeckAdvisorApp)Application.Current;
 			Format.Value = application.State.LastFormat;
 			bool saveState = false;
 			if(string.IsNullOrWhiteSpace(Format.Value) || !_formatMappings.ContainsKey(Format.Value))
@@ -2643,7 +2645,7 @@ namespace DailyArena.DeckAdvisor
 		{
 			_logger.Debug("New Format Selected, Format={0}", Format.Value);
 
-			App application = (App)Application.Current;
+			IDeckAdvisorApp application = (IDeckAdvisorApp)Application.Current;
 			application.State.LastFormat = Format.Value;
 			application.SaveState();
 
