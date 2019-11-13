@@ -257,7 +257,7 @@ namespace DailyArena.DeckAdvisor
 						}
 						catch(NullReferenceException e)
 						{
-							throw new NullReferenceException($"NullReferenceExption in CommanderColorIdentity for Card {cardName}", e);
+							throw new NullReferenceException($"NullReferenceExeption in CommanderColorIdentity for Card {cardName}", e);
 						}
 					}
 					string colorString = (colorsInIdentity["W"] ? "W" : string.Empty) +

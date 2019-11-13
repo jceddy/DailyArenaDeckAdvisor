@@ -47,6 +47,15 @@
   <PropertyGroup>
     <ApplicationIcon>DA_tiny.ico</ApplicationIcon>
   </PropertyGroup>
+  <PropertyGroup>
+    <SignManifests>false</SignManifests>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ManifestCertificateThumbprint>9CFAD3D9DCDE70DC56909D3927A0DD5CB7DA1A83</ManifestCertificateThumbprint>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ManifestTimestampUrl>http://timestamp.comodoca.com</ManifestTimestampUrl>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.12.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
@@ -182,4 +191,7 @@
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>"C:\Program Files (x86)\Windows Kits\8.1\bin\$(PlatformName)\signtool.exe"  sign  /t http://timestamp.comodoca.com /sha1 9CFAD3D9DCDE70DC56909D3927A0DD5CB7DA1A83 "$(ProjectDir)$(OutDir)DailyArenaDeckAdvisorLauncher.exe"</PostBuildEvent>
+  </PropertyGroup>
 </Project>
