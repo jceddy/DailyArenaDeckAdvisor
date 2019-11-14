@@ -412,7 +412,7 @@ namespace DailyArena.DeckAdvisor
 						string landName = (string)lands["Name"];
 						if (!_colorsByLand.ContainsKey(landName))
 						{
-							_colorsByLand.Add((string)lands["Name"], CardColors.CardColorFromString((string)lands["Colors"]));
+							_colorsByLand.Add(landName, CardColors.CardColorFromString((string)lands["Colors"]));
 						}
 					}
 
@@ -2231,25 +2231,35 @@ namespace DailyArena.DeckAdvisor
 				if (cardToReplace.Type.Contains("Land"))
 				{
 					_logger.Debug("Processing Candidates based on Color");
-					var candidates = playerInventory.Select(x => new { Card = cardsById[x.Key], Quantity = x.Value }).
-						Where(x => x.Quantity > 0 && x.Card.Type == cardToReplace.Type && _colorsByLand[x.Card.Name] == _colorsByLand[cardToReplace.Name] && (identity == null || identity.Contains(x.Card.ColorIdentity))).
-						OrderByDescending(x => x.Card.Rank + CardStats.GetAssociationModifier(cardToReplace.Name, x.Card.Name, _cardStats));
-
-					foreach (var candidate in candidates)
+					try
 					{
-						if (replacementsNeeded == 0) { break; }
-						if (candidate.Quantity > replacementsNeeded)
+						var candidates = playerInventory.Select(x => new { Card = cardsById[x.Key], Quantity = x.Value }).
+							Where(x => x.Quantity > 0 && x.Card.Type == cardToReplace.Type && _colorsByLand[x.Card.Name] == _colorsByLand[cardToReplace.Name] && (identity == null || identity.Contains(x.Card.ColorIdentity))).
+							OrderByDescending(x => x.Card.Rank + CardStats.GetAssociationModifier(cardToReplace.Name, x.Card.Name, _cardStats));
+
+						foreach (var candidate in candidates)
 						{
-							suggestedReplacements.Add(new Tuple<int, int, int>(cardToReplace.ArenaId, candidate.Card.ArenaId, replacementsNeeded));
-							playerInventory[candidate.Card.ArenaId] -= replacementsNeeded;
-							replacementsNeeded = 0;
+							if (replacementsNeeded == 0) { break; }
+							if (candidate.Quantity > replacementsNeeded)
+							{
+								suggestedReplacements.Add(new Tuple<int, int, int>(cardToReplace.ArenaId, candidate.Card.ArenaId, replacementsNeeded));
+								playerInventory[candidate.Card.ArenaId] -= replacementsNeeded;
+								replacementsNeeded = 0;
+							}
+							else
+							{
+								suggestedReplacements.Add(new Tuple<int, int, int>(cardToReplace.ArenaId, candidate.Card.ArenaId, candidate.Quantity));
+								playerInventory[candidate.Card.ArenaId] = 0;
+								replacementsNeeded -= candidate.Quantity;
+							}
 						}
-						else
-						{
-							suggestedReplacements.Add(new Tuple<int, int, int>(cardToReplace.ArenaId, candidate.Card.ArenaId, candidate.Quantity));
-							playerInventory[candidate.Card.ArenaId] = 0;
-							replacementsNeeded -= candidate.Quantity;
-						}
+					}
+					catch(KeyNotFoundException e)
+					{
+						string colorsByLandString = string.Join(Environment.NewLine, _colorsByLand.Select(x => x.Key + ": " + x.Value.ToString()));
+						string candidatesString = string.Join(Environment.NewLine, playerInventory.Select(x => new { Card = cardsById[x.Key], Quantity = x.Value }).
+							Where(x => x.Quantity > 0 && x.Card.Type == cardToReplace.Type).Select(x => x.Card.Name));
+						throw new KeyNotFoundException($"KeyNotFoundException while Processing Candidates based on Color: cardToReplace={cardToReplace.Name}, _colorsByLand={Environment.NewLine}{colorsByLandString}{Environment.NewLine}candidates={Environment.NewLine}{candidatesString}", e);
 					}
 
 					if (replacementsNeeded > 0)
