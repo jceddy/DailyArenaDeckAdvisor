@@ -13,7 +13,6 @@ using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Configuration;
 using System.Diagnostics;
-using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -778,6 +777,27 @@ namespace DailyArena.DeckAdvisor
 					{
 						continue;
 					}
+				}
+
+				bool ignoreDeckCheck = false;
+				foreach(dynamic card in archetype["deck_list"])
+				{
+					string cardName = ((string)card["name"]).Trim();
+					if(!cardsByName.ContainsKey(cardName))
+					{
+						cardName = Regex.Split(cardName, " // ")[0].Trim();
+						cardName = Regex.Split(cardName, " <")[0].Trim();
+						if(!cardsByName.ContainsKey(cardName))
+						{
+							Logger.Debug("{cardName} does not exist in Arena, ignore this deck", cardName);
+							ignoreDeckCheck = true;
+							break;
+						}
+					}
+				}
+				if (ignoreDeckCheck)
+				{
+					continue;
 				}
 
 				foreach (dynamic card in archetype["deck_list"])
