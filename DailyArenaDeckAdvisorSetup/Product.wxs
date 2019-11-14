@@ -12,10 +12,13 @@
 		<?define SerilogDllSourcePath = "$(var.ProjectDir)..\DailyArenaDeckAdvisor\x64\Release\Serilog.dll" ?>
 		<?define SerilogFormattingDllSourcePath = "$(var.ProjectDir)..\DailyArenaDeckAdvisor\x64\Release\Serilog.Formatting.Compact.dll" ?>
 		<?define SerilogFileDllSourcePath = "$(var.ProjectDir)..\DailyArenaDeckAdvisor\x64\Release\Serilog.Sinks.File.dll" ?>
+		<?define NetstandardDllSourcePath = "$(var.ProjectDir)..\DailyArenaDeckAdvisor\x64\Release\netstandard.dll" ?>
 		<?define DailyArenaDeckAdvisorLauncherExeSourcePath = "$(var.ProjectDir)..\DailyArenaDeckAdvisorLauncher\x64\Release\DailyArenaDeckAdvisorLauncher.exe" ?>
 		<?define DailyArenaDeckAdvisorUpdaterExeSourcePath = "$(var.ProjectDir)..\DailyArenaDeckAdvisorUpdater\x64\Release\DailyArenaDeckAdvisorUpdater.exe" ?>
 		<?define DailyArenaDeckAdvisorConfigSourcePath = "$(var.ProjectDir)..\DailyArenaDeckAdvisor\x64\Release\DailyArenaDeckAdvisor.exe.config" ?>
+		<?define DailyArenaDeckAdvisorCommonDllSourcePath = "$(var.ProjectDir)..\DailyArenaDeckAdvisor\x64\Release\DailyArena.DeckAdvisor.Common.dll" ?>
 		<?define DailyArenaCommonDllSourcePath = "$(var.ProjectDir)..\DailyArenaDeckAdvisor\x64\Release\DailyArena.Common.dll" ?>
+		<?define DailyArenaCommonCoreDllSourcePath = "$(var.ProjectDir)..\DailyArenaDeckAdvisor\x64\Release\DailyArena.Common.Core.dll" ?>
 		<?define XceedToolkitDllPath = "$(var.ProjectDir)..\DailyArenaDeckAdvisor\x64\Release\Xceed.Wpf.Toolkit.dll" ?>
 		<?define XceedAvalonDockDllPath = "$(var.ProjectDir)..\DailyArenaDeckAdvisor\x64\Release\Xceed.Wpf.AvalonDock.dll" ?>
 		<?define XceedAeroDllPath = "$(var.ProjectDir)..\DailyArenaDeckAdvisor\x64\Release\Xceed.Wpf.AvalonDock.Themes.Aero.dll" ?>
@@ -29,6 +32,9 @@
 		<?define DailyArenaRuResourceDllPath = "$(var.ProjectDir)..\DailyArenaDeckAdvisor\x64\Release\ru\DailyArenaDeckAdvisor.resources.dll" ?>
 		<?define DailyArenaLauncherRuResourceDllPath = "$(var.ProjectDir)..\DailyArenaDeckAdvisorLauncher\x64\Release\ru\DailyArenaDeckAdvisorLauncher.resources.dll" ?>
 		<?define DailyArenaUpdaterRuResourceDllPath = "$(var.ProjectDir)..\DailyArenaDeckAdvisorUpdater\x64\Release\ru\DailyArenaDeckAdvisorUpdater.resources.dll" ?>
+		<?define DailyArenaEsResourceDllPath = "$(var.ProjectDir)..\DailyArenaDeckAdvisor\x64\Release\es\DailyArenaDeckAdvisor.resources.dll" ?>
+		<?define DailyArenaLauncherEsResourceDllPath = "$(var.ProjectDir)..\DailyArenaDeckAdvisorLauncher\x64\Release\es\DailyArenaDeckAdvisorLauncher.resources.dll" ?>
+		<?define DailyArenaUpdaterEsResourceDllPath = "$(var.ProjectDir)..\DailyArenaDeckAdvisorUpdater\x64\Release\es\DailyArenaDeckAdvisorUpdater.resources.dll" ?>
 	
 		<!-- Xceed language resource files -->
 		<?define XceedDeResourceDllPath = "$(var.ProjectDir)..\DailyArenaDeckAdvisor\x64\Release\de\Xceed.Wpf.AvalonDock.resources.dll" ?>
@@ -49,10 +55,13 @@
 		<?define SerilogDllSourcePath = "$(var.ProjectDir)..\DailyArenaDeckAdvisor\x86\Release\Serilog.dll" ?>
 		<?define SerilogFormattingDllSourcePath = "$(var.ProjectDir)..\DailyArenaDeckAdvisor\x86\Release\Serilog.Formatting.Compact.dll" ?>
 		<?define SerilogFileDllSourcePath = "$(var.ProjectDir)..\DailyArenaDeckAdvisor\x86\Release\Serilog.Sinks.File.dll" ?>
+		<?define NetstandardDllSourcePath = "$(var.ProjectDir)..\DailyArenaDeckAdvisor\x86\Release\netstandard.dll" ?>
 		<?define DailyArenaDeckAdvisorLauncherExeSourcePath = "$(var.ProjectDir)..\DailyArenaDeckAdvisorLauncher\x86\Release\DailyArenaDeckAdvisorLauncher.exe" ?>
 		<?define DailyArenaDeckAdvisorUpdaterExeSourcePath = "$(var.ProjectDir)..\DailyArenaDeckAdvisorUpdater\x86\Release\DailyArenaDeckAdvisorUpdater.exe" ?>
 		<?define DailyArenaDeckAdvisorConfigSourcePath = "$(var.ProjectDir)..\DailyArenaDeckAdvisor\x86\Release\DailyArenaDeckAdvisor.exe.config" ?>
+		<?define DailyArenaDeckAdvisorCommonDllSourcePath = "$(var.ProjectDir)..\DailyArenaDeckAdvisor\x86\Release\DailyArena.DeckAdvisor.Common.dll" ?>
 		<?define DailyArenaCommonDllSourcePath = "$(var.ProjectDir)..\DailyArenaDeckAdvisor\x86\Release\DailyArena.Common.dll" ?>
+		<?define DailyArenaCommonCoreDllSourcePath = "$(var.ProjectDir)..\DailyArenaDeckAdvisor\x86\Release\DailyArena.Common.Core.dll" ?>
 		<?define XceedToolkitDllPath = "$(var.ProjectDir)..\DailyArenaDeckAdvisor\x86\Release\Xceed.Wpf.Toolkit.dll" ?>
 		<?define XceedAvalonDockDllPath = "$(var.ProjectDir)..\DailyArenaDeckAdvisor\x86\Release\Xceed.Wpf.AvalonDock.dll" ?>
 		<?define XceedAeroDllPath = "$(var.ProjectDir)..\DailyArenaDeckAdvisor\x86\Release\Xceed.Wpf.AvalonDock.Themes.Aero.dll" ?>
@@ -66,6 +75,9 @@
 		<?define DailyArenaRuResourceDllPath = "$(var.ProjectDir)..\DailyArenaDeckAdvisor\x86\Release\ru\DailyArenaDeckAdvisor.resources.dll" ?>
 		<?define DailyArenaLauncherRuResourceDllPath = "$(var.ProjectDir)..\DailyArenaDeckAdvisorLauncher\x86\Release\ru\DailyArenaDeckAdvisorLauncher.resources.dll" ?>
 		<?define DailyArenaUpdaterRuResourceDllPath = "$(var.ProjectDir)..\DailyArenaDeckAdvisorUpdater\x86\Release\ru\DailyArenaDeckAdvisorUpdater.resources.dll" ?>
+		<?define DailyArenaEsResourceDllPath = "$(var.ProjectDir)..\DailyArenaDeckAdvisor\x86\Release\es\DailyArenaDeckAdvisor.resources.dll" ?>
+		<?define DailyArenaLauncherEsResourceDllPath = "$(var.ProjectDir)..\DailyArenaDeckAdvisorLauncher\x86\Release\es\DailyArenaDeckAdvisorLauncher.resources.dll" ?>
+		<?define DailyArenaUpdaterEsResourceDllPath = "$(var.ProjectDir)..\DailyArenaDeckAdvisorUpdater\x86\Release\es\DailyArenaDeckAdvisorUpdater.resources.dll" ?>
 
 		<!-- Xceed language resource files -->
 		<?define XceedDeResourceDllPath = "$(var.ProjectDir)..\DailyArenaDeckAdvisor\x86\Release\de\Xceed.Wpf.AvalonDock.resources.dll" ?>
@@ -174,11 +186,20 @@
 						<Component Id="Serilog.Sinks.File.dll_comp" Guid="1e1fb3b3-b723-49ca-b5a4-d1958cd6874b" Win64="$(var.Win64)">
 							<File Source="$(var.SerilogFileDllSourcePath)" Id="SerilogFileDll" KeyPath="yes" />
 						</Component>
+						<Component Id="netstandard.dll_comp" Guid="76cbb860-d76e-4245-9a65-23a2f142d09a" Win64="$(var.Win64)">
+							<File Source="$(var.NetstandardDllSourcePath)" Id="NetstandardDll" KeyPath="yes" />
+						</Component>
 						<Component Id="DailyArenaDeckAdvisor.exe.config_comp" Guid="0d4c4d74-501d-42fd-966b-e9cd4a2b74d2" Win64="$(var.Win64)">
 							<File Source="$(var.DailyArenaDeckAdvisorConfigSourcePath)" Id="DailyArenaDeckAdvisorConfig" KeyPath="yes" />
 						</Component>
+						<Component Id="DailyArena.DeckAdvisor.Common.dll_comp" Guid="1af08e90-8b4a-49f1-801c-5cccc3771fdc" Win64="$(var.Win64)">
+							<File Source="$(var.DailyArenaDeckAdvisorCommonDllSourcePath)" Id="DailyArenaDeckAdvisorCommonDll" KeyPath="yes" />
+						</Component>
 						<Component Id="DailyArena.Common.dll_comp" Guid="6f52a1fc-e8f4-4396-ac4d-4479cf383087" Win64="$(var.Win64)">
 							<File Source="$(var.DailyArenaCommonDllSourcePath)" Id="DailyArenaCommonDll" KeyPath="yes" />
+						</Component>
+						<Component Id="DailyArena.Common.Core.dll_comp" Guid="a784026a-5f6e-42a7-a131-efc6323deeb7" Win64="$(var.Win64)">
+							<File Source="$(var.DailyArenaCommonCoreDllSourcePath)" Id="DailyArenaCommonCoreDll" KeyPath="yes" />
 						</Component>
 						<Component Id="Xceed.Wpf.Toolkit.dll_comp" Guid="192d8842-ce93-4f2a-9099-77311dde31fc" Win64="$(var.Win64)">
 							<File Source="$(var.XceedToolkitDllPath)" Id="XceedToolkitDll" KeyPath="yes" />
@@ -216,6 +237,17 @@
 							</Component>
 						</Directory>
 						<Directory Id="esResourceFolder" Name="es">
+							<!-- DailyArena language resource files -->
+							<Component Id="es_DailyArenaDeckAdvisor.resource.dll_comp" Guid="e8d3592a-c5f7-4d3b-9a27-bfd3dad72563" Win64="$(var.Win64)">
+								<File Source="$(var.DailyArenaEsResourceDllPath)" Id="DailyArenaEsResourceDll" KeyPath="yes" />
+							</Component>
+							<Component Id="es_DailyArenaDeckAdvisorLauncher.resource.dll_comp" Guid="c0bf50f5-5656-438d-b8f3-94abea79a886" Win64="$(var.Win64)">
+								<File Source="$(var.DailyArenaLauncherEsResourceDllPath)" Id="DailyArenaLauncherEsResourceDll" KeyPath="yes" />
+							</Component>
+							<Component Id="es_DailyArenaDeckAdvisorUpdater.resource.dll_comp" Guid="ef638a75-d11a-4787-8551-5bbb4bb59d95" Win64="$(var.Win64)">
+								<File Source="$(var.DailyArenaUpdaterEsResourceDllPath)" Id="DailyArenaUpdaterEsResourceDll" KeyPath="yes" />
+							</Component>
+							
 							<!-- Xceed language resource files -->
 							<Component Id="es_Xceed.Wpf.AvalonDock.resources.dll_comp" Guid="28e7b111-b0b8-4d10-b63b-a1b4735b3aa7" Win64="$(var.Win64)">
 								<File Source="$(var.XceedEsResourceDllPath)" Id="XceedEsResourceDll" KeyPath="yes" />
@@ -306,10 +338,13 @@
 				<ComponentRef Id="Serilog.dll_comp" />
 				<ComponentRef Id="Serilog.Formatting.Compact.dll_comp" />
 				<ComponentRef Id="Serilog.Sinks.File.dll_comp" />
+				<ComponentRef Id="netstandard.dll_comp" />
 				<ComponentRef Id="DailyArenaDeckAdvisorLauncher.exe_comp" />
 				<ComponentRef Id="DailyArenaDeckAdvisorUpdater.exe_comp" />
 				<ComponentRef Id="DailyArenaDeckAdvisor.exe.config_comp" />
+				<ComponentRef Id="DailyArena.DeckAdvisor.Common.dll_comp" />
 				<ComponentRef Id="DailyArena.Common.dll_comp" />
+				<ComponentRef Id="DailyArena.Common.Core.dll_comp" />
 				<ComponentRef Id="Xceed.Wpf.Toolkit.dll_comp" />
 				<ComponentRef Id="Xceed.Wpf.AvalonDock.dll_comp" />
 				<ComponentRef Id="Xceed.Wpf.AvalonDock.Themes.Aero.dll_comp" />
@@ -323,6 +358,9 @@
 				<ComponentRef Id="ru_DailyArenaDeckAdvisor.resource.dll_comp" />
 				<ComponentRef Id="ru_DailyArenaDeckAdvisorLauncher.resource.dll_comp" />
 				<ComponentRef Id="ru_DailyArenaDeckAdvisorUpdater.resource.dll_comp" />
+				<ComponentRef Id="es_DailyArenaDeckAdvisor.resource.dll_comp" />
+				<ComponentRef Id="es_DailyArenaDeckAdvisorLauncher.resource.dll_comp" />
+				<ComponentRef Id="es_DailyArenaDeckAdvisorUpdater.resource.dll_comp" />
 				
 				<!-- Xceed language resource files -->
 				<ComponentRef Id="de_Xceed.Wpf.AvalonDock.resources.dll_comp" />
