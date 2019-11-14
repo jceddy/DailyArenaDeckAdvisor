@@ -36,7 +36,7 @@ namespace DailyArena.DeckAdvisor
 	/// <summary>
 	/// Interaction logic for MainWindow.xaml
 	/// </summary>
-	public partial class MainWindow : Window
+	public partial class MainWindow : Window, IDeckAdvisorProgram
 	{
 		/// <summary>
 		/// The list of Archetypes pulled down from the server.
@@ -126,9 +126,14 @@ namespace DailyArena.DeckAdvisor
 		};
 
 		/// <summary>
-		/// A reference to the application logger.
+		/// Gets or sets reference to the application logger.
 		/// </summary>
-		ILogger _logger;
+		public ILogger Logger { get; set; }
+
+		/// <summary>
+		/// Gets the application name string to use while logging.
+		/// </summary>
+		public string ApplicationName { get { return "Main Application"; } }
 
 		/// <summary>
 		/// Gets or sets the selected format being viewed.
@@ -191,10 +196,10 @@ namespace DailyArena.DeckAdvisor
 		public MainWindow()
 		{
 			App application = (App)Application.Current;
-			_logger = application.Logger;
-			_logger.Debug("Main Window Constructor Called - {0}", "Main Application");
+			Logger = application.Logger;
+			Logger.Debug("Main Window Constructor Called - {0}", ApplicationName);
 
-			SetCulture();
+			this.InitializeProgram();
 
 			// these have to happen after SetCulture()
 			_formatMappings = new Dictionary<string, Tuple<string, string>>()
@@ -233,12 +238,12 @@ namespace DailyArena.DeckAdvisor
 				{ "architecture", assemblyArchitecture }
 			};
 			string response = WebUtilities.UploadValues("https://clans.dailyarena.net/usage_stats.php", inputs, "POST", true, out List<WebException> exceptions);
-			_logger.Debug("Usage Statistics Response: {response}", response);
+			Logger.Debug("Usage Statistics Response: {response}", response);
 			if(response == null)
 			{
 				foreach(WebException exception in exceptions)
 				{
-					_logger.Error(exception, "Exception from UploadValues in {method}", "SendUsageStats");
+					Logger.Error(exception, "Exception from UploadValues in {method}", "SendUsageStats");
 				}
 			}
 		}
@@ -260,7 +265,7 @@ namespace DailyArena.DeckAdvisor
 		/// <returns>The updated cache timestamp in a sortable string format.</returns>
 		private string LoadStandardBannings()
 		{
-			_logger.Debug("LoadStandardBannings() Called");
+			Logger.Debug("LoadStandardBannings() Called");
 			string cacheTimestamp = "1970-01-01T00:00:00Z";
 
 			if (File.Exists("standard_bannings.json"))
@@ -277,11 +282,11 @@ namespace DailyArena.DeckAdvisor
 				}
 				catch (Exception e)
 				{
-					_logger.Error(e, "Exception in LoadStandardBannings() - need to re-download");
+					Logger.Error(e, "Exception in LoadStandardBannings() - need to re-download");
 				}
 			}
 
-			_logger.Debug("LoadStandardBannings() Finished - cacheTimestamp={0)", cacheTimestamp);
+			Logger.Debug("LoadStandardBannings() Finished - cacheTimestamp={0)", cacheTimestamp);
 			return cacheTimestamp;
 		}
 
@@ -291,7 +296,7 @@ namespace DailyArena.DeckAdvisor
 		/// <param name="lastUpdate">The latest timestamp for the standard lands data that was pulled from the server.</param>
 		public void SaveStandardBannings(string lastUpdate)
 		{
-			_logger.Debug("SaveStandardBannings() Called - lastUpdate={0}", lastUpdate);
+			Logger.Debug("SaveStandardBannings() Called - lastUpdate={0}", lastUpdate);
 			var data = new
 			{
 				LastUpdate = lastUpdate,
@@ -300,7 +305,7 @@ namespace DailyArena.DeckAdvisor
 
 			string json = JsonConvert.SerializeObject(data);
 			File.WriteAllText("standard_bannings.json", json);
-			_logger.Debug("SaveStandardBannings() Finished");
+			Logger.Debug("SaveStandardBannings() Finished");
 		}
 
 		/// <summary>
@@ -308,7 +313,7 @@ namespace DailyArena.DeckAdvisor
 		/// </summary>
 		private void PopulateStandardBannings()
 		{
-			_logger.Debug("PopulateStandardBannings() Called");
+			Logger.Debug("PopulateStandardBannings() Called");
 			string serverUpdateTime = CardDatabase.GetServerTimestamp("StandardBannings");
 			string cacheTimestamp = LoadStandardBannings();
 
@@ -321,7 +326,7 @@ namespace DailyArena.DeckAdvisor
 				{
 					foreach (WebException exception in exceptions)
 					{
-						_logger.Error(exception, "Exception from FetchStringFromUrl in {method}", "PopulateStandardBannings");
+						Logger.Error(exception, "Exception from FetchStringFromUrl in {method}", "PopulateStandardBannings");
 					}
 				}
 				else
@@ -331,7 +336,7 @@ namespace DailyArena.DeckAdvisor
 					SaveStandardBannings(serverUpdateTime);
 				}
 			}
-			_logger.Debug("PopulateStandardBannings() Finished");
+			Logger.Debug("PopulateStandardBannings() Finished");
 		}
 
 		/// <summary>
@@ -340,7 +345,7 @@ namespace DailyArena.DeckAdvisor
 		/// <returns>The updated cache timestamp in a sortable string format.</returns>
 		private string LoadStandardLands()
 		{
-			_logger.Debug("LoadStandardLands() Called");
+			Logger.Debug("LoadStandardLands() Called");
 			string cacheTimestamp = "1970-01-01T00:00:00Z";
 
 			if (File.Exists("lands.json"))
@@ -357,11 +362,11 @@ namespace DailyArena.DeckAdvisor
 				}
 				catch(Exception e)
 				{
-					_logger.Error(e, "Exception in LoadStandardLands() - need to re-download");
+					Logger.Error(e, "Exception in LoadStandardLands() - need to re-download");
 				}
 			}
 
-			_logger.Debug("LoadStandardLands() Finished - cacheTimestamp={0)", cacheTimestamp);
+			Logger.Debug("LoadStandardLands() Finished - cacheTimestamp={0)", cacheTimestamp);
 			return cacheTimestamp;
 		}
 
@@ -371,7 +376,7 @@ namespace DailyArena.DeckAdvisor
 		/// <param name="lastUpdate">The latest timestamp for the standard lands data that was pulled from the server.</param>
 		public void SaveStandardLands(string lastUpdate)
 		{
-			_logger.Debug("SaveStandardLands() Called - lastUpdate={0}", lastUpdate);
+			Logger.Debug("SaveStandardLands() Called - lastUpdate={0}", lastUpdate);
 			var data = new
 			{
 				LastUpdate = lastUpdate,
@@ -380,7 +385,7 @@ namespace DailyArena.DeckAdvisor
 
 			string json = JsonConvert.SerializeObject(data);
 			File.WriteAllText("lands.json", json);
-			_logger.Debug("SaveStandardLands() Finished");
+			Logger.Debug("SaveStandardLands() Finished");
 		}
 
 		/// <summary>
@@ -388,7 +393,7 @@ namespace DailyArena.DeckAdvisor
 		/// </summary>
 		private void PopulateColorsByLand()
 		{
-			_logger.Debug("PopulateColorsByLand() Called");
+			Logger.Debug("PopulateColorsByLand() Called");
 			string serverUpdateTime = CardDatabase.GetServerTimestamp("StandardLands");
 			string cacheTimestamp = LoadStandardLands();
 
@@ -401,7 +406,7 @@ namespace DailyArena.DeckAdvisor
 				{
 					foreach (WebException exception in exceptions)
 					{
-						_logger.Error(exception, "Exception from FetchStringFromUrl in {method}", "PopulateColorsByLand");
+						Logger.Error(exception, "Exception from FetchStringFromUrl in {method}", "PopulateColorsByLand");
 					}
 				}
 				else
@@ -419,7 +424,7 @@ namespace DailyArena.DeckAdvisor
 					SaveStandardLands(serverUpdateTime);
 				}
 			}
-			_logger.Debug("PopulateColorsByLand() Finished");
+			Logger.Debug("PopulateColorsByLand() Finished");
 		}
 
 		/// <summary>
@@ -428,7 +433,7 @@ namespace DailyArena.DeckAdvisor
 		/// <returns>The updated cache timestamp in a sortable string format.</returns>
 		private string LoadSetTranslations()
 		{
-			_logger.Debug("LoadSetTranslations() Called");
+			Logger.Debug("LoadSetTranslations() Called");
 			string cacheTimestamp = "1970-01-01T00:00:00Z";
 
 			if (File.Exists("set_name_translations.json"))
@@ -445,11 +450,11 @@ namespace DailyArena.DeckAdvisor
 				}
 				catch (Exception e)
 				{
-					_logger.Error(e, "Exception in LoadSetTranslations() - need to re-download");
+					Logger.Error(e, "Exception in LoadSetTranslations() - need to re-download");
 				}
 			}
 
-			_logger.Debug("LoadSetTranslations() Finished - cacheTimestamp={0)", cacheTimestamp);
+			Logger.Debug("LoadSetTranslations() Finished - cacheTimestamp={0)", cacheTimestamp);
 			return cacheTimestamp;
 		}
 
@@ -459,7 +464,7 @@ namespace DailyArena.DeckAdvisor
 		/// <param name="lastUpdate">The latest timestamp for the set name translation file that was pulled from the server.</param>
 		public void SaveSetTranslations(string lastUpdate)
 		{
-			_logger.Debug("SaveSetTranslations() Called - lastUpdate={0}", lastUpdate);
+			Logger.Debug("SaveSetTranslations() Called - lastUpdate={0}", lastUpdate);
 			var data = new
 			{
 				LastUpdate = lastUpdate,
@@ -468,7 +473,7 @@ namespace DailyArena.DeckAdvisor
 
 			string json = JsonConvert.SerializeObject(data);
 			File.WriteAllText("set_name_translations.json", json);
-			_logger.Debug("SaveSetTranslations() Finished");
+			Logger.Debug("SaveSetTranslations() Finished");
 		}
 
 		/// <summary>
@@ -476,7 +481,7 @@ namespace DailyArena.DeckAdvisor
 		/// </summary>
 		private void PopulateSetTranslations()
 		{
-			_logger.Debug("PopulateSetTranslations() Called");
+			Logger.Debug("PopulateSetTranslations() Called");
 			string serverUpdateTime = CardDatabase.GetServerTimestamp("SetTranslations");
 			string cacheTimestamp = LoadSetTranslations();
 
@@ -489,7 +494,7 @@ namespace DailyArena.DeckAdvisor
 				{
 					foreach (WebException exception in exceptions)
 					{
-						_logger.Error(exception, "Exception from FetchStringFromUrl in {method}", "PopulateSetTranslations");
+						Logger.Error(exception, "Exception from FetchStringFromUrl in {method}", "PopulateSetTranslations");
 					}
 				}
 				else
@@ -500,7 +505,7 @@ namespace DailyArena.DeckAdvisor
 					SaveSetTranslations(serverUpdateTime);
 				}
 			}
-			_logger.Debug("PopulateSetTranslations() Finished");
+			Logger.Debug("PopulateSetTranslations() Finished");
 		}
 
 		/// <summary>
@@ -513,7 +518,7 @@ namespace DailyArena.DeckAdvisor
 		/// </summary>
 		private void ReloadAndCrunchAllData()
 		{
-			_logger.Debug("ReloadAndCrunchAllData() Called");
+			Logger.Debug("ReloadAndCrunchAllData() Called");
 
 			App application = (App)Application.Current;
 			DeckFilters filters = application.State.Filters;
@@ -554,12 +559,12 @@ namespace DailyArena.DeckAdvisor
 
 			LoadingValue.Value = 100;
 
-			_logger.Debug("Card Database Loaded with {0} Cards", cardsById.Count);
+			Logger.Debug("Card Database Loaded with {0} Cards", cardsById.Count);
 
 			LoadingText.Value = Properties.Resources.Loading_LoadingDeckArchetypes;
 			LoadingValue.Value = 0;
 
-			_logger.Debug("Loading Archetype Data");
+			Logger.Debug("Loading Archetype Data");
 
 			LoadingValue.Value = 25;
 
@@ -569,7 +574,7 @@ namespace DailyArena.DeckAdvisor
 			bool loadDecksFromServer = true;
 			if(File.Exists($"{mappedFormat.Item1}_decks.json"))
 			{
-				_logger.Debug("Cached decks file exists ({mappedFormat}_decks.json)", mappedFormat.Item1);
+				Logger.Debug("Cached decks file exists ({mappedFormat}_decks.json)", mappedFormat.Item1);
 				string content = File.ReadAllText($"{mappedFormat.Item1}_decks.json");
 				using (StringReader contentStringReader = new StringReader(content))
 				using (JsonTextReader contentJsonReader = new JsonTextReader(contentStringReader) { DateParseHandling = DateParseHandling.None })
@@ -579,7 +584,7 @@ namespace DailyArena.DeckAdvisor
 					if (!(serverTimestamp == null || string.Compare(serverTimestamp, decksTimestamp) > 0))
 					{
 						// use cached decks
-						_logger.Debug("Cached decks file is up to date, use cached deck data (skip server download)");
+						Logger.Debug("Cached decks file is up to date, use cached deck data (skip server download)");
 						decksJson = json["Decks"];
 						loadDecksFromServer = false;
 					}
@@ -587,7 +592,7 @@ namespace DailyArena.DeckAdvisor
 			}
 			if (loadDecksFromServer)
 			{
-				_logger.Debug("Loading deck data from server");
+				Logger.Debug("Loading deck data from server");
 
 				var archetypesUrl = $"https://clans.dailyarena.net/{mappedFormat.Item1}_decks.json?_c={Guid.NewGuid()}";
 				var result = WebUtilities.FetchStringFromUrl(archetypesUrl, decksJson != null, out List<WebException> exceptions);
@@ -596,7 +601,7 @@ namespace DailyArena.DeckAdvisor
 				{
 					foreach (WebException exception in exceptions)
 					{
-						_logger.Error(exception, "Exception from FetchStringFromUrl in {method}", "ReloadAndCrunchAllData");
+						Logger.Error(exception, "Exception from FetchStringFromUrl in {method}", "ReloadAndCrunchAllData");
 					}
 				}
 				else
@@ -605,7 +610,7 @@ namespace DailyArena.DeckAdvisor
 					using (JsonTextReader resultJsonReader = new JsonTextReader(resultStringReader) { DateParseHandling = DateParseHandling.None })
 					{
 						decksJson = JToken.ReadFrom(resultJsonReader);
-						_logger.Debug("Writing file {mappedFormat}_decks.json", mappedFormat.Item1);
+						Logger.Debug("Writing file {mappedFormat}_decks.json", mappedFormat.Item1);
 						File.WriteAllText($"{mappedFormat.Item1}_decks.json", JsonConvert.SerializeObject(
 							new
 							{
@@ -619,36 +624,36 @@ namespace DailyArena.DeckAdvisor
 
 			LoadingValue.Value = 50;
 
-			_logger.Debug("Parsing decksJson");
+			Logger.Debug("Parsing decksJson");
 			foreach (dynamic archetype in decksJson)
 			{
 				bool badDeckDefinition = false;
 				string name = archetype["deck_name"];
-				_logger.Debug("Deck Name: {name}", name);
+				Logger.Debug("Deck Name: {name}", name);
 				Dictionary<string, int> commandZone = new Dictionary<string, int>();
 				Dictionary<string, int> mainDeck = new Dictionary<string, int>();
 				Dictionary<string, int> sideboard = new Dictionary<string, int>();
 				if(RotationProof.Value)
 				{
 					// check whether there are any cards in the deck that aren't rotation-proof...if so, ignore this deck
-					_logger.Debug(@"Doing ""rotation-proof"" check...");
+					Logger.Debug(@"Doing ""rotation-proof"" check...");
 					bool ignoreDeck = false;
 					foreach (dynamic card in archetype["deck_list"])
 					{
 						string cardName = (string)card["name"];
-						_logger.Debug("Checking main deck card: {cardName}", cardName);
+						Logger.Debug("Checking main deck card: {cardName}", cardName);
 
 						try
 						{
 							if (cardsByName[cardName].Count(x => x.Set.RotationSafe) == 0)
 							{
-								_logger.Debug("{cardName} is rotating soon, ignore this deck", cardName);
+								Logger.Debug("{cardName} is rotating soon, ignore this deck", cardName);
 								ignoreDeck = true;
 								break;
 							}
 							if (Format != Properties.Resources.Item_Historic_Bo1 && Format != Properties.Resources.Item_Historic_Bo3 && _standardBannings.Contains(cardName))
 							{
-								_logger.Debug("{cardName} is banned in standard, ignore this deck", cardName);
+								Logger.Debug("{cardName} is banned in standard, ignore this deck", cardName);
 								ignoreDeck = true;
 								break;
 							}
@@ -660,13 +665,13 @@ namespace DailyArena.DeckAdvisor
 							cardName = Regex.Split(cardName, " <")[0].Trim();
 							if (cardsByName[cardName].Count(x => x.Set.RotationSafe) == 0)
 							{
-								_logger.Debug("{cardName} is rotating soon, ignore this deck", cardName);
+								Logger.Debug("{cardName} is rotating soon, ignore this deck", cardName);
 								ignoreDeck = true;
 								break;
 							}
 							if (Format != Properties.Resources.Item_Historic_Bo1 && Format != Properties.Resources.Item_Historic_Bo3 && _standardBannings.Contains(cardName))
 							{
-								_logger.Debug("{cardName} is banned in standard, ignore this deck", cardName);
+								Logger.Debug("{cardName} is banned in standard, ignore this deck", cardName);
 								ignoreDeck = true;
 								break;
 							}
@@ -679,17 +684,17 @@ namespace DailyArena.DeckAdvisor
 						{
 							string cardName = (string)card["name"];
 
-							_logger.Debug("Checking sideboard card: {cardName}", cardName);
+							Logger.Debug("Checking sideboard card: {cardName}", cardName);
 
 							if (cardsByName[cardName].Count(x => x.Set.RotationSafe) == 0)
 							{
-								_logger.Debug("{cardName} is rotating soon, ignore this deck", cardName);
+								Logger.Debug("{cardName} is rotating soon, ignore this deck", cardName);
 								ignoreDeck = true;
 								break;
 							}
 							if (Format != Properties.Resources.Item_Historic_Bo1 && Format != Properties.Resources.Item_Historic_Bo3 && _standardBannings.Contains(cardName))
 							{
-								_logger.Debug("{cardName} is banned in standard, ignore this deck", cardName);
+								Logger.Debug("{cardName} is banned in standard, ignore this deck", cardName);
 								ignoreDeck = true;
 								break;
 							}
@@ -704,24 +709,24 @@ namespace DailyArena.DeckAdvisor
 				else if (Format != Properties.Resources.Item_Historic_Bo1 && Format != Properties.Resources.Item_Historic_Bo3)
 				{
 					// check whether there are any cards in the deck that aren't in standard...if so, ignore this deck
-					_logger.Debug(@"Doing Standard legality check...");
+					Logger.Debug(@"Doing Standard legality check...");
 					bool ignoreDeck = false;
 					foreach (dynamic card in archetype["deck_list"])
 					{
 						string cardName = (string)card["name"];
-						_logger.Debug("Checking main deck card: {cardName}", cardName);
+						Logger.Debug("Checking main deck card: {cardName}", cardName);
 
 						try
 						{
 							if (_standardBannings.Contains(cardName))
 							{
-								_logger.Debug("{cardName} is banned in standard, ignore this deck", cardName);
+								Logger.Debug("{cardName} is banned in standard, ignore this deck", cardName);
 								ignoreDeck = true;
 								break;
 							}
 							else if (cardsByName[cardName].Count(x => x.Set.StandardLegal) == 0)
 							{
-								_logger.Debug("{cardName} is not standard legal, ignore this deck", cardName);
+								Logger.Debug("{cardName} is not standard legal, ignore this deck", cardName);
 								ignoreDeck = true;
 								break;
 							}
@@ -733,13 +738,13 @@ namespace DailyArena.DeckAdvisor
 							cardName = Regex.Split(cardName, " <")[0].Trim();
 							if (_standardBannings.Contains(cardName))
 							{
-								_logger.Debug("{cardName} is banned in standard, ignore this deck", cardName);
+								Logger.Debug("{cardName} is banned in standard, ignore this deck", cardName);
 								ignoreDeck = true;
 								break;
 							}
 							else if (cardsByName[cardName].Count(x => x.Set.StandardLegal) == 0)
 							{
-								_logger.Debug("{cardName} is not standard legal, ignore this deck", cardName);
+								Logger.Debug("{cardName} is not standard legal, ignore this deck", cardName);
 								ignoreDeck = true;
 								break;
 							}
@@ -752,17 +757,17 @@ namespace DailyArena.DeckAdvisor
 						{
 							string cardName = (string)card["name"];
 
-							_logger.Debug("Checking sideboard card: {cardName}", cardName);
+							Logger.Debug("Checking sideboard card: {cardName}", cardName);
 
 							if(_standardBannings.Contains(cardName))
 							{
-								_logger.Debug("{cardName} is banned in standard, ignore this deck", cardName);
+								Logger.Debug("{cardName} is banned in standard, ignore this deck", cardName);
 								ignoreDeck = true;
 								break;
 							}
 							else if (cardsByName[cardName].Count(x => x.Set.StandardLegal) == 0)
 							{
-								_logger.Debug("{cardName} is not standard legal, ignore this deck", cardName);
+								Logger.Debug("{cardName} is not standard legal, ignore this deck", cardName);
 								ignoreDeck = true;
 								break;
 							}
@@ -780,7 +785,7 @@ namespace DailyArena.DeckAdvisor
 					string cardName = ((string)card["name"]).Trim();
 					int cardQuantity = (int)card["quantity"];
 
-					_logger.Debug("Processing main deck card: {cardName}, {cardQuantity}", cardName, cardQuantity);
+					Logger.Debug("Processing main deck card: {cardName}, {cardQuantity}", cardName, cardQuantity);
 					try
 					{
 						foreach (Card archetypeCard in cardsByName[cardName])
@@ -795,7 +800,7 @@ namespace DailyArena.DeckAdvisor
 					}
 					catch (KeyNotFoundException e)
 					{
-						_logger.Error(e, "Card name not found in cardsByName: {cardName}", cardName);
+						Logger.Error(e, "Card name not found in cardsByName: {cardName}", cardName);
 						if (cardName.Contains("//"))
 						{
 							cardName = Regex.Split(cardName, " // ")[0].Trim();
@@ -815,7 +820,7 @@ namespace DailyArena.DeckAdvisor
 					// entry twice...we'll just ignore those decks here
 					if (mainDeck.ContainsKey(cardName))
 					{
-						_logger.Debug("Bad deck, definition, skipping");
+						Logger.Debug("Bad deck, definition, skipping");
 						badDeckDefinition = true;
 						break;
 					}
@@ -830,7 +835,7 @@ namespace DailyArena.DeckAdvisor
 					string cardName = (string)card["name"];
 					int cardQuantity = (int)card["quantity"];
 
-					_logger.Debug("Processing sideboard card: {cardName}, {cardQuantity}", cardName, cardQuantity);
+					Logger.Debug("Processing sideboard card: {cardName}, {cardQuantity}", cardName, cardQuantity);
 					foreach (Card archetypeCard in cardsByName[cardName])
 					{
 						CardStats stats = _cardStats[archetypeCard];
@@ -856,7 +861,7 @@ namespace DailyArena.DeckAdvisor
 						string cardName = (string)card["name"];
 						int cardQuantity = (int)card["quantity"];
 
-						_logger.Debug("Processing commandZone card: {cardName}, {cardQuantity}", cardName, cardQuantity);
+						Logger.Debug("Processing commandZone card: {cardName}, {cardQuantity}", cardName, cardQuantity);
 						foreach (Card archetypeCard in cardsByName[cardName])
 						{
 							CardStats stats = _cardStats[archetypeCard];
@@ -891,7 +896,7 @@ namespace DailyArena.DeckAdvisor
 				List<Archetype> similarDecks = new List<Archetype>();
 				if(archetype["similar_decks"] != null)
 				{
-					_logger.Debug("Alternate deck configuration found, processing...");
+					Logger.Debug("Alternate deck configuration found, processing...");
 					foreach (dynamic similarDeck in archetype["similar_decks"])
 					{
 						Dictionary<string, int> similarMainDeck = new Dictionary<string, int>();
@@ -902,7 +907,7 @@ namespace DailyArena.DeckAdvisor
 						{
 							string cardName = (string)card["name"];
 							int cardQuantity = (int)card["quantity"];
-							_logger.Debug("Processing alternate main deck card: {cardName}, {cardQuantity}", cardName, cardQuantity);
+							Logger.Debug("Processing alternate main deck card: {cardName}, {cardQuantity}", cardName, cardQuantity);
 
 							foreach (Card archetypeCard in cardsByName[cardName])
 							{
@@ -920,7 +925,7 @@ namespace DailyArena.DeckAdvisor
 						{
 							string cardName = (string)card["name"];
 							int cardQuantity = (int)card["quantity"];
-							_logger.Debug("Processing alternate sideboard card: {cardName}, {cardQuantity}", cardName, cardQuantity);
+							Logger.Debug("Processing alternate sideboard card: {cardName}, {cardQuantity}", cardName, cardQuantity);
 
 							foreach (Card archetypeCard in cardsByName[cardName])
 							{
@@ -947,7 +952,7 @@ namespace DailyArena.DeckAdvisor
 							{
 								string cardName = (string)card["name"];
 								int cardQuantity = (int)card["quantity"];
-								_logger.Debug("Processing alternate commandZone card: {cardName}, {cardQuantity}", cardName, cardQuantity);
+								Logger.Debug("Processing alternate commandZone card: {cardName}, {cardQuantity}", cardName, cardQuantity);
 
 								foreach (Card archetypeCard in cardsByName[cardName])
 								{
@@ -984,7 +989,7 @@ namespace DailyArena.DeckAdvisor
 
 			LoadingValue.Value = 75;
 
-			_logger.Debug("Initializing Card Stats Objects");
+			Logger.Debug("Initializing Card Stats Objects");
 			foreach (Card card in cardsById.Values)
 			{
 				CardStats stats = _cardStats[card];
@@ -994,12 +999,12 @@ namespace DailyArena.DeckAdvisor
 
 			LoadingValue.Value = 100;
 
-			_logger.Debug("{0} Deck Archetypes Loaded", _archetypes.Count);
+			Logger.Debug("{0} Deck Archetypes Loaded", _archetypes.Count);
 
 			LoadingText.Value = Properties.Resources.Loading_ProcessingCollectionFromLog;
 			LoadingValue.Value = 0;
 
-			_logger.Debug("Processing Player Collection");
+			Logger.Debug("Processing Player Collection");
 
 			var logFolder = GetLogFolderLocation();
 			bool playerInventoryFound = false;
@@ -1211,16 +1216,16 @@ namespace DailyArena.DeckAdvisor
 										if (RotationProof.Value)
 										{
 											// check whether there are any cards in the deck that aren't rotation-proof...if so, ignore this deck
-											_logger.Debug(@"Doing ""rotation-proof"" check...");
+											Logger.Debug(@"Doing ""rotation-proof"" check...");
 											bool ignoreDeck = false;
 											foreach (var card in mainDeckByName)
 											{
 												string cardName = card.Key;
-												_logger.Debug("Checking main deck card: {cardName}", cardName);
+												Logger.Debug("Checking main deck card: {cardName}", cardName);
 
 												if (cardsByName[cardName].Count(x => x.Set.RotationSafe) == 0)
 												{
-													_logger.Debug("{cardName} is rotating soon, ignore this deck", cardName);
+													Logger.Debug("{cardName} is rotating soon, ignore this deck", cardName);
 													ignoreDeck = true;
 													break;
 												}
@@ -1232,11 +1237,11 @@ namespace DailyArena.DeckAdvisor
 												{
 													string cardName = card.Key;
 
-													_logger.Debug("Checking sideboard card: {cardName}", cardName);
+													Logger.Debug("Checking sideboard card: {cardName}", cardName);
 
 													if (cardsByName[cardName].Count(x => x.Set.RotationSafe) == 0)
 													{
-														_logger.Debug("{cardName} is rotating soon, ignore this deck", cardName);
+														Logger.Debug("{cardName} is rotating soon, ignore this deck", cardName);
 														ignoreDeck = true;
 														break;
 													}
@@ -1249,11 +1254,11 @@ namespace DailyArena.DeckAdvisor
 												{
 													string cardName = card.Key;
 
-													_logger.Debug("Checking command zone card: {cardName}", cardName);
+													Logger.Debug("Checking command zone card: {cardName}", cardName);
 
 													if (cardsByName[cardName].Count(x => x.Set.RotationSafe) == 0)
 													{
-														_logger.Debug("{cardName} is rotating soon, ignore this deck", cardName);
+														Logger.Debug("{cardName} is rotating soon, ignore this deck", cardName);
 														ignoreDeck = true;
 														break;
 													}
@@ -1268,16 +1273,16 @@ namespace DailyArena.DeckAdvisor
 										else if (Format != Properties.Resources.Item_Historic_Bo1 && Format != Properties.Resources.Item_Historic_Bo3)
 										{
 											// check whether there are any cards in the deck that aren't in standard...if so, ignore this deck
-											_logger.Debug(@"Doing Standard legality check...");
+											Logger.Debug(@"Doing Standard legality check...");
 											bool ignoreDeck = false;
 											foreach (var card in mainDeckByName)
 											{
 												string cardName = card.Key;
-												_logger.Debug("Checking main deck card: {cardName}", cardName);
+												Logger.Debug("Checking main deck card: {cardName}", cardName);
 
 												if (cardsByName[cardName].Count(x => x.Set.StandardLegal) == 0)
 												{
-													_logger.Debug("{cardName} is not standard legal, ignore this deck", cardName);
+													Logger.Debug("{cardName} is not standard legal, ignore this deck", cardName);
 													ignoreDeck = true;
 													break;
 												}
@@ -1289,11 +1294,11 @@ namespace DailyArena.DeckAdvisor
 												{
 													string cardName = card.Key;
 
-													_logger.Debug("Checking sideboard card: {cardName}", cardName);
+													Logger.Debug("Checking sideboard card: {cardName}", cardName);
 
 													if (cardsByName[cardName].Count(x => x.Set.StandardLegal) == 0)
 													{
-														_logger.Debug("{cardName} is not standard legal, ignore this deck", cardName);
+														Logger.Debug("{cardName} is not standard legal, ignore this deck", cardName);
 														ignoreDeck = true;
 														break;
 													}
@@ -1306,11 +1311,11 @@ namespace DailyArena.DeckAdvisor
 												{
 													string cardName = card.Key;
 
-													_logger.Debug("Checking command zone card: {cardName}", cardName);
+													Logger.Debug("Checking command zone card: {cardName}", cardName);
 
 													if (cardsByName[cardName].Count(x => x.Set.StandardLegal) == 0)
 													{
-														_logger.Debug("{cardName} is not standard legal, ignore this deck", cardName);
+														Logger.Debug("{cardName} is not standard legal, ignore this deck", cardName);
 														ignoreDeck = true;
 														break;
 													}
@@ -1421,16 +1426,16 @@ namespace DailyArena.DeckAdvisor
 								if (RotationProof.Value)
 								{
 									// check whether there are any cards in the deck that aren't rotation-proof...if so, ignore this deck
-									_logger.Debug(@"Doing ""rotation-proof"" check...");
+									Logger.Debug(@"Doing ""rotation-proof"" check...");
 									bool ignoreDeck = false;
 									foreach (var card in mainDeckByName)
 									{
 										string cardName = card.Key;
-										_logger.Debug("Checking main deck card: {cardName}", cardName);
+										Logger.Debug("Checking main deck card: {cardName}", cardName);
 
 										if (cardsByName[cardName].Count(x => x.Set.RotationSafe) == 0)
 										{
-											_logger.Debug("{cardName} is rotating soon, ignore this deck", cardName);
+											Logger.Debug("{cardName} is rotating soon, ignore this deck", cardName);
 											ignoreDeck = true;
 											break;
 										}
@@ -1442,11 +1447,11 @@ namespace DailyArena.DeckAdvisor
 										{
 											string cardName = card.Key;
 
-											_logger.Debug("Checking sideboard card: {cardName}", cardName);
+											Logger.Debug("Checking sideboard card: {cardName}", cardName);
 
 											if (cardsByName[cardName].Count(x => x.Set.RotationSafe) == 0)
 											{
-												_logger.Debug("{cardName} is rotating soon, ignore this deck", cardName);
+												Logger.Debug("{cardName} is rotating soon, ignore this deck", cardName);
 												ignoreDeck = true;
 												break;
 											}
@@ -1459,11 +1464,11 @@ namespace DailyArena.DeckAdvisor
 										{
 											string cardName = card.Key;
 
-											_logger.Debug("Checking command zone card: {cardName}", cardName);
+											Logger.Debug("Checking command zone card: {cardName}", cardName);
 
 											if (cardsByName[cardName].Count(x => x.Set.RotationSafe) == 0)
 											{
-												_logger.Debug("{cardName} is rotating soon, ignore this deck", cardName);
+												Logger.Debug("{cardName} is rotating soon, ignore this deck", cardName);
 												ignoreDeck = true;
 												break;
 											}
@@ -1478,16 +1483,16 @@ namespace DailyArena.DeckAdvisor
 								else if (Format != Properties.Resources.Item_Historic_Bo1 && Format != Properties.Resources.Item_Historic_Bo3)
 								{
 									// check whether there are any cards in the deck that aren't in standard...if so, ignore this deck
-									_logger.Debug(@"Doing Standard legality check...");
+									Logger.Debug(@"Doing Standard legality check...");
 									bool ignoreDeck = false;
 									foreach (var card in mainDeckByName)
 									{
 										string cardName = card.Key;
-										_logger.Debug("Checking main deck card: {cardName}", cardName);
+										Logger.Debug("Checking main deck card: {cardName}", cardName);
 
 										if (cardsByName[cardName].Count(x => x.Set.StandardLegal) == 0)
 										{
-											_logger.Debug("{cardName} is not standard legal, ignore this deck", cardName);
+											Logger.Debug("{cardName} is not standard legal, ignore this deck", cardName);
 											ignoreDeck = true;
 											break;
 										}
@@ -1499,11 +1504,11 @@ namespace DailyArena.DeckAdvisor
 										{
 											string cardName = card.Key;
 
-											_logger.Debug("Checking sideboard card: {cardName}", cardName);
+											Logger.Debug("Checking sideboard card: {cardName}", cardName);
 
 											if (cardsByName[cardName].Count(x => x.Set.StandardLegal) == 0)
 											{
-												_logger.Debug("{cardName} is not standard legal, ignore this deck", cardName);
+												Logger.Debug("{cardName} is not standard legal, ignore this deck", cardName);
 												ignoreDeck = true;
 												break;
 											}
@@ -1516,11 +1521,11 @@ namespace DailyArena.DeckAdvisor
 										{
 											string cardName = card.Key;
 
-											_logger.Debug("Checking command zone card: {cardName}", cardName);
+											Logger.Debug("Checking command zone card: {cardName}", cardName);
 
 											if (cardsByName[cardName].Count(x => x.Set.StandardLegal) == 0)
 											{
-												_logger.Debug("{cardName} is not standard legal, ignore this deck", cardName);
+												Logger.Debug("{cardName} is not standard legal, ignore this deck", cardName);
 												ignoreDeck = true;
 												break;
 											}
@@ -1571,7 +1576,7 @@ namespace DailyArena.DeckAdvisor
 
 			if(!(playerInventoryFound && playerCardsFound))
 			{
-				_logger.Debug("Player Inventory or Cards not found in MTGA log, show an information screen [{playerInventoryFound}, {playerCardsFound}]", playerInventoryFound, playerCardsFound);
+				Logger.Debug("Player Inventory or Cards not found in MTGA log, show an information screen [{playerInventoryFound}, {playerCardsFound}]", playerInventoryFound, playerCardsFound);
 				Dispatcher.Invoke(() =>
 				{
 					LoadingScreen.Visibility = Visibility.Collapsed;
@@ -1584,16 +1589,16 @@ namespace DailyArena.DeckAdvisor
 
 			LoadingValue.Value = 100;
 
-			_logger.Debug("Player Collection Loaded with {0} Cards", _playerInventory.Count);
+			Logger.Debug("Player Collection Loaded with {0} Cards", _playerInventory.Count);
 
 			LoadingText.Value = Properties.Resources.Loading_ComputingDeckSuggestions;
 			LoadingValue.Value = 0;
 
-			_logger.Debug("Computing Suggestions");
+			Logger.Debug("Computing Suggestions");
 
 			foreach (Archetype archetype in _archetypes)
 			{
-				_logger.Debug("Processing Archetype {0}", archetype.Name);
+				Logger.Debug("Processing Archetype {0}", archetype.Name);
 				Dictionary<string, int> haveCards = new Dictionary<string, int>();
 				Dictionary<int, int> mainDeckCards = new Dictionary<int, int>();
 				Dictionary<int, int> sideboardCards = new Dictionary<int, int>();
@@ -1607,7 +1612,7 @@ namespace DailyArena.DeckAdvisor
 
 				Dictionary<int, int> playerInventory = new Dictionary<int, int>(_playerInventory.Select(x => new { Id = x.Key, Count = x.Value }).ToDictionary(x => x.Id, y => y.Count));
 
-				_logger.Debug("Comparing deck list to inventory to determine which cards are still needed");
+				Logger.Debug("Comparing deck list to inventory to determine which cards are still needed");
 				foreach (var neededCard in cardsNeededForArchetype)
 				{
 					int neededForMain = archetype.MainDeck.ContainsKey(neededCard.Name) ? archetype.MainDeck[neededCard.Name] : 0;
@@ -1750,11 +1755,11 @@ namespace DailyArena.DeckAdvisor
 					}
 				}
 
-				_logger.Debug("Generating replacement suggestions for missing cards");
+				Logger.Debug("Generating replacement suggestions for missing cards");
 				List<Tuple<int, int, int>> suggestedReplacements = GenerateReplacements(archetype, mainDeckToCollect, sideboardToCollect, commandZoneToCollect, playerInventory,
 					cardsByName, cardsById);
 
-				_logger.Debug("Updating Archetype objects with suggestions");
+				Logger.Debug("Updating Archetype objects with suggestions");
 				archetype.SuggestedMainDeck = new ReadOnlyDictionary<int, int>(mainDeckCards);
 				archetype.SuggestedSideboard = new ReadOnlyDictionary<int, int>(sideboardCards);
 				archetype.SuggestedCommandZone = new ReadOnlyDictionary<int, int>(commandZoneCards);
@@ -1763,12 +1768,12 @@ namespace DailyArena.DeckAdvisor
 				archetype.CommandZoneToCollect = new ReadOnlyDictionary<int, int>(commandZoneToCollect);
 				archetype.SuggestedReplacements = suggestedReplacements.AsReadOnly();
 
-				_logger.Debug("Processing Alternate Deck Configurations");
+				Logger.Debug("Processing Alternate Deck Configurations");
 				if(archetype.SimilarDecks != null && archetype.SimilarDecks.Count > 0)
 				{
 					foreach(Archetype similarArchetype in archetype.SimilarDecks)
 					{
-						_logger.Debug("Processing Similar Archetype {0}", similarArchetype.Name);
+						Logger.Debug("Processing Similar Archetype {0}", similarArchetype.Name);
 						haveCards = new Dictionary<string, int>();
 						mainDeckCards = new Dictionary<int, int>();
 						sideboardCards = new Dictionary<int, int>();
@@ -1782,7 +1787,7 @@ namespace DailyArena.DeckAdvisor
 
 						playerInventory = new Dictionary<int, int>(_playerInventory.Select(x => new { Id = x.Key, Count = x.Value }).ToDictionary(x => x.Id, y => y.Count));
 
-						_logger.Debug("Comparing deck list to inventory to determine which cards are still needed");
+						Logger.Debug("Comparing deck list to inventory to determine which cards are still needed");
 						foreach (var neededCard in cardsNeededForArchetype)
 						{
 							int neededForMain = similarArchetype.MainDeck.ContainsKey(neededCard.Name) ? similarArchetype.MainDeck[neededCard.Name] : 0;
@@ -1925,11 +1930,11 @@ namespace DailyArena.DeckAdvisor
 							}
 						}
 
-						_logger.Debug("Generating replacement suggestions for missing cards");
+						Logger.Debug("Generating replacement suggestions for missing cards");
 						suggestedReplacements = GenerateReplacements(similarArchetype, mainDeckToCollect, sideboardToCollect, commandZoneToCollect, playerInventory, cardsByName,
 							cardsById);
 
-						_logger.Debug("Updating Archetype objects with suggestions");
+						Logger.Debug("Updating Archetype objects with suggestions");
 						similarArchetype.SuggestedMainDeck = new ReadOnlyDictionary<int, int>(mainDeckCards);
 						similarArchetype.SuggestedSideboard = new ReadOnlyDictionary<int, int>(sideboardCards);
 						similarArchetype.SuggestedCommandZone = new ReadOnlyDictionary<int, int>(commandZoneCards);
@@ -1945,10 +1950,10 @@ namespace DailyArena.DeckAdvisor
 
 			LoadingValue.Value = 50;
 
-			_logger.Debug("Handling player inventory decks");
+			Logger.Debug("Handling player inventory decks");
 			foreach (Archetype playerDeck in _playerDecks.Values)
 			{
-				_logger.Debug("Processing Player Deck {0}", playerDeck.Name);
+				Logger.Debug("Processing Player Deck {0}", playerDeck.Name);
 				Dictionary<string, int> haveCards = new Dictionary<string, int>();
 				Dictionary<int, int> mainDeckCards = new Dictionary<int, int>();
 				Dictionary<int, int> sideboardCards = new Dictionary<int, int>();
@@ -1962,7 +1967,7 @@ namespace DailyArena.DeckAdvisor
 
 				Dictionary<int, int> playerInventory = new Dictionary<int, int>(_playerInventory.Select(x => new { Id = x.Key, Count = x.Value }).ToDictionary(x => x.Id, y => y.Count));
 
-				_logger.Debug("Comparing deck list to inventory to determine which cards are still needed");
+				Logger.Debug("Comparing deck list to inventory to determine which cards are still needed");
 				foreach (var neededCard in cardsNeededForArchetype)
 				{
 					int neededForMain = playerDeck.MainDeck.ContainsKey(neededCard.Name) ? playerDeck.MainDeck[neededCard.Name] : 0;
@@ -2105,11 +2110,11 @@ namespace DailyArena.DeckAdvisor
 					}
 				}
 
-				_logger.Debug("Generating replacement suggestions for missing cards");
+				Logger.Debug("Generating replacement suggestions for missing cards");
 				List<Tuple<int, int, int>> suggestedReplacements = GenerateReplacements(playerDeck, mainDeckToCollect, sideboardToCollect, commandZoneToCollect, playerInventory,
 					cardsByName, cardsById);
 
-				_logger.Debug("Updating Player Deck objects with suggestions");
+				Logger.Debug("Updating Player Deck objects with suggestions");
 				playerDeck.SuggestedMainDeck = new ReadOnlyDictionary<int, int>(mainDeckCards);
 				playerDeck.SuggestedSideboard = new ReadOnlyDictionary<int, int>(sideboardCards);
 				playerDeck.SuggestedCommandZone = new ReadOnlyDictionary<int, int>(commandZoneCards);
@@ -2127,7 +2132,7 @@ namespace DailyArena.DeckAdvisor
 
 			LoadingValue.Value = 75;
 
-			_logger.Debug("Sorting Archetypes and generating Meta Report");
+			Logger.Debug("Sorting Archetypes and generating Meta Report");
 			FilterArchetypes(filters);
 
 			LoadingValue.Value = 90;
@@ -2135,7 +2140,7 @@ namespace DailyArena.DeckAdvisor
 
 			LoadingValue.Value = 100;
 
-			_logger.Debug("Finished Computing Suggestions, Updating GUI");
+			Logger.Debug("Finished Computing Suggestions, Updating GUI");
 
 			Dispatcher.Invoke(() =>
 			{
@@ -2146,7 +2151,7 @@ namespace DailyArena.DeckAdvisor
 				DeckTabs.SelectedIndex = 0;
 			});
 
-			_logger.Debug("ReloadAndCrunchAllData() Finished");
+			Logger.Debug("ReloadAndCrunchAllData() Finished");
 		}
 
 		/// <summary>
@@ -2156,7 +2161,7 @@ namespace DailyArena.DeckAdvisor
 		/// <param name="sort">Whether to sort the list after applying filters (Defaults to false).</param>
 		private void FilterArchetypes(DeckFilters filters, bool sort = false)
 		{
-			_logger.Debug("FilterArchetypes() Called, sort={sort}", sort);
+			Logger.Debug("FilterArchetypes() Called, sort={sort}", sort);
 			ReadOnlyDictionary<string, List<Card>> cardsByName = Card.CardsByName;
 			ReadOnlyDictionary<int, Card> cardsById = Card.CardsById;
 			_filteredArchetypes = _archetypes;
@@ -2212,7 +2217,7 @@ namespace DailyArena.DeckAdvisor
 		private List<Tuple<int, int, int>> GenerateReplacements(Archetype archetype, Dictionary<int, int> mainDeckToCollect, Dictionary<int, int> sideboardToCollect,
 			Dictionary<int, int> commandZoneToCollect, Dictionary<int, int> playerInventory, IDictionary<string, List<Card>> cardsByName, IDictionary<int, Card> cardsById)
 		{
-			_logger.Debug("GenerateReplacements() Called for Archetype {archetypeName}", archetype.Name);
+			Logger.Debug("GenerateReplacements() Called for Archetype {archetypeName}", archetype.Name);
 
 			List<Tuple<int, int, int>> suggestedReplacements = new List<Tuple<int, int, int>>();
 			CardColors identity = null;
@@ -2224,13 +2229,13 @@ namespace DailyArena.DeckAdvisor
 				Select(x => new { Id = x.Key, Count = x.Sum(y => y.Value) });
 			foreach (var find in replacementsToFind)
 			{
-				_logger.Debug("Generating replacements suggestions for card with Arena Id: {0} (need {1})", find.Id, find.Count);
+				Logger.Debug("Generating replacements suggestions for card with Arena Id: {0} (need {1})", find.Id, find.Count);
 				var cardToReplace = cardsById[find.Id];
 				var replacementsNeeded = find.Count;
 
 				if (cardToReplace.Type.Contains("Land"))
 				{
-					_logger.Debug("Processing Candidates based on Color");
+					Logger.Debug("Processing Candidates based on Color");
 					try
 					{
 						var candidates = playerInventory.Select(x => new { Card = cardsById[x.Key], Quantity = x.Value }).
@@ -2264,7 +2269,7 @@ namespace DailyArena.DeckAdvisor
 
 					if (replacementsNeeded > 0)
 					{
-						_logger.Debug("Insufficient Candidates Found, suggesting basic land replacements");
+						Logger.Debug("Insufficient Candidates Found, suggesting basic land replacements");
 						Random r = new Random();
 						// randomizing colors here so we don't always favor colors in WUBRG order
 						string[] colors = (_colorsByLand[cardToReplace.Name] == null ?
@@ -2293,14 +2298,14 @@ namespace DailyArena.DeckAdvisor
 
 					if (replacementsNeeded > 0)
 					{
-						_logger.Debug("Insufficient Candidates Found, done looking");
+						Logger.Debug("Insufficient Candidates Found, done looking");
 					}
 				}
 				else
 				{
 					bool isCommander = archetype.CommandZone.ContainsKey(cardToReplace.Name);
 
-					_logger.Debug("Processing Candidates based on Type and Cost");
+					Logger.Debug("Processing Candidates based on Type and Cost");
 					var candidates = playerInventory.Select(x => new { Card = cardsById[x.Key], Quantity = x.Value }).
 							Where(x => x.Quantity > 0 && x.Card.Type == cardToReplace.Type && x.Card.Cost == cardToReplace.Cost && (identity == null || (isCommander && identity == x.Card.ColorIdentity && x.Card.Type.Contains("Legendary")) || (!isCommander && identity.Contains(x.Card.ColorIdentity)))).
 							OrderByDescending(x => x.Card.Rank + CardStats.GetAssociationModifier(cardToReplace.Name, x.Card.Name, _cardStats));
@@ -2324,7 +2329,7 @@ namespace DailyArena.DeckAdvisor
 
 					if (replacementsNeeded > 0)
 					{
-						_logger.Debug("Insufficient Candidates Found, Getting Candidates by Cost");
+						Logger.Debug("Insufficient Candidates Found, Getting Candidates by Cost");
 						candidates = playerInventory.Select(x => new { Card = cardsById[x.Key], Quantity = x.Value }).
 							Where(x => x.Quantity > 0 && x.Card.Cost == cardToReplace.Cost && (identity == null || (isCommander && identity == x.Card.ColorIdentity && x.Card.Type.Contains("Legendary")) || (!isCommander && identity.Contains(x.Card.ColorIdentity)))).
 							OrderByDescending(x => x.Card.Rank + CardStats.GetAssociationModifier(cardToReplace.Name, x.Card.Name, _cardStats));
@@ -2349,7 +2354,7 @@ namespace DailyArena.DeckAdvisor
 
 					if (replacementsNeeded > 0)
 					{
-						_logger.Debug("Insufficient Candidates Found, Getting Candidates by Cmc and Color");
+						Logger.Debug("Insufficient Candidates Found, Getting Candidates by Cmc and Color");
 						candidates = playerInventory.Select(x => new { Card = cardsById[x.Key], Quantity = x.Value }).
 							Where(x => x.Quantity > 0 && x.Card.Cmc == cardToReplace.Cmc && x.Card.Colors == cardToReplace.Colors && (identity == null || (isCommander && identity == x.Card.ColorIdentity && x.Card.Type.Contains("Legendary")) || (!isCommander && identity.Contains(x.Card.ColorIdentity)))).
 							OrderByDescending(x => x.Card.Rank + CardStats.GetAssociationModifier(cardToReplace.Name, x.Card.Name, _cardStats));
@@ -2374,7 +2379,7 @@ namespace DailyArena.DeckAdvisor
 
 					if (replacementsNeeded > 0)
 					{
-						_logger.Debug("Insufficient Candidates Found, Getting Candidates, looking for candidates with lower Cmc");
+						Logger.Debug("Insufficient Candidates Found, Getting Candidates, looking for candidates with lower Cmc");
 						int cmcToTest = cardToReplace.Cmc - 1;
 						while (replacementsNeeded > 0 && cmcToTest > 0)
 						{
@@ -2404,7 +2409,7 @@ namespace DailyArena.DeckAdvisor
 
 					if (replacementsNeeded > 0)
 					{
-						_logger.Debug("Insufficient Candidates Found, Getting Candidates, relaxing color requirements and looping through Cmc <= {0}", cardToReplace.Cmc);
+						Logger.Debug("Insufficient Candidates Found, Getting Candidates, relaxing color requirements and looping through Cmc <= {0}", cardToReplace.Cmc);
 						int cmcToTest = cardToReplace.Cmc;
 						while (replacementsNeeded > 0 && cmcToTest > 0)
 						{
@@ -2434,12 +2439,12 @@ namespace DailyArena.DeckAdvisor
 
 					if (replacementsNeeded > 0)
 					{
-						_logger.Debug("Insufficient Candidates Found, done looking");
+						Logger.Debug("Insufficient Candidates Found, done looking");
 					}
 				}
 			}
 
-			_logger.Debug("GenerateReplacements() Finished");
+			Logger.Debug("GenerateReplacements() Finished");
 
 			return suggestedReplacements;
 		}
@@ -2465,7 +2470,7 @@ namespace DailyArena.DeckAdvisor
 		/// <param name="e">Arguments regarding the event that triggered the callback.</param>
 		private void Window_Loaded(object sender, RoutedEventArgs e)
 		{
-			_logger.Debug("Main Window Loaded - {0}", "Main Application");
+			Logger.Debug("Main Window Loaded - {0}", ApplicationName);
 
 			AssemblyName assemblyName = Assembly.GetExecutingAssembly().GetName();
 			string assemblyVersion = assemblyName.Version.ToString();
@@ -2546,7 +2551,7 @@ namespace DailyArena.DeckAdvisor
 			SelectedFontSize.PropertyChanged += SelectedFontSize_PropertyChanged;
 
 			Task loadTask = new Task(() => {
-				_logger.Debug("Initializing Card Database");
+				Logger.Debug("Initializing Card Database");
 				CardDatabase.Initialize(false);
 				LoadingValue.Value = 20;
 
@@ -2565,7 +2570,7 @@ namespace DailyArena.DeckAdvisor
 				{
 					if (t.Exception != null)
 					{
-						_logger.Error(t.Exception, "Exception in {0} ({1} - {2})", "loadTask", "Window_Loaded", "Main Application");
+						Logger.Error(t.Exception, "Exception in {0} ({1} - {2})", "loadTask", "Window_Loaded", ApplicationName);
 
 						ReportException("loadTask", "Window_Loaded", t.Exception);
 					}
@@ -2583,7 +2588,7 @@ namespace DailyArena.DeckAdvisor
 		/// <param name="exception">The exception being reported.</param>
 		private void ReportException(string task, string method, Exception taskException)
 		{
-			_logger.Debug("ReportException Called: task={task}, method={method}", task, method);
+			Logger.Debug("ReportException Called: task={task}, method={method}", task, method);
 
 			ExceptionText.Value = "Unhandled Exception - Sending Data to Server";
 
@@ -2621,11 +2626,11 @@ namespace DailyArena.DeckAdvisor
 				new string[] { "automatic" }, ((App)Application.Current).State.Fingerprint, attachments.ToArray(), out string serverResponse, out Exception exception);
 			if (serverResponse != null)
 			{
-				_logger.Debug("Server Response: {serverResponse}", serverResponse);
+				Logger.Debug("Server Response: {serverResponse}", serverResponse);
 			}
 			if (exception != null)
 			{
-				_logger.Error(exception, "Exception in {0} ({1} - {2})", "CreateNewIssue", method, "Main Application");
+				Logger.Error(exception, "Exception in {0} ({1} - {2})", "CreateNewIssue", method, ApplicationName);
 			}
 
 			if (response == null)
@@ -2653,7 +2658,7 @@ namespace DailyArena.DeckAdvisor
 		/// <param name="e">Arguments regarding the event that triggered the callback.</param>
 		private void Format_PropertyChanged(object sender, PropertyChangedEventArgs e)
 		{
-			_logger.Debug("New Format Selected, Format={0}", Format.Value);
+			Logger.Debug("New Format Selected, Format={0}", Format.Value);
 
 			IDeckAdvisorApp application = (IDeckAdvisorApp)Application.Current;
 			application.State.LastFormat = Format.Value;
@@ -2678,7 +2683,7 @@ namespace DailyArena.DeckAdvisor
 				{
 					if (t.Exception != null)
 					{
-						_logger.Error(t.Exception, "Exception in {0} ({1} - {2})", "loadTask", "Format_PropertyChanged", "Main Application");
+						Logger.Error(t.Exception, "Exception in {0} ({1} - {2})", "loadTask", "Format_PropertyChanged", ApplicationName);
 
 						ReportException("loadTask", "Format_PropertyChanged", t.Exception);
 					}
@@ -2785,7 +2790,7 @@ namespace DailyArena.DeckAdvisor
 		/// <param name="e">Arguments regarding the event that triggered the callback.</param>
 		private void Sort_PropertyChanged(object sender, PropertyChangedEventArgs e)
 		{
-			_logger.Debug("New Sort Selected, Sort={0}", Sort.Value);
+			Logger.Debug("New Sort Selected, Sort={0}", Sort.Value);
 
 			App application = (App)Application.Current;
 			application.State.LastSort = Sort.Value;
@@ -2798,7 +2803,7 @@ namespace DailyArena.DeckAdvisor
 				{
 					if (t.Exception != null)
 					{
-						_logger.Error(t.Exception, "Exception in {0} ({1} - {2})", "sortTask", "Sort_PropertyChanged", "Main Application");
+						Logger.Error(t.Exception, "Exception in {0} ({1} - {2})", "sortTask", "Sort_PropertyChanged", ApplicationName);
 
 						ReportException("sortTask", "Sort_PropertyChanged", t.Exception);
 					}
@@ -2815,7 +2820,7 @@ namespace DailyArena.DeckAdvisor
 		/// <param name="e">Arguments regarding the event that triggered the callback.</param>
 		private void SortDir_PropertyChanged(object sender, PropertyChangedEventArgs e)
 		{
-			_logger.Debug("New Sort Dir Selected, SortDir={0}", SortDir.Value);
+			Logger.Debug("New Sort Dir Selected, SortDir={0}", SortDir.Value);
 
 			App application = (App)Application.Current;
 			application.State.LastSortDir = SortDir.Value;
@@ -2828,7 +2833,7 @@ namespace DailyArena.DeckAdvisor
 				{
 					if (t.Exception != null)
 					{
-						_logger.Error(t.Exception, "Exception in {0} ({1} - {2})", "sortTask", "SortDir_PropertyChanged", "Main Application");
+						Logger.Error(t.Exception, "Exception in {0} ({1} - {2})", "sortTask", "SortDir_PropertyChanged", ApplicationName);
 
 						ReportException("sortTask", "SortDir_PropertyChanged", t.Exception);
 					}
@@ -2844,7 +2849,7 @@ namespace DailyArena.DeckAdvisor
 		/// <param name="filters">Filters to apply.</param>
 		public void ApplyFilters(DeckFilters filters)
 		{
-			_logger.Debug("ApplyFilters() Called");
+			Logger.Debug("ApplyFilters() Called");
 
 			Task filterTask = new Task(() => {
 				FilterArchetypes(filters, true);
@@ -2853,7 +2858,7 @@ namespace DailyArena.DeckAdvisor
 			{
 				if (t.Exception != null)
 				{
-					_logger.Error(t.Exception, "Exception in {0} ({1} - {2})", "filterTask", "ApplyFilters", "Main Application");
+					Logger.Error(t.Exception, "Exception in {0} ({1} - {2})", "filterTask", "ApplyFilters", ApplicationName);
 
 					ReportException("filterTask", "ApplyFilters", t.Exception);
 				}
@@ -2870,7 +2875,7 @@ namespace DailyArena.DeckAdvisor
 		/// <param name="e">Arguments regarding the event that triggered the callback.</param>
 		private void CardText_PropertyChanged(object sender, PropertyChangedEventArgs e)
 		{
-			_logger.Debug("CardText Changed, CardText={0}", CardText.Value);
+			Logger.Debug("CardText Changed, CardText={0}", CardText.Value);
 
 			App application = (App)Application.Current;
 			application.State.CardTextFilter = CardText.Value;
@@ -2905,7 +2910,7 @@ namespace DailyArena.DeckAdvisor
 		{
 			if (e.PropertyName == "Value")
 			{
-				_logger.Debug("Rotation Proof toggled, RotationProof={0}", RotationProof.Value);
+				Logger.Debug("Rotation Proof toggled, RotationProof={0}", RotationProof.Value);
 
 				App application = (App)Application.Current;
 				application.State.RotationProof = RotationProof.Value;
@@ -2930,7 +2935,7 @@ namespace DailyArena.DeckAdvisor
 					{
 						if (t.Exception != null)
 						{
-							_logger.Error(t.Exception, "Exception in {0} ({1} - {2})", "loadTask", "RotationProof_PropertyChanged", "Main Application");
+							Logger.Error(t.Exception, "Exception in {0} ({1} - {2})", "loadTask", "RotationProof_PropertyChanged", ApplicationName);
 
 							ReportException("loadTask", "RotationProof_PropertyChanged", t.Exception);
 						}
@@ -2948,7 +2953,7 @@ namespace DailyArena.DeckAdvisor
 		/// <param name="e">Arguments regarding the event that triggered the callback.</param>
 		private void SelectedFontSize_PropertyChanged(object sender, PropertyChangedEventArgs e)
 		{
-			_logger.Debug("New Font Size Selected, FontSize={0}", SelectedFontSize.Value);
+			Logger.Debug("New Font Size Selected, FontSize={0}", SelectedFontSize.Value);
 
 			App application = (App)Application.Current;
 			application.State.FontSize = SelectedFontSize.Value;
@@ -2967,14 +2972,14 @@ namespace DailyArena.DeckAdvisor
 				var button = (Button)sender;
 				var item = (Archetype)button.DataContext;
 
-				_logger.Debug("Deck Export Clicked, Deck={0}", item.Name);
+				Logger.Debug("Deck Export Clicked, Deck={0}", item.Name);
 
 				Clipboard.SetText(item.ExportList);
 				MessageBox.Show($"{item.Name} {Properties.Resources.Message_ExportSuccessful}", "Export");
 			}
 			catch(Exception ex)
 			{
-				_logger.Error(ex, "Exception in Export_Clicked");
+				Logger.Error(ex, "Exception in Export_Clicked");
 				if(!(ex is ExternalException || ex is ArgumentNullException))
 				{
 					throw;
@@ -2994,14 +2999,14 @@ namespace DailyArena.DeckAdvisor
 				var button = (Button)sender;
 				var item = (Archetype)button.DataContext;
 
-				_logger.Debug("Deck Export Suggested Clicked, Deck={0}", item.Name);
+				Logger.Debug("Deck Export Suggested Clicked, Deck={0}", item.Name);
 
 				Clipboard.SetText(item.ExportListSuggested);
 				MessageBox.Show($"{item.Name} {Properties.Resources.Message_ExportReplacementsSuccessful}", "Export");
 			}
 			catch (Exception ex)
 			{
-				_logger.Error(ex, "Exception in ExportSuggested_Click");
+				Logger.Error(ex, "Exception in ExportSuggested_Click");
 				if (!(ex is ExternalException || ex is ArgumentNullException))
 				{
 					throw;
@@ -3019,7 +3024,7 @@ namespace DailyArena.DeckAdvisor
 			Hyperlink link = (Hyperlink)sender;
 			var item = (Archetype)link.DataContext;
 
-			_logger.Debug("Deck Hyperlink Clicked, Deck={0}", item.Name);
+			Logger.Debug("Deck Hyperlink Clicked, Deck={0}", item.Name);
 
 			DeckTabs.SelectedItem = item;
 		}
@@ -3034,7 +3039,7 @@ namespace DailyArena.DeckAdvisor
 			Hyperlink link = (Hyperlink)sender;
 			var item = (Archetype)link.DataContext;
 
-			_logger.Debug("Similar Deck Hyperlink Clicked, Deck={0}", item.Name);
+			Logger.Debug("Similar Deck Hyperlink Clicked, Deck={0}", item.Name);
 
 			int selectedIndex = DeckTabs.SelectedIndex;
 			_tabObjects[selectedIndex] = item;
@@ -3051,7 +3056,7 @@ namespace DailyArena.DeckAdvisor
 			Hyperlink link = (Hyperlink)sender;
 			var item = (Archetype)link.DataContext;
 
-			_logger.Debug("Parent Deck Hyperlink Clicked, Deck={0}", item.Name);
+			Logger.Debug("Parent Deck Hyperlink Clicked, Deck={0}", item.Name);
 
 			int selectedIndex = DeckTabs.SelectedIndex;
 			_tabObjects[selectedIndex] = item.Parent;
@@ -3064,7 +3069,7 @@ namespace DailyArena.DeckAdvisor
 		/// <param name="hardRefresh">If true, check server for updates before refreshing.</param>
 		public void Refresh(bool hardRefresh)
 		{
-			_logger.Debug("Refresh({hardRefresh})", hardRefresh);
+			Logger.Debug("Refresh({hardRefresh})", hardRefresh);
 
 			LoadingText.Value = Properties.Resources.Loading_LoadingCardDatabase;
 			LoadingValue.Value = 0;
@@ -3080,7 +3085,7 @@ namespace DailyArena.DeckAdvisor
 			Task loadTask = new Task(() => {
 				if(hardRefresh)
 				{
-					_logger.Debug("Initializing Card Database");
+					Logger.Debug("Initializing Card Database");
 					CardDatabase.Initialize(false);
 					LoadingValue.Value = 20;
 
@@ -3098,7 +3103,7 @@ namespace DailyArena.DeckAdvisor
 				{
 					if (t.Exception != null)
 					{
-						_logger.Error(t.Exception, "Exception in {0} ({1} - {2})", "loadTask", "Refresh", "Main Application");
+						Logger.Error(t.Exception, "Exception in {0} ({1} - {2})", "loadTask", "Refresh", ApplicationName);
 
 						ReportException("loadTask", "Refresh", t.Exception);
 					}
@@ -3115,7 +3120,7 @@ namespace DailyArena.DeckAdvisor
 		/// <param name="e">Arguments regarding the event that triggered the callback.</param>
 		private void Refresh_Click(object sender, RoutedEventArgs e)
 		{
-			_logger.Debug("Refresh Clicked");
+			Logger.Debug("Refresh Clicked");
 			Refresh(false);
 		}
 
@@ -3126,7 +3131,7 @@ namespace DailyArena.DeckAdvisor
 		/// <param name="e">Arguments regarding the event that triggered the callback.</param>
 		private void HardRefresh_Click(object sender, RoutedEventArgs e)
 		{
-			_logger.Debug("Hard Refresh Clicked");
+			Logger.Debug("Hard Refresh Clicked");
 			Refresh(true);
 		}
 
@@ -3145,47 +3150,62 @@ namespace DailyArena.DeckAdvisor
 		}
 
 		/// <summary>
-		/// Gets the bitmap scaling mode.
+		/// Method to query a configuration setting.
 		/// </summary>
-		/// <returns>Fant, or whatever override value the user set in App.config.</returns>
-		private BitmapScalingMode GetBitmapScalingMode()
+		/// <param name="key">The setting key.</param>
+		/// <returns>The setting value.</returns>
+		public string GetConfigurationSetting(string key)
 		{
-			_logger.Debug("GetBitmapScalingMode() Called - {0}", "Main Application");
+			Logger.Debug("GetConfigurationSetting() Called - {key} ({ApplicationName})", key, ApplicationName);
 
 			try
 			{
 				var appSettings = ConfigurationManager.AppSettings;
 				if (appSettings == null)
 				{
-					_logger.Debug("No AppSettings Found, Using Fant");
-					return BitmapScalingMode.Fant;
+					return null;
 				}
-				string bitmapScalingMode = appSettings["BitmapScalingMode"] ?? "Fant";
-				switch (bitmapScalingMode)
+				else
 				{
-					case "Fant":
-						_logger.Debug("Using BitmapScalingMode {0}", "Fant");
-						return BitmapScalingMode.Fant;
-					case "HighQuality":
-						_logger.Debug("Using BitmapScalingMode {0}", "HighQuality");
-						return BitmapScalingMode.HighQuality;
-					case "Linear":
-						_logger.Debug("Using BitmapScalingMode {0}", "Linear");
-						return BitmapScalingMode.Linear;
-					case "LowQuality":
-						_logger.Debug("Using BitmapScalingMode {0}", "LowQuality");
-						return BitmapScalingMode.LowQuality;
-					case "NearestNeighbor":
-						_logger.Debug("Using BitmapScalingMode {0}", "NearestNeighbor");
-						return BitmapScalingMode.NearestNeighbor;
-					default:
-						return BitmapScalingMode.Fant;
+					return appSettings[key];
 				}
 			}
 			catch (ConfigurationErrorsException e)
 			{
-				_logger.Error(e, "Exception in GetBitmapScalingMode(), Using Fant");
-				return BitmapScalingMode.Fant;
+				Logger.Error(e, "Exception in GetConfigurationSetting()");
+				return null;
+			}
+		}
+
+		/// <summary>
+		/// Gets the bitmap scaling mode.
+		/// </summary>
+		/// <returns>Fant, or whatever override value the user set in App.config.</returns>
+		private BitmapScalingMode GetBitmapScalingMode()
+		{
+			Logger.Debug("GetBitmapScalingMode() Called - {0}", ApplicationName);
+
+			string bitmapScalingMode = GetConfigurationSetting("BitmapScalingMode") ?? "Fant";
+
+			switch (bitmapScalingMode)
+			{
+				case "Fant":
+					Logger.Debug("Using BitmapScalingMode {0}", "Fant");
+					return BitmapScalingMode.Fant;
+				case "HighQuality":
+					Logger.Debug("Using BitmapScalingMode {0}", "HighQuality");
+					return BitmapScalingMode.HighQuality;
+				case "Linear":
+					Logger.Debug("Using BitmapScalingMode {0}", "Linear");
+					return BitmapScalingMode.Linear;
+				case "LowQuality":
+					Logger.Debug("Using BitmapScalingMode {0}", "LowQuality");
+					return BitmapScalingMode.LowQuality;
+				case "NearestNeighbor":
+					Logger.Debug("Using BitmapScalingMode {0}", "NearestNeighbor");
+					return BitmapScalingMode.NearestNeighbor;
+				default:
+					return BitmapScalingMode.Fant;
 			}
 		}
 
@@ -3195,60 +3215,18 @@ namespace DailyArena.DeckAdvisor
 		/// <returns>The default location in the current user's AppData, unless there is an override value set in App.config.</returns>
 		private string GetLogFolderLocation()
 		{
-			_logger.Debug("GetLogFolderLocation() Called - {0}", "Main Application");
+			Logger.Debug("GetLogFolderLocation() Called - {0}", ApplicationName);
 			var logFolder = string.Format("{0}Low\\Wizards of the Coast\\MTGA", Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData));
 
-			try
+			string mtgaLogFolder = GetConfigurationSetting("MTGALogFolder");
+
+			if(mtgaLogFolder != null)
 			{
-				var appSettings = ConfigurationManager.AppSettings;
-				if (appSettings == null)
-				{
-					_logger.Debug("No AppSettings Found, Using Default Log Folder Location: {0}", logFolder);
-					return logFolder;
-				}
-				logFolder = appSettings["MTGALogFolder"] ?? logFolder;
-			}
-			catch (ConfigurationErrorsException e)
-			{
-				_logger.Error(e, "Exception in GetLogFolderLocation(), Using Default Log Folder Location: {0}", logFolder);
-				return logFolder;
+				logFolder = mtgaLogFolder;
 			}
 
-			_logger.Debug("Using Log Folder Location: {0}", logFolder);
+			Logger.Debug("Using Log Folder Location: {0}", logFolder);
 			return logFolder;
-		}
-
-		/// <summary>
-		/// Sets the current UI culture from app.config if it's set there.
-		/// </summary>
-		private void SetCulture()
-		{
-			_logger.Debug("SetCulture() Called - {0}", "Main Application");
-
-			try
-			{
-				var appSettings = ConfigurationManager.AppSettings;
-				if (appSettings == null)
-				{
-					_logger.Debug("No AppSettings Found, Using Default UI Culture");
-				}
-				else {
-					string culture = appSettings["UICulture"];
-					if(culture != null)
-					{
-						_logger.Debug("Setting UI Culture to {culture}", culture);
-						Thread.CurrentThread.CurrentUICulture = new CultureInfo(culture);
-					}
-					else
-					{
-						_logger.Debug("UICulture not set in AppSettings, Using Default UI Culture");
-					}
-				}
-			}
-			catch (ConfigurationErrorsException e)
-			{
-				_logger.Error(e, "Exception in SetCulture(), Using Default UI Culture");
-			}
 		}
 
 		/// <summary>
@@ -3258,7 +3236,7 @@ namespace DailyArena.DeckAdvisor
 		/// <param name="e">Arguments regarding the event that triggered the callback.</param>
 		private void ShowFilters_Click(object sender, RoutedEventArgs e)
 		{
-			_logger.Debug("ShowFilters_Click() Called - {0}", "Main Application");
+			Logger.Debug("ShowFilters_Click() Called - {0}", ApplicationName);
 			FiltersDialog filtersDialog = new FiltersDialog()
 			{
 				Owner = this
@@ -3273,7 +3251,7 @@ namespace DailyArena.DeckAdvisor
 		/// <param name="e">Arguments regarding the event that triggered the callback.</param>
 		private void Hyperlink_RequestNavigate(object sender, RequestNavigateEventArgs e)
 		{
-			_logger.Debug("Hyperlink_RequestNavigate() Called - {0}", "Main Application");
+			Logger.Debug("Hyperlink_RequestNavigate() Called - {0}", ApplicationName);
 			Process.Start(new ProcessStartInfo(e.Uri.AbsoluteUri));
 			e.Handled = true;
 		}
@@ -3285,7 +3263,7 @@ namespace DailyArena.DeckAdvisor
 		/// <param name="e">The routed event arguments.</param>
 		private void Close_Click(object sender, RoutedEventArgs e)
 		{
-			_logger.Debug("Close_Click() Called - {0}", "Main Application");
+			Logger.Debug("Close_Click() Called - {0}", ApplicationName);
 			Close();
 		}
 	}

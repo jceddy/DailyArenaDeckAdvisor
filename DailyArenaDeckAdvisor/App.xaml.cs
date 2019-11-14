@@ -30,7 +30,7 @@ namespace DailyArena.DeckAdvisor
 		/// </summary>
 		public App()
 		{
-			this.Initialize();
+			this.InitializeApp();
 
 			DispatcherUnhandledException += (sender, e) =>
 			{

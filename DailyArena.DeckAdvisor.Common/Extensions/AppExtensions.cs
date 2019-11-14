@@ -12,9 +12,9 @@ using System.Management;
 namespace DailyArena.DeckAdvisor.Common.Extensions
 {
 	/// <summary>
-	/// Common class extension for Deck Advisor classes.
+	/// Common class extension for Deck Advisor App classes.
 	/// </summary>
-	public static class Extensions
+	public static class AppExtensions
 	{
 		/// <summary>
 		/// Save the Cached State out to a file.
@@ -136,7 +136,7 @@ namespace DailyArena.DeckAdvisor.Common.Extensions
 		/// <param name="app">The app.</param>
 		/// <param name="postfix">The postfix for log files.</param>
 		/// <param name="logSystemInfo">Whether to log system info (don't do this in the .NET Core application)</param>
-		public static void Initialize(this IDeckAdvisorApp app, string postfix = "", bool logSystemInfo = true)
+		public static void InitializeApp(this IDeckAdvisorApp app, string postfix = "", bool logSystemInfo = true)
 		{
 			ApplicationUtilities.CurrentApp = app;
 
