@@ -1,9 +1,11 @@
 ﻿using DailyArena.DeckAdvisor.Common;
 using DailyArena.DeckAdvisor.Common.Extensions;
+using DailyArena.DeckAdvisor.Console.Resources;
 using Microsoft.Extensions.Configuration;
 using Serilog;
 using System.IO;
 using System.Reflection;
+using System.Text;
 using System.Text.RegularExpressions;
 using S = System;
 
@@ -84,7 +86,8 @@ namespace DailyArena.DeckAdvisor.Console
 		static void Main(string[] args)
 		{
 			CurrentProgram = new Program();
-			S.Console.WriteLine("Press any key to exit.");
+			S.Console.OutputEncoding = Encoding.UTF8;
+			S.Console.WriteLine(Localization.Message_PressToExit);
 			S.Console.ReadKey();
 		}
 	}
