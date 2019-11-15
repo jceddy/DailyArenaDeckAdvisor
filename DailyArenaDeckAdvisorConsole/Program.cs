@@ -67,12 +67,19 @@ namespace DailyArena.DeckAdvisor.Console
 			if (_configuration == null)
 			{
 				var exePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().CodeBase);
-				Regex appPathMatcher = new Regex(@"(?<!fil)[A-Za-z]:\\+[\S\s]*?(?=\\+bin)");
-				var appRoot = appPathMatcher.Match(exePath).Value;
+				Logger.Debug("CodeBase: {exePath}", exePath);
+
+				var appRoot = exePath;
+				if(appRoot.Contains("\\"))
+				{
+					Regex appPathMatcher = new Regex(@"(?<!fil)[A-Za-z]:\\+[\S\s]*?(?=\\+bin)");
+					appRoot = appPathMatcher.Match(exePath).Value;
+				}
+
+				Logger.Debug("BasePath: {appRoot}", appRoot);
 
 				var builder = new ConfigurationBuilder()
-					.SetBasePath(appRoot)
-					.AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
+					.AddJsonFile($"{appRoot}{Path.DirectorySeparatorChar}appsettings.json", optional: true, reloadOnChange: true);
 				_configuration = builder.Build();
 			}
 

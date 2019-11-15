@@ -140,21 +140,22 @@ namespace DailyArena.DeckAdvisor.Common.Extensions
 		{
 			ApplicationUtilities.CurrentApp = app;
 
-			var dataFolder = string.Format("{0}Low\\DailyArena\\DailyArenaDeckAdvisor", Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData));
+			var dataFolder = string.Format("{0}Low{1}DailyArena{1}DailyArenaDeckAdvisor", Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), Path.DirectorySeparatorChar);
 			if (!Directory.Exists(dataFolder))
 			{
 				Directory.CreateDirectory(dataFolder);
 			}
-			if (!Directory.Exists($"{dataFolder}\\logs"))
+			var logFolder = string.Format($"{dataFolder}{Path.DirectorySeparatorChar}logs");
+			if (!Directory.Exists(logFolder))
 			{
-				Directory.CreateDirectory($"{dataFolder}\\logs");
+				Directory.CreateDirectory(logFolder);
 			}
 			Directory.SetCurrentDirectory(dataFolder);
 
 			SelfLog.Enable(msg => Debug.WriteLine(msg));
 			SelfLog.Enable(Console.Error);
 			app.Logger = new LoggerConfiguration().MinimumLevel.Debug().WriteTo.
-				File(new CompactJsonFormatter(), $"{dataFolder}\\logs\\log{postfix}.txt",
+				File(new CompactJsonFormatter(), $"{dataFolder}{Path.DirectorySeparatorChar}logs{Path.DirectorySeparatorChar}log{postfix}.txt",
 					rollingInterval: RollingInterval.Hour,
 					retainedFileCountLimit: 5,
 					fileSizeLimitBytes: 10485760,
@@ -162,7 +163,7 @@ namespace DailyArena.DeckAdvisor.Common.Extensions
 					shared: true).
 				CreateLogger();
 			app.FirstChanceLogger = new LoggerConfiguration().MinimumLevel.Debug().WriteTo.
-				File(new CompactJsonFormatter(), $"{dataFolder}\\logs\\firstChanceExceptions{postfix}.txt",
+				File(new CompactJsonFormatter(), $"{dataFolder}{Path.DirectorySeparatorChar}logs{Path.DirectorySeparatorChar}firstChanceExceptions{postfix}.txt",
 					rollingInterval: RollingInterval.Hour,
 					retainedFileCountLimit: 2,
 					fileSizeLimitBytes: 10485760,
