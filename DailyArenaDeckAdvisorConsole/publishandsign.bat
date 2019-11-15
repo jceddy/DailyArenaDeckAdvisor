@@ -1,5 +1,7 @@
 dotnet publish -f netcoreapp2.2 -r win-x86 -c Release --self-contained false
 dotnet publish -f netcoreapp2.2 -r win-x64 -c Release --self-contained false
+dotnet publish -f netcoreapp2.2 -r win-arm -c Release --self-contained false
+dotnet publish -f netcoreapp2.2 -r win-arm64 -c Release --self-contained false
 dotnet publish -f netcoreapp2.2 -r osx-x64 -c Release --self-contained false
 dotnet publish -f netcoreapp2.2 -r linux-x64 -c Release --self-contained false
 dotnet publish -f netcoreapp2.2 -r linux-musl-x64 -c Release --self-contained false
