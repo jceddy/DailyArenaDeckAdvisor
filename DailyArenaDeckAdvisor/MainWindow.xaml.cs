@@ -662,17 +662,26 @@ namespace DailyArena.DeckAdvisor
 							Log.Error(e, "Card not found: {cardName}", cardName);
 							cardName = Regex.Split(cardName, " // ")[0].Trim();
 							cardName = Regex.Split(cardName, " <")[0].Trim();
-							if (cardsByName[cardName].Count(x => x.Set.RotationSafe) == 0)
+							if (!cardsByName.ContainsKey(cardName))
 							{
-								Logger.Debug("{cardName} is rotating soon, ignore this deck", cardName);
+								Logger.Debug("{cardName} is not legal on Arena, ignore this deck", cardName);
 								ignoreDeck = true;
 								break;
 							}
-							if (Format != Properties.Resources.Item_Historic_Bo1 && Format != Properties.Resources.Item_Historic_Bo3 && _standardBannings.Contains(cardName))
+							else
 							{
-								Logger.Debug("{cardName} is banned in standard, ignore this deck", cardName);
-								ignoreDeck = true;
-								break;
+								if (cardsByName[cardName].Count(x => x.Set.RotationSafe) == 0)
+								{
+									Logger.Debug("{cardName} is rotating soon, ignore this deck", cardName);
+									ignoreDeck = true;
+									break;
+								}
+								if (Format != Properties.Resources.Item_Historic_Bo1 && Format != Properties.Resources.Item_Historic_Bo3 && _standardBannings.Contains(cardName))
+								{
+									Logger.Debug("{cardName} is banned in standard, ignore this deck", cardName);
+									ignoreDeck = true;
+									break;
+								}
 							}
 						}
 					}
