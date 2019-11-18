@@ -795,6 +795,24 @@ namespace DailyArena.DeckAdvisor
 						}
 					}
 				}
+				if(!ignoreDeckCheck)
+				{
+					foreach (dynamic card in archetype["sideboard"])
+					{
+						string cardName = ((string)card["name"]).Trim();
+						if (!cardsByName.ContainsKey(cardName))
+						{
+							cardName = Regex.Split(cardName, " // ")[0].Trim();
+							cardName = Regex.Split(cardName, " <")[0].Trim();
+							if (!cardsByName.ContainsKey(cardName))
+							{
+								Logger.Debug("{cardName} does not exist in Arena, ignore this deck", cardName);
+								ignoreDeckCheck = true;
+								break;
+							}
+						}
+					}
+				}
 				if (ignoreDeckCheck)
 				{
 					continue;
