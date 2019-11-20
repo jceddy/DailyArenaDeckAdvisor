@@ -117,6 +117,30 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="Item_ArenaStandard" xml:space="preserve">
+    <value>Arena Standard</value>
+    <comment>The string for Arena Standard in the Format ComboBox.</comment>
+  </data>
+  <data name="Item_Brawl" xml:space="preserve">
+    <value>Brawl</value>
+    <comment>The string for Brawl in the Format ComboBox.</comment>
+  </data>
+  <data name="Item_Historic_Bo1" xml:space="preserve">
+    <value>Historic (Bo1)</value>
+    <comment>The string for Historic (Bo1) in the Format ComboBox.</comment>
+  </data>
+  <data name="Item_Historic_Bo3" xml:space="preserve">
+    <value>Historic (Bo3)</value>
+    <comment>The string for Historic (Bo3) in the Format ComboBox.</comment>
+  </data>
+  <data name="Item_Standard" xml:space="preserve">
+    <value>Standard</value>
+    <comment>The string for Standard in the Format ComboBox.</comment>
+  </data>
+  <data name="Loading_LoadingCardDatabase" xml:space="preserve">
+    <value>Loading card database...</value>
+    <comment>The "loading card database" string for the loading screen.</comment>
+  </data>
   <data name="Message_PressToExit" xml:space="preserve">
     <value>Press any key to exit.</value>
     <comment>"Press any key to exit." Message</comment>

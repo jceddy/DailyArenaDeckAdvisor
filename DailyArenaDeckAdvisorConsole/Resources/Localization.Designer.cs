@@ -61,6 +61,60 @@ namespace DailyArena.DeckAdvisor.Console.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Arena Standard.
+        /// </summary>
+        internal static string Item_ArenaStandard {
+            get {
+                return ResourceManager.GetString("Item_ArenaStandard", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Brawl.
+        /// </summary>
+        internal static string Item_Brawl {
+            get {
+                return ResourceManager.GetString("Item_Brawl", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Historic (Bo1).
+        /// </summary>
+        internal static string Item_Historic_Bo1 {
+            get {
+                return ResourceManager.GetString("Item_Historic_Bo1", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Historic (Bo3).
+        /// </summary>
+        internal static string Item_Historic_Bo3 {
+            get {
+                return ResourceManager.GetString("Item_Historic_Bo3", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Standard.
+        /// </summary>
+        internal static string Item_Standard {
+            get {
+                return ResourceManager.GetString("Item_Standard", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Loading card database....
+        /// </summary>
+        internal static string Loading_LoadingCardDatabase {
+            get {
+                return ResourceManager.GetString("Loading_LoadingCardDatabase", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Press any key to exit..
         /// </summary>
         internal static string Message_PressToExit {

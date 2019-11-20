@@ -1,4 +1,5 @@
 ﻿using DailyArena.Common.Bindable;
+using DailyArena.Common.Core.Utility;
 using DailyArena.Common.Database;
 using DailyArena.Common.Utility;
 using DailyArena.DeckAdvisor.Common;
@@ -130,9 +131,25 @@ namespace DailyArena.DeckAdvisor
 		public ILogger Logger { get; set; }
 
 		/// <summary>
+		/// Gets the currently running app.
+		/// </summary>
+		public IDeckAdvisorApp CurrentApp
+		{
+			get
+			{
+				return (IDeckAdvisorApp)Application.Current;
+			}
+		}
+
+		/// <summary>
 		/// Gets the application name string to use while logging.
 		/// </summary>
 		public string ApplicationName { get { return "Main Application"; } }
+
+		/// <summary>
+		/// Gets the application name to use while sending Usage Statistics.
+		/// </summary>
+		public string ApplicationUsageName { get { return "DailyArenaDeckAdvisor"; } }
 
 		/// <summary>
 		/// Gets or sets the selected format being viewed.
@@ -200,51 +217,12 @@ namespace DailyArena.DeckAdvisor
 
 			this.InitializeProgram();
 
-			// these have to happen after SetCulture()
-			_formatMappings = new Dictionary<string, Tuple<string, string>>()
-			{
-				{ Properties.Resources.Item_Standard, new Tuple<string, string>("standard", "Standard") },
-				{ Properties.Resources.Item_ArenaStandard, new Tuple<string, string>("arena_standard", "ArenaStandard") },
-				{ Properties.Resources.Item_Brawl, new Tuple<string, string>("brawl", "Brawl") },
-				{ Properties.Resources.Item_Historic_Bo3, new Tuple<string, string>("historic_bo3", "Historic") },
-				{ Properties.Resources.Item_Historic_Bo1, new Tuple<string, string>("historic_bo1", "Historic") }
-			};
-
 			LoadingText = new Bindable<string>() { Value = Properties.Resources.Loading_LoadingCardDatabase };
 
 			BitmapScalingMode = GetBitmapScalingMode();
 
 			InitializeComponent();
 			DataContext = this;
-
-			new Task(() => { SendUsageStats(); }).Start();
-		}
-
-		/// <summary>
-		/// Send usage stats to server.
-		/// </summary>
-		private void SendUsageStats()
-		{
-			AssemblyName assemblyName = Assembly.GetExecutingAssembly().GetName();
-			string assemblyVersion = assemblyName.Version.ToString();
-			string assemblyArchitecture = assemblyName.ProcessorArchitecture.ToString();
-
-			NameValueCollection inputs = new NameValueCollection
-			{
-				{ "application", "DailyArenaDeckAdvisor" },
-				{ "fingerprint", ((App)Application.Current).State.Fingerprint.ToString() },
-				{ "version", assemblyVersion },
-				{ "architecture", assemblyArchitecture }
-			};
-			string response = WebUtilities.UploadValues("https://clans.dailyarena.net/usage_stats.php", inputs, "POST", true, out List<WebException> exceptions);
-			Logger.Debug("Usage Statistics Response: {response}", response);
-			if(response == null)
-			{
-				foreach(WebException exception in exceptions)
-				{
-					Logger.Error(exception, "Exception from UploadValues in {method}", "SendUsageStats");
-				}
-			}
 		}
 
 		/// <summary>
@@ -508,9 +486,9 @@ namespace DailyArena.DeckAdvisor
 		}
 
 		/// <summary>
-		/// A dictionary mapping the Format names shown on the GUI drop-down to the name to use when querying archetype data from the server.
+		/// Gets or sets a dictionary mapping the Format names shown on the GUI drop-down to the name to use when querying archetype data from the server.
 		/// </summary>
-		private Dictionary<string, Tuple<string, string>> _formatMappings;
+		public Dictionary<string, Tuple<string, string>> FormatMappings { get; set; }
 
 		/// <summary>
 		/// Reload all of the player data from the Arena real-time logs and recompute all of the app data.
@@ -567,7 +545,7 @@ namespace DailyArena.DeckAdvisor
 
 			LoadingValue.Value = 25;
 
-			Tuple<string, string> mappedFormat = _formatMappings[Format.Value];
+			Tuple<string, string> mappedFormat = FormatMappings[Format.Value];
 			JToken decksJson = null;
 			string serverTimestamp = CardDatabase.GetServerTimestamp($"{mappedFormat.Item2}Decks");
 			bool loadDecksFromServer = true;
@@ -2546,7 +2524,7 @@ namespace DailyArena.DeckAdvisor
 			IDeckAdvisorApp application = (IDeckAdvisorApp)Application.Current;
 			Format.Value = application.State.LastFormat;
 			bool saveState = false;
-			if(string.IsNullOrWhiteSpace(Format.Value) || !_formatMappings.ContainsKey(Format.Value))
+			if(string.IsNullOrWhiteSpace(Format.Value) || !FormatMappings.ContainsKey(Format.Value))
 			{
 				Format.Value = Properties.Resources.Item_Standard;
 				application.State.LastFormat = Format.Value;
@@ -3336,6 +3314,16 @@ namespace DailyArena.DeckAdvisor
 		{
 			Logger.Debug("Close_Click() Called - {0}", ApplicationName);
 			Close();
+		}
+
+		/// <summary>
+		/// Method to get a localized string based on the resource name.
+		/// </summary>
+		/// <param name="name">The resource name to get a localized string for.</param>
+		/// <returns>The localized string for the requested resource name.</returns>
+		public string GetLocalizedString(string name)
+		{
+			return Properties.Resources.ResourceManager.GetString(name);
 		}
 	}
 }
