@@ -106,6 +106,102 @@ namespace DailyArena.DeckAdvisor.Common
 		}
 
 		/// <summary>
+		/// Whether to hide decks with a score below a given threshold.
+		/// </summary>
+		private bool _hideScoreThreshold;
+
+		/// <summary>
+		/// Gets or sets a value determining whether to hide decks with a score below a given threshold.
+		/// </summary>
+		public bool HideScoreThreshold
+		{
+			get
+			{
+				return _hideScoreThreshold;
+			}
+			set
+			{
+				if (_hideScoreThreshold != value)
+				{
+					_hideScoreThreshold = value;
+					RaisePropertyChanged("HideScoreThreshold");
+				}
+			}
+		}
+
+		/// <summary>
+		/// The score threshold below which decks are hidden.
+		/// </summary>
+		private int _scoreThreshold = 50;
+
+		/// <summary>
+		/// Gets or sets the score threshold below which decks are hidden.
+		/// </summary>
+		public int ScoreThreshold
+		{
+			get
+			{
+				return _scoreThreshold;
+			}
+			set
+			{
+				if (_scoreThreshold != value)
+				{
+					_scoreThreshold = value;
+					RaisePropertyChanged("ScoreThreshold");
+				}
+			}
+		}
+
+		/// <summary>
+		/// Whether to hide decks with fewer than some number of games recorded.
+		/// </summary>
+		private bool _hideGamesRecorded;
+
+		/// <summary>
+		/// Gets or sets a value determining whether to hide decks with fewer than some number of games recorded.
+		/// </summary>
+		public bool HideGamesRecorded
+		{
+			get
+			{
+				return _hideGamesRecorded;
+			}
+			set
+			{
+				if (_hideGamesRecorded != value)
+				{
+					_hideGamesRecorded = value;
+					RaisePropertyChanged("HideGamesRecorded");
+				}
+			}
+		}
+
+		/// <summary>
+		/// The recorded games threshold below which decks are hidden.
+		/// </summary>
+		private int _gamesThreshold = 1000;
+
+		/// <summary>
+		/// Gets or sets the recorded games threshold below which decks are hidden.
+		/// </summary>
+		public int GamesThreshold
+		{
+			get
+			{
+				return _gamesThreshold;
+			}
+			set
+			{
+				if (_gamesThreshold != value)
+				{
+					_gamesThreshold = value;
+					RaisePropertyChanged("GamesThreshold");
+				}
+			}
+		}
+
+		/// <summary>
 		/// Whether to hide decks with a number of mythic cards over a certain threshold.
 		/// </summary>
 		private bool _hideMythic;
@@ -310,6 +406,10 @@ namespace DailyArena.DeckAdvisor.Common
 				HideMissingWildcards = HideMissingWildcards,
 				HideMissingCards = HideMissingCards,
 				HideIncompleteReplacements = HideIncompleteReplacements,
+				HideScoreThreshold = HideScoreThreshold,
+				ScoreThreshold = ScoreThreshold,
+				HideGamesRecorded = HideGamesRecorded,
+				GamesThreshold = GamesThreshold,
 				HideMythic = HideMythic,
 				MythicCount = MythicCount,
 				HideRare = HideRare,
@@ -331,6 +431,10 @@ namespace DailyArena.DeckAdvisor.Common
 			HideMissingWildcards = other.HideMissingWildcards;
 			HideMissingCards = other.HideMissingCards;
 			HideIncompleteReplacements = other.HideIncompleteReplacements;
+			HideScoreThreshold = other.HideScoreThreshold;
+			ScoreThreshold = other.ScoreThreshold;
+			HideGamesRecorded = other.HideGamesRecorded;
+			GamesThreshold = other.GamesThreshold;
 			HideMythic = other.HideMythic;
 			MythicCount = other.MythicCount;
 			HideRare = other.HideRare;
@@ -413,14 +517,18 @@ namespace DailyArena.DeckAdvisor.Common
 				HideMissingWildcards.GetHashCode() << 1 |
 				HideMissingCards.GetHashCode() << 2 |
 				HideIncompleteReplacements.GetHashCode() << 3 |
-				HideMythic.GetHashCode() << 4 |
-				MythicCount.GetHashCode() << 5 |
-				HideRare.GetHashCode() << 11 |
-				RareCount.GetHashCode() << 12 |
-				HideUncommon.GetHashCode() << 18 |
-				UncommonCount.GetHashCode() << 19 |
-				HideCommon.GetHashCode() << 25 |
-				CommonCount.GetHashCode() << 26;
+				HideScoreThreshold.GetHashCode() << 4 |
+				ScoreThreshold.GetHashCode() << 5 |
+				HideGamesRecorded.GetHashCode() << 10 |
+				GamesThreshold.GetHashCode() << 11 |
+				HideMythic.GetHashCode() << 14 |
+				MythicCount.GetHashCode() << 15 |
+				HideRare.GetHashCode() << 18 |
+				RareCount.GetHashCode() << 19 |
+				HideUncommon.GetHashCode() << 22 |
+				UncommonCount.GetHashCode() << 23 |
+				HideCommon.GetHashCode() << 26 |
+				CommonCount.GetHashCode() << 27;
 		}
 
 		/// <summary>
@@ -440,6 +548,10 @@ namespace DailyArena.DeckAdvisor.Common
 				HideMissingWildcards == other.HideMissingWildcards &&
 				HideMissingCards == other.HideMissingCards &&
 				HideIncompleteReplacements == other.HideIncompleteReplacements &&
+				HideScoreThreshold == other.HideScoreThreshold &&
+				ScoreThreshold == other.ScoreThreshold &&
+				HideGamesRecorded == other.HideGamesRecorded &&
+				GamesThreshold == other.GamesThreshold &&
 				HideMythic == other.HideMythic &&
 				MythicCount == other.MythicCount &&
 				HideRare == other.HideRare &&

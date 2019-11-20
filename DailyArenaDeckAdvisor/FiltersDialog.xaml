@@ -6,11 +6,13 @@
 		xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
 		xmlns:p="clr-namespace:DailyArena.DeckAdvisor.Properties"
         mc:Ignorable="d"
-        Title="Daily Arena Deck Advisor - Filters" Height="325" Width="400"
+        Title="Daily Arena Deck Advisor - Filters" Height="400" Width="400"
 		WindowStyle="None" WindowStartupLocation="CenterOwner" ResizeMode="NoResize" BorderBrush="Black" BorderThickness="3" FontSize="{Binding Owner.SelectedFontSize.Value}">
 	<Grid>
 		<Grid HorizontalAlignment="Center" VerticalAlignment="Center">
 			<Grid.RowDefinitions>
+				<RowDefinition Height="Auto" />
+				<RowDefinition Height="Auto" />
 				<RowDefinition Height="Auto" />
 				<RowDefinition Height="Auto" />
 				<RowDefinition Height="Auto" />
@@ -42,8 +44,21 @@
 			<CheckBox Grid.Row="4" Grid.Column="0" Margin="3" HorizontalAlignment="Right" IsChecked="{Binding Filters.HideIncompleteReplacements, Mode=TwoWay}" />
 			<TextBlock Grid.Row="4" Grid.Column="1" Margin="3" Text="{x:Static p:Resources.Label_HideIncompleteReplacements}" />
 
-			<CheckBox Grid.Row="5" Grid.Column="0" Margin="3" HorizontalAlignment="Right" VerticalAlignment="Center" IsChecked="{Binding Filters.HideMythic, Mode=TwoWay}" />
+			<CheckBox Grid.Row="5" Grid.Column="0" Margin="3" HorizontalAlignment="Right" VerticalAlignment="Center" IsChecked="{Binding Filters.HideScoreThreshold, Mode=TwoWay}" />
 			<StackPanel Grid.Row="5" Grid.Column="1" Orientation="Horizontal" Margin="3">
+				<TextBlock VerticalAlignment="Center" Text="{x:Static p:Resources.Label_HideScoreLower}" />
+				<xctk:IntegerUpDown Value="{Binding Filters.ScoreThreshold, Mode=TwoWay}" Minimum="0" Maximum="100" />
+			</StackPanel>
+
+			<CheckBox Grid.Row="6" Grid.Column="0" Margin="3" HorizontalAlignment="Right" VerticalAlignment="Center" IsChecked="{Binding Filters.HideGamesRecorded, Mode=TwoWay}" />
+			<StackPanel Grid.Row="6" Grid.Column="1" Orientation="Horizontal" Margin="3">
+				<TextBlock VerticalAlignment="Center" Text="{x:Static p:Resources.Label_HideWithFewer}" />
+				<xctk:IntegerUpDown Value="{Binding Filters.GamesThreshold, Mode=TwoWay}" Minimum="0" />
+				<TextBlock VerticalAlignment="Center" Text="{x:Static p:Resources.Label_GamesRecorded}" />
+			</StackPanel>
+
+			<CheckBox Grid.Row="7" Grid.Column="0" Margin="3" HorizontalAlignment="Right" VerticalAlignment="Center" IsChecked="{Binding Filters.HideMythic, Mode=TwoWay}" />
+			<StackPanel Grid.Row="7" Grid.Column="1" Orientation="Horizontal" Margin="3">
 				<TextBlock VerticalAlignment="Center" Text="{x:Static p:Resources.Label_HideWithMore}" />
 				<xctk:IntegerUpDown Value="{Binding Filters.MythicCount, Mode=TwoWay}" Minimum="0" />
 				<TextBlock VerticalAlignment="Center" Text=" " />
@@ -51,8 +66,8 @@
 				<TextBlock VerticalAlignment="Center" Text="{x:Static p:Resources.Label_Cards}" />
 			</StackPanel>
 
-			<CheckBox Grid.Row="6" Grid.Column="0" Margin="3" HorizontalAlignment="Right" VerticalAlignment="Center" IsChecked="{Binding Filters.HideRare, Mode=TwoWay}" />
-			<StackPanel Grid.Row="6" Grid.Column="1" Orientation="Horizontal" Margin="3">
+			<CheckBox Grid.Row="8" Grid.Column="0" Margin="3" HorizontalAlignment="Right" VerticalAlignment="Center" IsChecked="{Binding Filters.HideRare, Mode=TwoWay}" />
+			<StackPanel Grid.Row="8" Grid.Column="1" Orientation="Horizontal" Margin="3">
 				<TextBlock VerticalAlignment="Center" Text="{x:Static p:Resources.Label_HideWithMore}" />
 				<xctk:IntegerUpDown Value="{Binding Filters.RareCount, Mode=TwoWay}" Minimum="0" />
 				<TextBlock VerticalAlignment="Center" Text=" " />
@@ -60,8 +75,8 @@
 				<TextBlock VerticalAlignment="Center" Text="{x:Static p:Resources.Label_Cards}" />
 			</StackPanel>
 
-			<CheckBox Grid.Row="7" Grid.Column="0" Margin="3" HorizontalAlignment="Right" VerticalAlignment="Center" IsChecked="{Binding Filters.HideUncommon, Mode=TwoWay}" />
-			<StackPanel Grid.Row="7" Grid.Column="1" Orientation="Horizontal" Margin="3">
+			<CheckBox Grid.Row="9" Grid.Column="0" Margin="3" HorizontalAlignment="Right" VerticalAlignment="Center" IsChecked="{Binding Filters.HideUncommon, Mode=TwoWay}" />
+			<StackPanel Grid.Row="9" Grid.Column="1" Orientation="Horizontal" Margin="3">
 				<TextBlock VerticalAlignment="Center" Text="{x:Static p:Resources.Label_HideWithMore}" />
 				<xctk:IntegerUpDown Value="{Binding Filters.UncommonCount, Mode=TwoWay}" Minimum="0" />
 				<TextBlock VerticalAlignment="Center" Text=" " />
@@ -69,8 +84,8 @@
 				<TextBlock VerticalAlignment="Center" Text="{x:Static p:Resources.Label_Cards}" />
 			</StackPanel>
 
-			<CheckBox Grid.Row="8" Grid.Column="0" Margin="3" HorizontalAlignment="Right" VerticalAlignment="Center" IsChecked="{Binding Filters.HideCommon, Mode=TwoWay}" />
-			<StackPanel Grid.Row="8" Grid.Column="1" Orientation="Horizontal" Margin="3">
+			<CheckBox Grid.Row="10" Grid.Column="0" Margin="3" HorizontalAlignment="Right" VerticalAlignment="Center" IsChecked="{Binding Filters.HideCommon, Mode=TwoWay}" />
+			<StackPanel Grid.Row="10" Grid.Column="1" Orientation="Horizontal" Margin="3">
 				<TextBlock VerticalAlignment="Center" Text="{x:Static p:Resources.Label_HideWithMore}" />
 				<xctk:IntegerUpDown Value="{Binding Filters.CommonCount, Mode=TwoWay}" Minimum="0" />
 				<TextBlock VerticalAlignment="Center" Text=" " />
@@ -78,7 +93,7 @@
 				<TextBlock VerticalAlignment="Center" Text="{x:Static p:Resources.Label_Cards}" />
 			</StackPanel>
 
-			<Grid Grid.Row="9" Grid.Column="0" Grid.ColumnSpan="2" Margin="3" VerticalAlignment="Center">
+			<Grid Grid.Row="11" Grid.Column="0" Grid.ColumnSpan="2" Margin="3" VerticalAlignment="Center">
 				<Grid.ColumnDefinitions>
 					<ColumnDefinition Width="*" />
 					<ColumnDefinition Width="*" />

@@ -558,6 +558,7 @@
 						<ComboBoxItem Content="{x:Static p:Resources.Item_BoosterCost}" />
 						<ComboBoxItem Content="{x:Static p:Resources.Item_BoosterCostIgnoringWildcards}" />
 						<ComboBoxItem Content="{x:Static p:Resources.Item_BoosterCostIgnoringCollection}" />
+						<ComboBoxItem Content="{x:Static p:Resources.Item_DeckScore}" />
 						<ComboBoxItem Content="{x:Static p:Resources.Item_WinRate}" />
 						<ComboBoxItem Content="{x:Static p:Resources.Item_MythicRareCount}" />
 						<ComboBoxItem Content="{x:Static p:Resources.Item_RareCount}" />

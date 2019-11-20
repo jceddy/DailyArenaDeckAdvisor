@@ -331,6 +331,15 @@ namespace DailyArena.DeckAdvisor.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Deck Score.
+        /// </summary>
+        public static string Item_DeckScore {
+            get {
+                return ResourceManager.GetString("Item_DeckScore", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Default.
         /// </summary>
         public static string Item_Default {
@@ -439,6 +448,15 @@ namespace DailyArena.DeckAdvisor.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to  games recorded.
+        /// </summary>
+        public static string Label_GamesRecorded {
+            get {
+                return ResourceManager.GetString("Label_GamesRecorded", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Hide decks from my collection.
         /// </summary>
         public static string Label_HideFromCollection {
@@ -471,6 +489,24 @@ namespace DailyArena.DeckAdvisor.Properties {
         public static string Label_HideMissingWildcards {
             get {
                 return ResourceManager.GetString("Label_HideMissingWildcards", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Hide decks with Score lower than .
+        /// </summary>
+        public static string Label_HideScoreLower {
+            get {
+                return ResourceManager.GetString("Label_HideScoreLower", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Hide decks with fewer than .
+        /// </summary>
+        public static string Label_HideWithFewer {
+            get {
+                return ResourceManager.GetString("Label_HideWithFewer", resourceCulture);
             }
         }
         

@@ -237,6 +237,10 @@
     <value>Conde de los Comunes</value>
     <comment>The string for Common Count in the Sort ComboBox.</comment>
   </data>
+  <data name="Item_DeckScore" xml:space="preserve">
+    <value>Puntuación de Baraja</value>
+    <comment>String for "Deck Score" sort item.</comment>
+  </data>
   <data name="Item_Default" xml:space="preserve">
     <value>Defecto</value>
     <comment>The string for Default in the Sort/Dir ComboBox.</comment>
@@ -285,6 +289,10 @@
     <value>Formato:</value>
     <comment>The string for the Format label.</comment>
   </data>
+  <data name="Label_GamesRecorded" xml:space="preserve">
+    <value> juegos grabados</value>
+    <comment>"games recorded" label</comment>
+  </data>
   <data name="Label_HideFromCollection" xml:space="preserve">
     <value>Ocultar barajas de mi colección</value>
     <comment>Label for filter to hide decks from the user's collection on the GUI.</comment>
@@ -300,6 +308,14 @@
   <data name="Label_HideMissingWildcards" xml:space="preserve">
     <value>Ocultar barajas que no tengo comodines para completar</value>
     <comment>Label for filter to hide decks the user doesn't have enough wildcards to complete.</comment>
+  </data>
+  <data name="Label_HideScoreLower" xml:space="preserve">
+    <value>Ocultar barajas con puntaje inferior a </value>
+    <comment>Label for deck score filter.</comment>
+  </data>
+  <data name="Label_HideWithFewer" xml:space="preserve">
+    <value>Ocultar barajas con menos de </value>
+    <comment>Label for "fewer than" filter.</comment>
   </data>
   <data name="Label_HideWithMore" xml:space="preserve">
     <value>Ocultar barajas con más de </value>

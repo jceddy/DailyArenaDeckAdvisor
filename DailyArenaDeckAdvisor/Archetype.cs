@@ -106,6 +106,12 @@ namespace DailyArena.DeckAdvisor
 		public double WinRate { get; private set; }
 
 		/// <summary>
+		/// Gets or sets a Score based on the bottom cutoff of the 99% confidence interval for win rate.
+		/// This Score penalizes decks with fewer recorded games played and will be used for default ordering for Arena Standard.
+		/// </summary>
+		public double Score { get; private set; }
+
+		/// <summary>
 		/// A string version of the win/loss information for this deck, for Xaml binding.
 		/// </summary>
 		public string WinLossView { get; private set; }
@@ -318,6 +324,7 @@ namespace DailyArena.DeckAdvisor
 			Win = win;
 			Loss = loss;
 			WinRate = (double)win / (win + loss);
+			Score = 100.0 * (WinRate - 2.58 * Math.Sqrt(WinRate * (1.0 - WinRate) / (win + loss)) / Math.Sqrt(win + loss));
 
 			if (win == -1 || loss == -1)
 			{
@@ -326,7 +333,7 @@ namespace DailyArena.DeckAdvisor
 			}
 			else
 			{
-				WinLossView = $"{Properties.Resources.Archetype_Win}: {win}, {Properties.Resources.Archetype_Loss}: {loss}, {Properties.Resources.Archetype_Total}: {win + loss} ({WinRate:P})";
+				WinLossView = $"{Properties.Resources.Archetype_Win}: {win}, {Properties.Resources.Archetype_Loss}: {loss}, {Properties.Resources.Archetype_Total}: {win + loss} ({WinRate:P}, {Score:0.##})";
 				WinLossVisibility = Visibility.Visible;
 			}
 

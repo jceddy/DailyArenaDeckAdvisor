@@ -2237,6 +2237,14 @@ namespace DailyArena.DeckAdvisor
 					x => x.MainDeckToCollect.Sum(y => y.Value) + x.SideboardToCollect.Sum(y => y.Value) == x.SuggestedReplacements.Sum(y => y.Item3)
 				).ToList();
 			}
+			if(filters.HideScoreThreshold)
+			{
+				_filteredArchetypes = _filteredArchetypes.Where(x => x.Score >= filters.ScoreThreshold).ToList();
+			}
+			if (filters.HideGamesRecorded)
+			{
+				_filteredArchetypes = _filteredArchetypes.Where(x => (x.Win + x.Loss) >= filters.GamesThreshold).ToList();
+			}
 			if (filters.HideMythic || filters.HideRare || filters.HideUncommon || filters.HideCommon)
 			{
 				_filteredArchetypes = _filteredArchetypes.Where(
@@ -2552,6 +2560,7 @@ namespace DailyArena.DeckAdvisor
 				Properties.Resources.Item_BoosterCost,
 				Properties.Resources.Item_BoosterCostIgnoringWildcards,
 				Properties.Resources.Item_BoosterCostIgnoringCollection,
+				Properties.Resources.Item_DeckScore,
 				Properties.Resources.Item_WinRate,
 				Properties.Resources.Item_MythicRareCount,
 				Properties.Resources.Item_RareCount,
@@ -2769,9 +2778,14 @@ namespace DailyArena.DeckAdvisor
 			{
 				orderFunc = x => SortDir.Value == Properties.Resources.Item_Descending ? 0.0 - x.TotalBoosterCost : x.TotalBoosterCost;
 			}
+			else if (Sort.Value == Properties.Resources.Item_DeckScore)
+			{
+				// default is descending for win rate (highest score on top), most default to ascending (lowest cost on top)
+				orderFunc = x => SortDir.Value == Properties.Resources.Item_Ascending ? x.Score : 0.0 - x.Score;
+			}
 			else if(Sort.Value == Properties.Resources.Item_WinRate)
 			{
-				// default is descending for win rate (highest win rate on top), all others default to ascending (lowest cost on top)
+				// default is descending for win rate (highest win rate on top), most default to ascending (lowest cost on top)
 				orderFunc = x => SortDir.Value == Properties.Resources.Item_Ascending ? x.WinRate : 0.0 - x.WinRate;
 			}
 			else if (Sort.Value == Properties.Resources.Item_MythicRareCount)
@@ -2793,8 +2807,8 @@ namespace DailyArena.DeckAdvisor
 
 			if (Format == Properties.Resources.Item_ArenaStandard)
 			{
-				// for Arena Standard, use slightly different ordering, favoring win rate over estimated booster cost
-				_orderedArchetypes = _filteredArchetypes.OrderBy(orderFunc).ThenBy(x => x.IsPlayerDeck ? 0 : 1).ThenBy(x => x.BoosterCost == 0 ? 0 : (x.BoosterCostAfterWC == 0 ? 1 : 2)).ThenByDescending(x => x.BoosterCostAfterWC == 0 ? x.WinRate : x.BoosterCostAfterWC).ThenBy(x => x.BoosterCostAfterWC).ThenBy(x => x.BoosterCost);
+				// for Arena Standard, use slightly different ordering, favoring deck score over and win rate estimated booster cost
+				_orderedArchetypes = _filteredArchetypes.OrderBy(orderFunc).ThenBy(x => x.IsPlayerDeck ? 0 : 1).ThenBy(x => x.BoosterCost == 0 ? 0 : (x.BoosterCostAfterWC == 0 ? 1 : 2)).ThenByDescending(x => x.BoosterCostAfterWC == 0 ? x.Score : x.BoosterCostAfterWC).ThenByDescending(x => x.BoosterCostAfterWC == 0 ? x.WinRate : x.BoosterCostAfterWC).ThenBy(x => x.BoosterCostAfterWC).ThenBy(x => x.BoosterCost);
 			}
 			else
 			{

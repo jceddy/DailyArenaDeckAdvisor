@@ -237,6 +237,10 @@
     <value>Common Count</value>
     <comment>The string for Common Count in the Sort ComboBox.</comment>
   </data>
+  <data name="Item_DeckScore" xml:space="preserve">
+    <value>Deck Score</value>
+    <comment>String for "Deck Score" sort item.</comment>
+  </data>
   <data name="Item_Default" xml:space="preserve">
     <value>Default</value>
     <comment>The string for Default in the Sort/Dir ComboBox.</comment>
@@ -285,6 +289,10 @@
     <value>Format:</value>
     <comment>The string for the Format label.</comment>
   </data>
+  <data name="Label_GamesRecorded" xml:space="preserve">
+    <value> games recorded</value>
+    <comment>"games recorded" label</comment>
+  </data>
   <data name="Label_HideFromCollection" xml:space="preserve">
     <value>Hide decks from my collection</value>
     <comment>Label for filter to hide decks from the user's collection on the GUI.</comment>
@@ -300,6 +308,14 @@
   <data name="Label_HideMissingWildcards" xml:space="preserve">
     <value>Hide decks I don't have wildcards to complete</value>
     <comment>Label for filter to hide decks the user doesn't have enough wildcards to complete.</comment>
+  </data>
+  <data name="Label_HideScoreLower" xml:space="preserve">
+    <value>Hide decks with Score lower than </value>
+    <comment>Label for deck score filter.</comment>
+  </data>
+  <data name="Label_HideWithFewer" xml:space="preserve">
+    <value>Hide decks with fewer than </value>
+    <comment>Label for "fewer than" filter.</comment>
   </data>
   <data name="Label_HideWithMore" xml:space="preserve">
     <value>Hide decks with more than </value>
