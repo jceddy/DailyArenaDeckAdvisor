@@ -1071,6 +1071,7 @@ namespace DailyArena.DeckAdvisor
 
 						if (line.Contains("PlayerInventory.GetPlayerCardsV3"))
 						{
+							Logger.Debug(@"Processing player card inventory...");
 							playerCardsFound = true;
 							_playerInventory.Clear();
 							_basicLands.Clear();
@@ -1123,6 +1124,7 @@ namespace DailyArena.DeckAdvisor
 						}
 						else if (line.Contains("PlayerInventory.GetPlayerInventory"))
 						{
+							Logger.Debug(@"Processing player wildcard inventory...");
 							playerInventoryFound = true;
 							_wildcardsOwned[CardRarity.Common] = 0;
 							_wildcardsOwned[CardRarity.Uncommon] = 0;
@@ -1171,6 +1173,7 @@ namespace DailyArena.DeckAdvisor
 						}
 						else if (line.Contains("Deck.GetDeckListsV3") && !filters.HideFromCollection)
 						{
+							Logger.Debug(@"Processing player deck list...");
 							StringBuilder deckListJson = new StringBuilder();
 							if(line.EndsWith("["))
 							{
@@ -1388,6 +1391,7 @@ namespace DailyArena.DeckAdvisor
 						}
 						else if((line.Contains("Deck.CreateDeckV3") || line.Contains("Deck.UpdateDeckV3")) && !filters.HideFromCollection)
 						{
+							Logger.Debug(@"Processing player deck create/update...");
 							StringBuilder deckListJson = new StringBuilder();
 							line = reader.ReadLine();
 							while (line != "}")
@@ -1596,6 +1600,7 @@ namespace DailyArena.DeckAdvisor
 						}
 						else if (line.Contains("Deck.DeleteDeck") && !filters.HideFromCollection)
 						{
+							Logger.Debug(@"Processing player deck delete...");
 							StringBuilder deckListJson = new StringBuilder();
 							line = reader.ReadLine();
 							if(line != "{")
@@ -1616,6 +1621,11 @@ namespace DailyArena.DeckAdvisor
 							{
 								_playerDecks.Remove(id);
 							}
+						}
+						else if(line.StartsWith("[Accounts - Login] Logged in successfully. Display Name:"))
+						{
+							Logger.Debug(@"New login detected, clearing player deck list...");
+							_playerDecks.Clear();
 						}
 					}
 				}
