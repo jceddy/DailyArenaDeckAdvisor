@@ -1,8 +1,8 @@
 ﻿<Project>
 	<PropertyGroup>
-		<Version>1.0.6.0</Version>
-		<AssemblyVersion>1.0.6.0</AssemblyVersion>
-		<FileVersion>1.0.6.0</FileVersion>
+		<Version>1.0.6.3</Version>
+		<AssemblyVersion>1.0.6.3</AssemblyVersion>
+		<FileVersion>1.0.6.3</FileVersion>
 		<Copyright>© 2019 DailyArena</Copyright>
 		<Authors>Joseph Eddy</Authors>
 	</PropertyGroup>

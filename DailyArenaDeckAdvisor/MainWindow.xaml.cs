@@ -1,4 +1,5 @@
-﻿using DailyArena.Common.Bindable;
+﻿using DailyArena.Common.Core.Bindable;
+using DailyArena.Common.Core.Database;
 using DailyArena.Common.Core.Utility;
 using DailyArena.Common.Database;
 using DailyArena.Common.Utility;
@@ -10,7 +11,6 @@ using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Configuration;
 using System.Diagnostics;
@@ -216,6 +216,7 @@ namespace DailyArena.DeckAdvisor
 			Logger.Debug("Main Window Constructor Called - {0}", ApplicationName);
 
 			this.InitializeProgram();
+			WpfInitializer.InitializeDelegates();
 
 			LoadingText = new Bindable<string>() { Value = Properties.Resources.Loading_LoadingCardDatabase };
 
@@ -1049,23 +1050,24 @@ namespace DailyArena.DeckAdvisor
 
 						if (line.Contains("PlayerInventory.GetPlayerCardsV3"))
 						{
-							Logger.Debug(@"Processing player card inventory...");
-							playerCardsFound = true;
-							_playerInventory.Clear();
-							_basicLands.Clear();
-							_playerInventoryCounts.Clear();
-							line = reader.ReadLine();
-							while (line != "}")
+							int jsonStart = line.IndexOf("{");
+							int jsonEnd = line.LastIndexOf("}");
+							string jsonString = line.Substring(jsonStart, jsonEnd - jsonStart + 1);
+							dynamic json = JToken.Parse(jsonString);
+
+							if (json.payload != null)
 							{
-								if (line.Contains("jsonrpc") || line.Contains("params"))
+								Logger.Debug(@"Processing player card inventory...");
+								playerCardsFound = true;
+								_playerInventory.Clear();
+								_basicLands.Clear();
+								_playerInventoryCounts.Clear();
+
+								foreach(dynamic info in json.payload)
 								{
-									break;
-								}
-								if (!string.IsNullOrWhiteSpace(line) && line != "{")
-								{
-									var lineInfo = line.Replace(",", "").Replace("\"", "").Trim().Split(':');
-									int id = int.Parse(lineInfo[0]);
-									int count = int.Parse(lineInfo[1]);
+									int id = int.Parse(info.Name);
+									int count = info.Value;
+
 									Card card = cardsById[id];
 									Set set = card.Set;
 									if ((RotationProof.NotValue || card.RotationSafe) && (card.StandardLegal || Format == Properties.Resources.Item_Historic_Bo1 || Format == Properties.Resources.Item_Historic_Bo3))
@@ -1092,164 +1094,133 @@ namespace DailyArena.DeckAdvisor
 										}
 									}
 								}
-								line = reader.ReadLine();
-							}
 
-							if (!(line.Contains("jsonrpc") || line.Contains("params")))
-							{
 								LoadingValue.Value = Math.Max(LoadingValue.Value, 40);
 							}
 						}
 						else if (line.Contains("PlayerInventory.GetPlayerInventory"))
 						{
-							Logger.Debug(@"Processing player wildcard inventory...");
-							playerInventoryFound = true;
-							_wildcardsOwned[CardRarity.Common] = 0;
-							_wildcardsOwned[CardRarity.Uncommon] = 0;
-							_wildcardsOwned[CardRarity.Rare] = 0;
-							_wildcardsOwned[CardRarity.MythicRare] = 0;
-							line = reader.ReadLine();
-							while (line != "}")
-							{
-								if (line.Contains("jsonrpc") || line.Contains("params"))
-								{
-									break;
-								}
-								if (!string.IsNullOrWhiteSpace(line) && line != "{")
-								{
-									var lineInfo = line.Replace(",", "").Replace("\"", "").Trim().Split(':');
-									string id = lineInfo[0];
-									if (id.StartsWith("wc"))
-									{
-										int count = int.Parse(lineInfo[1]);
-										switch (id)
-										{
-											case "wcCommon":
-												_wildcardsOwned[CardRarity.Common] = count;
-												break;
-											case "wcUncommon":
-												_wildcardsOwned[CardRarity.Uncommon] = count;
-												break;
-											case "wcRare":
-												_wildcardsOwned[CardRarity.Rare] = count;
-												break;
-											case "wcMythic":
-												_wildcardsOwned[CardRarity.MythicRare] = count;
-												break;
-											default:
-												break;
-										}
-									}
-								}
-								line = reader.ReadLine();
-							}
+							int jsonStart = line.IndexOf("{");
+							int jsonEnd = line.LastIndexOf("}");
+							string jsonString = line.Substring(jsonStart, jsonEnd - jsonStart + 1);
+							dynamic json = JToken.Parse(jsonString);
 
-							if (!(line.Contains("jsonrpc") || line.Contains("params")))
+							if(json.payload != null)
 							{
+								Logger.Debug(@"Processing player wildcard inventory...");
+								playerInventoryFound = true;
+								_wildcardsOwned[CardRarity.Common] = json.payload.wcCommon ?? 0;
+								_wildcardsOwned[CardRarity.Uncommon] = json.payload.wcUncommon ?? 0;
+								_wildcardsOwned[CardRarity.Rare] = json.payload.wcRare ?? 0;
+								_wildcardsOwned[CardRarity.MythicRare] = json.payload.wcMythic ?? 0;
+
 								LoadingValue.Value = Math.Max(LoadingValue.Value, 60);
 							}
 						}
 						else if (line.Contains("Deck.GetDeckListsV3") && !filters.HideFromCollection)
 						{
-							Logger.Debug(@"Processing player deck list...");
-							StringBuilder deckListJson = new StringBuilder();
-							if(line.EndsWith("["))
+							int jsonStart = line.IndexOf("{");
+							int jsonEnd = line.LastIndexOf("}");
+							string jsonString = line.Substring(jsonStart, jsonEnd - jsonStart + 1);
+							dynamic json = JToken.Parse(jsonString);
+
+							if (json.payload != null)
 							{
-								deckListJson.AppendLine("[");
-							}
-							line = reader.ReadLine();
-							if (line != "[]")
-							{
-								while (line != "]")
+								Logger.Debug(@"Processing player deck list...");
+
+								foreach (dynamic deck in json.payload)
 								{
-									if (line.Contains("jsonrpc") || line.Contains("params"))
+									string name = deck["name"];
+									int[] commandZone = deck["commandZoneGRPIds"] == null ? new int[0] : deck["commandZoneGRPIds"].ToObject<int[]>();
+									int[] mainDeck = deck["mainDeck"].ToObject<int[]>();
+									int[] sideboard = deck["sideboard"].ToObject<int[]>();
+									Guid id = Guid.Parse((string)deck["id"]);
+									if (_playerDecks.ContainsKey(id))
 									{
-										break;
+										_playerDecks.Remove(id);
 									}
-									deckListJson.AppendLine(line);
-									line = reader.ReadLine();
-								}
-								if (line == "]")
-								{
-									deckListJson.AppendLine(line);
-									dynamic json = JToken.Parse(deckListJson.ToString());
-									foreach (dynamic deck in json)
+									Dictionary<string, int> mainDeckByName = new Dictionary<string, int>();
+									Dictionary<string, int> sideboardByName = new Dictionary<string, int>();
+									Dictionary<string, int> commandZoneByName = new Dictionary<string, int>();
+
+									if (Format == Properties.Resources.Item_Brawl && commandZone.Length == 0)
 									{
-										string name = deck["name"];
-										int[] commandZone = deck["commandZoneGRPIds"] == null ? new int[0] : deck["commandZoneGRPIds"].ToObject<int[]>();
-										int[] mainDeck = deck["mainDeck"].ToObject<int[]>();
-										int[] sideboard = deck["sideboard"].ToObject<int[]>();
-										Guid id = Guid.Parse((string)deck["id"]);
-										if (_playerDecks.ContainsKey(id))
-										{
-											_playerDecks.Remove(id);
-										}
-										Dictionary<string, int> mainDeckByName = new Dictionary<string, int>();
-										Dictionary<string, int> sideboardByName = new Dictionary<string, int>();
-										Dictionary<string, int> commandZoneByName = new Dictionary<string, int>();
+										continue;
+									}
+									else if ((Format == Properties.Resources.Item_Standard || Format == Properties.Resources.Item_Historic_Bo3) && (sideboard.Length == 0 || commandZone.Length > 0))
+									{
+										continue;
+									}
+									else if ((Format == Properties.Resources.Item_ArenaStandard || Format == Properties.Resources.Item_Historic_Bo1) && (sideboard.Length > 0 || commandZone.Length > 0))
+									{
+										continue;
+									}
 
-										if (Format == Properties.Resources.Item_Brawl && commandZone.Length == 0)
+									for (int i = 0; i < mainDeck.Length; i += 2)
+									{
+										string cardName = cardsById[mainDeck[i]].Name;
+										int cardQuantity = mainDeck[i + 1];
+										if (mainDeckByName.ContainsKey(cardName))
 										{
-											continue;
+											mainDeckByName[cardName] += cardQuantity;
 										}
-										else if ((Format == Properties.Resources.Item_Standard || Format == Properties.Resources.Item_Historic_Bo3) && (sideboard.Length == 0 || commandZone.Length > 0))
+										else
 										{
-											continue;
+											mainDeckByName.Add(cardName, cardQuantity);
 										}
-										else if ((Format == Properties.Resources.Item_ArenaStandard || Format == Properties.Resources.Item_Historic_Bo1) && (sideboard.Length > 0 || commandZone.Length > 0))
+									}
+									for (int i = 0; i < sideboard.Length; i += 2)
+									{
+										string cardName = cardsById[sideboard[i]].Name;
+										int cardQuantity = sideboard[i + 1];
+										if (sideboardByName.ContainsKey(cardName))
 										{
-											continue;
+											sideboardByName[cardName] += cardQuantity;
+										}
+										else
+										{
+											sideboardByName.Add(cardName, cardQuantity);
+										}
+									}
+									for (int i = 0; i < commandZone.Length; i += 2)
+									{
+										string cardName = cardsById[commandZone[i]].Name;
+										int cardQuantity = commandZone[i + 1];
+										if (commandZoneByName.ContainsKey(cardName))
+										{
+											commandZoneByName[cardName] += cardQuantity;
+										}
+										else
+										{
+											commandZoneByName.Add(cardName, cardQuantity);
+										}
+									}
+
+									if (RotationProof.Value)
+									{
+										// check whether there are any cards in the deck that aren't rotation-proof...if so, ignore this deck
+										Logger.Debug(@"Doing ""rotation-proof"" check...");
+										bool ignoreDeck = false;
+										foreach (var card in mainDeckByName)
+										{
+											string cardName = card.Key;
+											Logger.Debug("Checking main deck card: {cardName}", cardName);
+
+											if (cardsByName[cardName].Count(x => x.Set.RotationSafe) == 0)
+											{
+												Logger.Debug("{cardName} is rotating soon, ignore this deck", cardName);
+												ignoreDeck = true;
+												break;
+											}
 										}
 
-										for (int i = 0; i < mainDeck.Length; i += 2)
+										if (!ignoreDeck)
 										{
-											string cardName = cardsById[mainDeck[i]].Name;
-											int cardQuantity = mainDeck[i + 1];
-											if (mainDeckByName.ContainsKey(cardName))
-											{
-												mainDeckByName[cardName] += cardQuantity;
-											}
-											else
-											{
-												mainDeckByName.Add(cardName, cardQuantity);
-											}
-										}
-										for (int i = 0; i < sideboard.Length; i += 2)
-										{
-											string cardName = cardsById[sideboard[i]].Name;
-											int cardQuantity = sideboard[i + 1];
-											if (sideboardByName.ContainsKey(cardName))
-											{
-												sideboardByName[cardName] += cardQuantity;
-											}
-											else
-											{
-												sideboardByName.Add(cardName, cardQuantity);
-											}
-										}
-										for (int i = 0; i < commandZone.Length; i += 2)
-										{
-											string cardName = cardsById[commandZone[i]].Name;
-											int cardQuantity = commandZone[i + 1];
-											if (commandZoneByName.ContainsKey(cardName))
-											{
-												commandZoneByName[cardName] += cardQuantity;
-											}
-											else
-											{
-												commandZoneByName.Add(cardName, cardQuantity);
-											}
-										}
-
-										if (RotationProof.Value)
-										{
-											// check whether there are any cards in the deck that aren't rotation-proof...if so, ignore this deck
-											Logger.Debug(@"Doing ""rotation-proof"" check...");
-											bool ignoreDeck = false;
-											foreach (var card in mainDeckByName)
+											foreach (var card in sideboardByName)
 											{
 												string cardName = card.Key;
-												Logger.Debug("Checking main deck card: {cardName}", cardName);
+
+												Logger.Debug("Checking sideboard card: {cardName}", cardName);
 
 												if (cardsByName[cardName].Count(x => x.Set.RotationSafe) == 0)
 												{
@@ -1258,55 +1229,55 @@ namespace DailyArena.DeckAdvisor
 													break;
 												}
 											}
-
-											if (!ignoreDeck)
-											{
-												foreach (var card in sideboardByName)
-												{
-													string cardName = card.Key;
-
-													Logger.Debug("Checking sideboard card: {cardName}", cardName);
-
-													if (cardsByName[cardName].Count(x => x.Set.RotationSafe) == 0)
-													{
-														Logger.Debug("{cardName} is rotating soon, ignore this deck", cardName);
-														ignoreDeck = true;
-														break;
-													}
-												}
-											}
-
-											if (!ignoreDeck)
-											{
-												foreach (var card in commandZoneByName)
-												{
-													string cardName = card.Key;
-
-													Logger.Debug("Checking command zone card: {cardName}", cardName);
-
-													if (cardsByName[cardName].Count(x => x.Set.RotationSafe) == 0)
-													{
-														Logger.Debug("{cardName} is rotating soon, ignore this deck", cardName);
-														ignoreDeck = true;
-														break;
-													}
-												}
-											}
-
-											if (ignoreDeck)
-											{
-												continue;
-											}
 										}
-										else if (Format != Properties.Resources.Item_Historic_Bo1 && Format != Properties.Resources.Item_Historic_Bo3)
+
+										if (!ignoreDeck)
 										{
-											// check whether there are any cards in the deck that aren't in standard...if so, ignore this deck
-											Logger.Debug(@"Doing Standard legality check...");
-											bool ignoreDeck = false;
-											foreach (var card in mainDeckByName)
+											foreach (var card in commandZoneByName)
 											{
 												string cardName = card.Key;
-												Logger.Debug("Checking main deck card: {cardName}", cardName);
+
+												Logger.Debug("Checking command zone card: {cardName}", cardName);
+
+												if (cardsByName[cardName].Count(x => x.Set.RotationSafe) == 0)
+												{
+													Logger.Debug("{cardName} is rotating soon, ignore this deck", cardName);
+													ignoreDeck = true;
+													break;
+												}
+											}
+										}
+
+										if (ignoreDeck)
+										{
+											continue;
+										}
+									}
+									else if (Format != Properties.Resources.Item_Historic_Bo1 && Format != Properties.Resources.Item_Historic_Bo3)
+									{
+										// check whether there are any cards in the deck that aren't in standard...if so, ignore this deck
+										Logger.Debug(@"Doing Standard legality check...");
+										bool ignoreDeck = false;
+										foreach (var card in mainDeckByName)
+										{
+											string cardName = card.Key;
+											Logger.Debug("Checking main deck card: {cardName}", cardName);
+
+											if (cardsByName[cardName].Count(x => x.Set.StandardLegal) == 0)
+											{
+												Logger.Debug("{cardName} is not standard legal, ignore this deck", cardName);
+												ignoreDeck = true;
+												break;
+											}
+										}
+
+										if (!ignoreDeck)
+										{
+											foreach (var card in sideboardByName)
+											{
+												string cardName = card.Key;
+
+												Logger.Debug("Checking sideboard card: {cardName}", cardName);
 
 												if (cardsByName[cardName].Count(x => x.Set.StandardLegal) == 0)
 												{
@@ -1315,76 +1286,49 @@ namespace DailyArena.DeckAdvisor
 													break;
 												}
 											}
+										}
 
-											if (!ignoreDeck)
+										if (!ignoreDeck)
+										{
+											foreach (var card in commandZoneByName)
 											{
-												foreach (var card in sideboardByName)
+												string cardName = card.Key;
+
+												Logger.Debug("Checking command zone card: {cardName}", cardName);
+
+												if (cardsByName[cardName].Count(x => x.Set.StandardLegal) == 0)
 												{
-													string cardName = card.Key;
-
-													Logger.Debug("Checking sideboard card: {cardName}", cardName);
-
-													if (cardsByName[cardName].Count(x => x.Set.StandardLegal) == 0)
-													{
-														Logger.Debug("{cardName} is not standard legal, ignore this deck", cardName);
-														ignoreDeck = true;
-														break;
-													}
+													Logger.Debug("{cardName} is not standard legal, ignore this deck", cardName);
+													ignoreDeck = true;
+													break;
 												}
-											}
-
-											if (!ignoreDeck)
-											{
-												foreach (var card in commandZoneByName)
-												{
-													string cardName = card.Key;
-
-													Logger.Debug("Checking command zone card: {cardName}", cardName);
-
-													if (cardsByName[cardName].Count(x => x.Set.StandardLegal) == 0)
-													{
-														Logger.Debug("{cardName} is not standard legal, ignore this deck", cardName);
-														ignoreDeck = true;
-														break;
-													}
-												}
-											}
-
-											if (ignoreDeck)
-											{
-												continue;
 											}
 										}
 
-										_playerDecks.Add(id, new Archetype(name, mainDeckByName, sideboardByName, commandZoneByName, RotationProof.Value, isPlayerDeck: true,
-											setNameTranslations: _setNameTranslations));
+										if (ignoreDeck)
+										{
+											continue;
+										}
 									}
-								}
-							}
 
-							if (!(line.Contains("jsonrpc") || line.Contains("params")))
-							{
+									_playerDecks.Add(id, new Archetype(name, mainDeckByName, sideboardByName, commandZoneByName, RotationProof.Value, isPlayerDeck: true,
+										setNameTranslations: _setNameTranslations));
+								}
+
 								LoadingValue.Value = Math.Max(LoadingValue.Value, 20);
 							}
 						}
 						else if((line.Contains("Deck.CreateDeckV3") || line.Contains("Deck.UpdateDeckV3")) && !filters.HideFromCollection)
 						{
-							Logger.Debug(@"Processing player deck create/update...");
-							StringBuilder deckListJson = new StringBuilder();
-							line = reader.ReadLine();
-							while (line != "}")
+							int jsonStart = line.IndexOf("{");
+							int jsonEnd = line.LastIndexOf("}");
+							string jsonString = line.Substring(jsonStart, jsonEnd - jsonStart + 1);
+							dynamic json = JToken.Parse(jsonString);
+
+							if(json.payload != null)
 							{
-								if (line.Contains("jsonrpc") || line.Contains("params"))
-								{
-									break;
-								}
-								deckListJson.AppendLine(line);
-								line = reader.ReadLine();
-							}
-							if (line == "}")
-							{
-								deckListJson.AppendLine(line);
-								dynamic deck = JToken.Parse(deckListJson.ToString());
+								Logger.Debug(@"Processing player deck create/update...");
+								dynamic deck = json.payload;
 
 								string name = deck["name"];
 								int[] commandZone = deck["commandZoneGRPIds"] == null ? new int[0] : deck["commandZoneGRPIds"].ToObject<int[]>();
@@ -1569,38 +1513,30 @@ namespace DailyArena.DeckAdvisor
 
 								_playerDecks.Add(id, new Archetype(name, mainDeckByName, sideboardByName, commandZoneByName, RotationProof.Value, isPlayerDeck: true,
 									setNameTranslations: _setNameTranslations));
-							}
 
-							if (!(line.Contains("jsonrpc") || line.Contains("params")))
-							{
 								LoadingValue.Value = Math.Max(LoadingValue.Value, 80);
 							}
 						}
 						else if (line.Contains("Deck.DeleteDeck") && !filters.HideFromCollection)
 						{
-							Logger.Debug(@"Processing player deck delete...");
-							StringBuilder deckListJson = new StringBuilder();
-							line = reader.ReadLine();
-							if(line != "{")
-							{
-								break;
-							}
-							while (line != "}")
-							{
-								deckListJson.AppendLine(line);
-								line = reader.ReadLine();
-							}
+							int jsonStart = line.IndexOf("{");
+							int jsonEnd = line.LastIndexOf("}");
+							string jsonString = line.Substring(jsonStart, jsonEnd - jsonStart + 1);
+							dynamic json = JToken.Parse(jsonString);
 
-							deckListJson.AppendLine(line);
-							dynamic deck = JToken.Parse(deckListJson.ToString());
-
-							Guid id = Guid.Parse((string)deck["params"]["deckId"]);
-							if (_playerDecks.ContainsKey(id))
+							if(json.request != null)
 							{
-								_playerDecks.Remove(id);
+								Logger.Debug(@"Processing player deck delete...");
+								dynamic request = JToken.Parse((string)json.request);
+
+								Guid id = Guid.Parse((string)request["params"]["deckId"]);
+								if (_playerDecks.ContainsKey(id))
+								{
+									_playerDecks.Remove(id);
+								}
 							}
 						}
-						else if(line.StartsWith("[Accounts - Login] Logged in successfully. Display Name:"))
+						else if(line.StartsWith("[Accounts - Client] Successfully logged in to account:"))
 						{
 							Logger.Debug(@"New login detected, clearing player deck list...");
 							_playerDecks.Clear();
@@ -2521,77 +2457,14 @@ namespace DailyArena.DeckAdvisor
 
 			Title = Title + $" - ({assemblyVersion}, {assemblyArchitecture})";
 
-			IDeckAdvisorApp application = (IDeckAdvisorApp)Application.Current;
-			Format.Value = application.State.LastFormat;
-			bool saveState = false;
-			if(string.IsNullOrWhiteSpace(Format.Value) || !FormatMappings.ContainsKey(Format.Value))
-			{
-				Format.Value = Properties.Resources.Item_Standard;
-				application.State.LastFormat = Format.Value;
-				saveState = true;
-			}
+			this.InitializeState();
 
-			Sort.Value = application.State.LastSort;
-			List<string> sortStrings = new List<string>()
-			{
-				Properties.Resources.Item_Default,
-				Properties.Resources.Item_BoosterCost,
-				Properties.Resources.Item_BoosterCostIgnoringWildcards,
-				Properties.Resources.Item_BoosterCostIgnoringCollection,
-				Properties.Resources.Item_DeckScore,
-				Properties.Resources.Item_WinRate,
-				Properties.Resources.Item_MythicRareCount,
-				Properties.Resources.Item_RareCount,
-				Properties.Resources.Item_UncommonCount,
-				Properties.Resources.Item_CommonCount
-			};
-			if(string.IsNullOrWhiteSpace(Sort.Value) || !sortStrings.Contains(Sort.Value))
-			{
-				Sort.Value = Properties.Resources.Item_Default;
-				application.State.LastSort = Sort.Value;
-				saveState = true;
-			}
-
-			SortDir.Value = application.State.LastSortDir;
-			List<string> sortDirStrings = new List<string>()
-			{
-				Properties.Resources.Item_Default,
-				Properties.Resources.Item_Ascending,
-				Properties.Resources.Item_Descending
-			};
-			if(string.IsNullOrWhiteSpace(SortDir.Value) || !sortDirStrings.Contains(SortDir.Value))
-			{
-				SortDir.Value = Properties.Resources.Item_Default;
-				application.State.LastSortDir = SortDir.Value;
-				saveState = true;
-			}
-			
-			if(saveState)
-			{
-				application.SaveState();
-			}
-
+			// add propertychanged handlers for various fields
 			Format.PropertyChanged += Format_PropertyChanged;
 			Sort.PropertyChanged += Sort_PropertyChanged;
 			SortDir.PropertyChanged += SortDir_PropertyChanged;
-
-			RotationProof.Value = application.State.RotationProof;
 			RotationProof.PropertyChanged += RotationProof_PropertyChanged;
-
-			CardText.Value = application.State.CardTextFilter;
 			CardText.PropertyChanged += CardText_PropertyChanged;
-
-			int fontSize = application.State.FontSize;
-			if (fontSize < 8 || fontSize > 24)
-			{
-				SelectedFontSize.Value = 12;
-				application.State.FontSize = SelectedFontSize.Value;
-				application.SaveState();
-			}
-			else
-			{
-				SelectedFontSize.Value = fontSize;
-			}
 			SelectedFontSize.PropertyChanged += SelectedFontSize_PropertyChanged;
 
 			Task loadTask = new Task(() => {

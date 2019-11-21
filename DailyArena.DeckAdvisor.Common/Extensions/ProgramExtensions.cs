@@ -1,4 +1,5 @@
-﻿using DailyArena.Common.Core.Utility;
+﻿using DailyArena.Common.Core.Database;
+using DailyArena.Common.Core.Utility;
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
@@ -21,7 +22,7 @@ namespace DailyArena.DeckAdvisor.Common.Extensions
 		/// <param name="app">The program.</param>
 		public static void InitializeProgram(this IDeckAdvisorProgram program)
 		{
-			program.Logger.Debug("InitializeProgram Called - {0}", program.ApplicationName);
+			program.Logger.Debug("InitializeProgram() Called - {0}", program.ApplicationName);
 
 			program.SetCulture();
 
@@ -41,6 +42,7 @@ namespace DailyArena.DeckAdvisor.Common.Extensions
 		/// <summary>
 		/// Sets the current UI culture from app.config if it's set there.
 		/// </summary>
+		/// <param name="app">The program.</param>
 		private static void SetCulture(this IDeckAdvisorProgram program)
 		{
 			program.Logger.Debug("SetCulture() Called - {0}", program.ApplicationName);
@@ -60,8 +62,11 @@ namespace DailyArena.DeckAdvisor.Common.Extensions
 		/// <summary>
 		/// Send usage stats to server.
 		/// </summary>
+		/// <param name="app">The program.</param>
 		private static void SendUsageStats(this IDeckAdvisorProgram program)
 		{
+			program.Logger.Debug("SendUsageStats() Called - {0}", program.ApplicationName);
+
 			new Task(() =>
 			{
 				AssemblyName assemblyName = Assembly.GetExecutingAssembly().GetName();
@@ -86,5 +91,118 @@ namespace DailyArena.DeckAdvisor.Common.Extensions
 				}
 			}).Start();
 		}
+
+		/// <summary>
+		/// Initialize various state variables.
+		/// </summary>
+		/// <param name="app">The program.</param>
+		public static void InitializeState(this IDeckAdvisorProgram program)
+		{
+			program.Logger.Debug("InitializeState() Called - {0}", program.ApplicationName);
+
+			bool saveState = false;
+			program.Format.Value = program.CurrentApp.State.LastFormat;
+			if (string.IsNullOrWhiteSpace(program.Format.Value) || !program.FormatMappings.ContainsKey(program.Format.Value))
+			{
+				program.Format.Value = program.GetLocalizedString("Item_Standard");
+				program.CurrentApp.State.LastFormat = program.Format.Value;
+				saveState = true;
+			}
+
+			program.Sort.Value = program.CurrentApp.State.LastSort;
+			List<string> sortStrings = new List<string>()
+			{
+				program.GetLocalizedString("Item_Default"),
+				program.GetLocalizedString("Item_BoosterCost"),
+				program.GetLocalizedString("Item_BoosterCostIgnoringWildcards"),
+				program.GetLocalizedString("Item_BoosterCostIgnoringCollection"),
+				program.GetLocalizedString("Item_DeckScore"),
+				program.GetLocalizedString("Item_WinRate"),
+				program.GetLocalizedString("Item_MythicRareCount"),
+				program.GetLocalizedString("Item_RareCount"),
+				program.GetLocalizedString("Item_UncommonCount"),
+				program.GetLocalizedString("Item_CommonCount")
+			};
+			if (string.IsNullOrWhiteSpace(program.Sort.Value) || !sortStrings.Contains(program.Sort.Value))
+			{
+				program.Sort.Value = program.GetLocalizedString("Item_Default");
+				program.CurrentApp.State.LastSort = program.Sort.Value;
+				saveState = true;
+			}
+
+			program.SortDir.Value = program.CurrentApp.State.LastSortDir;
+			List<string> sortDirStrings = new List<string>()
+			{
+				program.GetLocalizedString("Item_Default"),
+				program.GetLocalizedString("Item_Ascending"),
+				program.GetLocalizedString("Item_Descending")
+			};
+			if (string.IsNullOrWhiteSpace(program.SortDir.Value) || !sortDirStrings.Contains(program.SortDir.Value))
+			{
+				program.SortDir.Value = program.GetLocalizedString("Item_Default");
+				program.CurrentApp.State.LastSortDir = program.SortDir.Value;
+				saveState = true;
+			}
+
+			program.RotationProof.Value = program.CurrentApp.State.RotationProof;
+			program.CardText.Value = program.CurrentApp.State.CardTextFilter;
+
+			int fontSize = program.CurrentApp.State.FontSize;
+			if (fontSize < 8 || fontSize > 24)
+			{
+				program.SelectedFontSize.Value = 12;
+				program.CurrentApp.State.FontSize = program.SelectedFontSize.Value;
+				saveState = true;
+			}
+			else
+			{
+				program.SelectedFontSize.Value = fontSize;
+			}
+
+			if (saveState)
+			{
+				program.CurrentApp.SaveState();
+			}
+		}
+
+		/// <summary>
+		/// Initialize the card database, and populate objects that are loaded from the back-end server.
+		/// </summary>
+		/// <param name="app">The program.</param>
+		/*public static Task InitializeDatabaseAndPopulate(this IDeckAdvisorProgram program)
+		{
+			program.Logger.Debug("InitializeDatabaseAndPopulate() Called - {0}", program.ApplicationName);
+
+			Task loadTask = new Task(() => {
+				program.Logger.Debug("Initializing Card Database");
+				CardDatabase.Initialize(false);
+				LoadingValue.Value = 20;
+
+				PopulateColorsByLand();
+				LoadingValue.Value = 30;
+
+				PopulateStandardBannings();
+				LoadingValue.Value = 40;
+
+				PopulateSetTranslations();
+				LoadingValue.Value = 50;
+
+				ReloadAndCrunchAllData();
+			});
+			loadTask.ContinueWith(t =>
+				{
+					if (t.Exception != null)
+					{
+						Logger.Error(t.Exception, "Exception in {0} ({1} - {2})", "loadTask", "Window_Loaded", ApplicationName);
+
+						ReportException("loadTask", "Window_Loaded", t.Exception);
+					}
+				},
+				TaskContinuationOptions.OnlyOnFaulted
+			);
+			loadTask.Start();
+
+			return loadTask;
+		}*/
 	}
 }

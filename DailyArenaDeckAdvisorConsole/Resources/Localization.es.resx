@@ -121,9 +121,41 @@
     <value>Arena Estándar</value>
     <comment>The string for Arena Standard in the Format ComboBox.</comment>
   </data>
+  <data name="Item_Ascending" xml:space="preserve">
+    <value>Ascendente</value>
+    <comment>The string for Ascending in the Sort Dir ComboBox.</comment>
+  </data>
+  <data name="Item_BoosterCost" xml:space="preserve">
+    <value>Costo en Paquetes</value>
+    <comment>The string for Booster Cost in the Sort ComboBox.</comment>
+  </data>
+  <data name="Item_BoosterCostIgnoringCollection" xml:space="preserve">
+    <value>Costo en Paquetes (Ignorando la Colección)</value>
+    <comment>The string for Booster Cost (Ignoring Collection) in the Sort ComboBox.</comment>
+  </data>
+  <data name="Item_BoosterCostIgnoringWildcards" xml:space="preserve">
+    <value>Costo en Paquetes (Ignorando los Comodines)</value>
+    <comment>The string for Booster Cost (Ignoring Wildcards) in the Sort ComboBox.</comment>
+  </data>
   <data name="Item_Brawl" xml:space="preserve">
     <value>Pelea</value>
     <comment>The string for Brawl in the Format ComboBox.</comment>
+  </data>
+  <data name="Item_CommonCount" xml:space="preserve">
+    <value>Conde de los Comunes</value>
+    <comment>The string for Common Count in the Sort ComboBox.</comment>
+  </data>
+  <data name="Item_DeckScore" xml:space="preserve">
+    <value>Puntuación de Baraja</value>
+    <comment>String for "Deck Score" sort item.</comment>
+  </data>
+  <data name="Item_Default" xml:space="preserve">
+    <value>Defecto</value>
+    <comment>The string for Default in the Sort/Dir ComboBox.</comment>
+  </data>
+  <data name="Item_Descending" xml:space="preserve">
+    <value>Descendente</value>
+    <comment>The string for Descending in the Sort Dir ComboBox.</comment>
   </data>
   <data name="Item_Historic_Bo1" xml:space="preserve">
     <value>Histórica (Bo1)</value>
@@ -133,9 +165,25 @@
     <value>Histórica (Bo3)</value>
     <comment>The string for Historic (Bo3) in the Format ComboBox.</comment>
   </data>
+  <data name="Item_MythicRareCount" xml:space="preserve">
+    <value>Conde de Raras Míticas</value>
+    <comment>The string for Mythic Rare Count in the Sort ComboBox.</comment>
+  </data>
+  <data name="Item_RareCount" xml:space="preserve">
+    <value>Conde de Raras</value>
+    <comment>The string for Rare Count in the Sort ComboBox.</comment>
+  </data>
   <data name="Item_Standard" xml:space="preserve">
     <value>Estándar</value>
     <comment>The string for Standard in the Format ComboBox.</comment>
+  </data>
+  <data name="Item_UncommonCount" xml:space="preserve">
+    <value>Cuenta de Infrecuentes</value>
+    <comment>The string for Uncommon Count in the Sort ComboBox.</comment>
+  </data>
+  <data name="Item_WinRate" xml:space="preserve">
+    <value>Registro de Victorias/Pérdidas</value>
+    <comment>The string for Win/Loss Record in the Sort ComboBox.</comment>
   </data>
   <data name="Loading_LoadingCardDatabase" xml:space="preserve">
     <value>Cargando base de datos de cartas...</value>

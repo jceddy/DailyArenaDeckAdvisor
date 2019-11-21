@@ -1,4 +1,7 @@
-﻿using DailyArena.DeckAdvisor.Common;
+﻿using DailyArena.Common.Core.Bindable;
+using DailyArena.Common.Core.Cryptography;
+using DailyArena.Common.Core.Database;
+using DailyArena.DeckAdvisor.Common;
 using DailyArena.DeckAdvisor.Common.Extensions;
 using DailyArena.DeckAdvisor.Console.Resources;
 using Microsoft.Extensions.Configuration;
@@ -7,6 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
+using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
 using S = System;
@@ -120,12 +124,70 @@ namespace DailyArena.DeckAdvisor.Console
 		}
 
 		/// <summary>
+		/// Gets or sets the selected format being viewed.
+		/// </summary>
+		public Bindable<string> Format { get; private set; } = new Bindable<string>();
+
+		/// <summary>
+		/// Gets or sets the selected deck sort field.
+		/// </summary>
+		public Bindable<string> Sort { get; private set; } = new Bindable<string>();
+
+		/// <summary>
+		/// Gets or sets the selected deck sort direction.
+		/// </summary>
+		public Bindable<string> SortDir { get; private set; } = new Bindable<string>();
+
+		/// <summary>
+		/// Gets or sets the state of the "Rotation" toggle button.
+		/// </summary>
+		public BindableBool RotationProof { get; private set; } = new BindableBool();
+
+		/// <summary>
+		/// Gets or sets the card text filter value.
+		/// </summary>
+		public Bindable<string> CardText { get; private set; } = new Bindable<string>() { Value = string.Empty };
+
+		/// <summary>
+		/// Gets or sets the selected font size for the display.
+		/// </summary>
+		public Bindable<int> SelectedFontSize { get; private set; } = new Bindable<int>() { Value = 12 };
+
+		/// <summary>
 		/// Method to run the program.
 		/// </summary>
 		public void Run()
 		{
 			S.Console.OutputEncoding = Encoding.UTF8;
 			S.Console.WriteLine(CurrentProgram.GetLocalizedString("Loading_LoadingCardDatabase"));
+
+			Logger.Debug("Application Running - {0}", ApplicationName);
+
+			AssemblyName assemblyName = Assembly.GetExecutingAssembly().GetName();
+			string assemblyVersion = assemblyName.Version.ToString();
+			string assemblyArchitecture = assemblyName.ProcessorArchitecture.ToString();
+
+			S.Console.WriteLine($"Assembly Version: {assemblyVersion}, Assembly Architecture: {assemblyArchitecture})");
+
+			this.InitializeState();
+
+			Logger.Debug("Initializing Card Database");
+			CardDatabase.Initialize(false);
+
+			// TODO: Remove this encryption test
+			string testString = "This is only a test.";
+			var userName = Environment.UserName;
+			byte[] salt = null;
+			using (SHA256 sha256 = SHA256.Create())
+			{
+				salt = sha256.ComputeHash(Encoding.ASCII.GetBytes(userName));
+			}
+			byte[] bytes = Encoding.ASCII.GetBytes(testString);
+			byte[] protectedTestString = Protection.Protect(bytes, salt);
+			byte[] unprotectedTestString = Protection.Unprotect(protectedTestString, salt);
+			S.Console.WriteLine(Encoding.ASCII.GetString(bytes));
+			// END TODO
+
 			S.Console.WriteLine(Localization.Message_PressToExit);
 			S.Console.ReadKey();
 		}

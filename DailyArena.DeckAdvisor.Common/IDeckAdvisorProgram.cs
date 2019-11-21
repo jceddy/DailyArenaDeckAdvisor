@@ -1,4 +1,5 @@
-﻿using Serilog;
+﻿using DailyArena.Common.Core.Bindable;
+using Serilog;
 using System;
 using System.Collections.Generic;
 
@@ -46,5 +47,35 @@ namespace DailyArena.DeckAdvisor.Common
 		/// Gets the currently running app.
 		/// </summary>
 		IDeckAdvisorApp CurrentApp { get; }
+
+		/// <summary>
+		/// Gets or the selected format being viewed.
+		/// </summary>
+		Bindable<string> Format { get; }
+
+		/// <summary>
+		/// Gets the selected deck sort field.
+		/// </summary>
+		Bindable<string> Sort { get; }
+
+		/// <summary>
+		/// Gets the selected deck sort direction.
+		/// </summary>
+		Bindable<string> SortDir { get; }
+
+		/// <summary>
+		/// Gets the state of the "Rotation" toggle button.
+		/// </summary>
+		BindableBool RotationProof { get; }
+
+		/// <summary>
+		/// Gets the card text filter value.
+		/// </summary>
+		Bindable<string> CardText { get; }
+
+		/// <summary>
+		/// Gets the selected font size for the display.
+		/// </summary>
+		Bindable<int> SelectedFontSize { get; }
 	}
 }

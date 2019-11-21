@@ -121,9 +121,41 @@
     <value>Арена Стандарт</value>
     <comment>The string for Arena Standard in the Format ComboBox.</comment>
   </data>
+  <data name="Item_Ascending" xml:space="preserve">
+    <value>По восходящей</value>
+    <comment>The string for Ascending in the Sort Dir ComboBox.</comment>
+  </data>
+  <data name="Item_BoosterCost" xml:space="preserve">
+    <value>По стоимости в бустерах</value>
+    <comment>The string for Booster Cost in the Sort ComboBox.</comment>
+  </data>
+  <data name="Item_BoosterCostIgnoringCollection" xml:space="preserve">
+    <value>По стоимости в бустерах (без учета Коллекции)</value>
+    <comment>The string for Booster Cost (Ignoring Collection) in the Sort ComboBox.</comment>
+  </data>
+  <data name="Item_BoosterCostIgnoringWildcards" xml:space="preserve">
+    <value>По стоимости в бустерах (без учета Джокеров)</value>
+    <comment>The string for Booster Cost (Ignoring Wildcards) in the Sort ComboBox.</comment>
+  </data>
   <data name="Item_Brawl" xml:space="preserve">
     <value>Бравл</value>
     <comment>The string for Brawl in the Format ComboBox.</comment>
+  </data>
+  <data name="Item_CommonCount" xml:space="preserve">
+    <value>По кол-ву Обычных карт</value>
+    <comment>The string for Common Count in the Sort ComboBox.</comment>
+  </data>
+  <data name="Item_DeckScore" xml:space="preserve">
+    <value>Счет колоды</value>
+    <comment>String for "Deck Score" sort item.</comment>
+  </data>
+  <data name="Item_Default" xml:space="preserve">
+    <value>По умолчанию</value>
+    <comment>The string for Default in the Sort/Dir ComboBox.</comment>
+  </data>
+  <data name="Item_Descending" xml:space="preserve">
+    <value>По нисходящей</value>
+    <comment>The string for Descending in the Sort Dir ComboBox.</comment>
   </data>
   <data name="Item_Historic_Bo1" xml:space="preserve">
     <value>Исторический (Bo1)</value>
@@ -133,9 +165,25 @@
     <value>Исторический (Bo3)</value>
     <comment>The string for Historic (Bo3) in the Format ComboBox.</comment>
   </data>
+  <data name="Item_MythicRareCount" xml:space="preserve">
+    <value>По кол-ву Раритетных карт</value>
+    <comment>The string for Mythic Rare Count in the Sort ComboBox.</comment>
+  </data>
+  <data name="Item_RareCount" xml:space="preserve">
+    <value>По кол-ву Редких карт</value>
+    <comment>The string for Rare Count in the Sort ComboBox.</comment>
+  </data>
   <data name="Item_Standard" xml:space="preserve">
     <value>Стандарт</value>
     <comment>The string for Standard in the Format ComboBox.</comment>
+  </data>
+  <data name="Item_UncommonCount" xml:space="preserve">
+    <value>По кол-ву Необычных карт</value>
+    <comment>The string for Uncommon Count in the Sort ComboBox.</comment>
+  </data>
+  <data name="Item_WinRate" xml:space="preserve">
+    <value>По статистике побед/поражений</value>
+    <comment>The string for Win/Loss Record in the Sort ComboBox.</comment>
   </data>
   <data name="Loading_LoadingCardDatabase" xml:space="preserve">
     <value>Вспоминаем все карты...</value>
