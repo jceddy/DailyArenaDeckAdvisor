@@ -174,20 +174,6 @@ namespace DailyArena.DeckAdvisor.Console
 			Logger.Debug("Initializing Card Database");
 			CardDatabase.Initialize(false);
 
-			// TODO: Remove this encryption test
-			string testString = "This is only a test.";
-			var userName = Environment.UserName;
-			byte[] salt = null;
-			using (SHA256 sha256 = SHA256.Create())
-			{
-				salt = sha256.ComputeHash(Encoding.ASCII.GetBytes(userName));
-			}
-			byte[] bytes = Encoding.ASCII.GetBytes(testString);
-			byte[] protectedTestString = Protection.Protect(bytes, salt);
-			byte[] unprotectedTestString = Protection.Unprotect(protectedTestString, salt);
-			S.Console.WriteLine(Encoding.ASCII.GetString(bytes));
-			// END TODO
-
 			S.Console.WriteLine(Localization.Message_PressToExit);
 			S.Console.ReadKey();
 		}

@@ -1068,30 +1068,37 @@ namespace DailyArena.DeckAdvisor
 									int id = int.Parse(info.Name);
 									int count = info.Value;
 
-									Card card = cardsById[id];
-									Set set = card.Set;
-									if ((RotationProof.NotValue || card.RotationSafe) && (card.StandardLegal || Format == Properties.Resources.Item_Historic_Bo1 || Format == Properties.Resources.Item_Historic_Bo3))
+									if (cardsById.ContainsKey(id))
 									{
-										string name = card.Name;
-										if (card.Rarity == CardRarity.BasicLand && !_basicLands.ContainsKey(_basicLandColors[card.Name]))
+										Card card = cardsById[id];
+										Set set = card.Set;
+										if ((RotationProof.NotValue || card.RotationSafe) && (card.StandardLegal || Format == Properties.Resources.Item_Historic_Bo1 || Format == Properties.Resources.Item_Historic_Bo3))
 										{
-											_basicLands[_basicLandColors[card.Name]] = card;
-										}
-										if (!_playerInventoryCounts.ContainsKey(name))
-										{
-											_playerInventoryCounts.Add(name, 0);
-										}
-										int maxCount = _anyNumber.Contains(name) ? 4 : maxInventoryCount;
-										while (count > 0 && _playerInventoryCounts[name] < maxCount)
-										{
-											if (!_playerInventory.ContainsKey(id))
+											string name = card.Name;
+											if (card.Rarity == CardRarity.BasicLand && !_basicLands.ContainsKey(_basicLandColors[card.Name]))
 											{
-												_playerInventory.Add(id, 0);
+												_basicLands[_basicLandColors[card.Name]] = card;
 											}
-											_playerInventory[id]++;
-											_playerInventoryCounts[name]++;
-											count--;
+											if (!_playerInventoryCounts.ContainsKey(name))
+											{
+												_playerInventoryCounts.Add(name, 0);
+											}
+											int maxCount = _anyNumber.Contains(name) ? 4 : maxInventoryCount;
+											while (count > 0 && _playerInventoryCounts[name] < maxCount)
+											{
+												if (!_playerInventory.ContainsKey(id))
+												{
+													_playerInventory.Add(id, 0);
+												}
+												_playerInventory[id]++;
+												_playerInventoryCounts[name]++;
+												count--;
+											}
 										}
+									}
+									else
+									{
+										Logger.Debug(@"Unknown card found in player inventory: {arenaId}", id);
 									}
 								}
 
@@ -1156,19 +1163,35 @@ namespace DailyArena.DeckAdvisor
 										continue;
 									}
 
+									bool ignoreDeck = false;
 									for (int i = 0; i < mainDeck.Length; i += 2)
 									{
-										string cardName = cardsById[mainDeck[i]].Name;
-										int cardQuantity = mainDeck[i + 1];
-										if (mainDeckByName.ContainsKey(cardName))
+										if (cardsById.ContainsKey(mainDeck[i]))
 										{
-											mainDeckByName[cardName] += cardQuantity;
+											string cardName = cardsById[mainDeck[i]].Name;
+											int cardQuantity = mainDeck[i + 1];
+											if (mainDeckByName.ContainsKey(cardName))
+											{
+												mainDeckByName[cardName] += cardQuantity;
+											}
+											else
+											{
+												mainDeckByName.Add(cardName, cardQuantity);
+											}
 										}
 										else
 										{
-											mainDeckByName.Add(cardName, cardQuantity);
+											Logger.Debug(@"Unknown card found, ignoring player deck: {arenaId}", mainDeck[i]);
+											ignoreDeck = true;
+											break;
 										}
 									}
+
+									if(ignoreDeck)
+									{
+										continue;
+									}
+
 									for (int i = 0; i < sideboard.Length; i += 2)
 									{
 										string cardName = cardsById[sideboard[i]].Name;
@@ -1200,7 +1223,7 @@ namespace DailyArena.DeckAdvisor
 									{
 										// check whether there are any cards in the deck that aren't rotation-proof...if so, ignore this deck
 										Logger.Debug(@"Doing ""rotation-proof"" check...");
-										bool ignoreDeck = false;
+										ignoreDeck = false;
 										foreach (var card in mainDeckByName)
 										{
 											string cardName = card.Key;
@@ -1257,7 +1280,7 @@ namespace DailyArena.DeckAdvisor
 									{
 										// check whether there are any cards in the deck that aren't in standard...if so, ignore this deck
 										Logger.Debug(@"Doing Standard legality check...");
-										bool ignoreDeck = false;
+										ignoreDeck = false;
 										foreach (var card in mainDeckByName)
 										{
 											string cardName = card.Key;
