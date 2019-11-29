@@ -19,7 +19,6 @@ using System.Linq;
 using System.Net;
 using System.Reflection;
 using System.Runtime.InteropServices;
-using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
@@ -1783,7 +1782,7 @@ namespace DailyArena.DeckAdvisor
 
 				Logger.Debug("Generating replacement suggestions for missing cards");
 				List<Tuple<int, int, int>> suggestedReplacements = GenerateReplacements(archetype, mainDeckToCollect, sideboardToCollect, commandZoneToCollect, playerInventory,
-					cardsByName, cardsById);
+					cardsByName, cardsById, filters);
 
 				Logger.Debug("Updating Archetype objects with suggestions");
 				archetype.SuggestedMainDeck = new ReadOnlyDictionary<int, int>(mainDeckCards);
@@ -1958,7 +1957,7 @@ namespace DailyArena.DeckAdvisor
 
 						Logger.Debug("Generating replacement suggestions for missing cards");
 						suggestedReplacements = GenerateReplacements(similarArchetype, mainDeckToCollect, sideboardToCollect, commandZoneToCollect, playerInventory, cardsByName,
-							cardsById);
+							cardsById, filters);
 
 						Logger.Debug("Updating Archetype objects with suggestions");
 						similarArchetype.SuggestedMainDeck = new ReadOnlyDictionary<int, int>(mainDeckCards);
@@ -2138,7 +2137,7 @@ namespace DailyArena.DeckAdvisor
 
 				Logger.Debug("Generating replacement suggestions for missing cards");
 				List<Tuple<int, int, int>> suggestedReplacements = GenerateReplacements(playerDeck, mainDeckToCollect, sideboardToCollect, commandZoneToCollect, playerInventory,
-					cardsByName, cardsById);
+					cardsByName, cardsById, filters);
 
 				Logger.Debug("Updating Player Deck objects with suggestions");
 				playerDeck.SuggestedMainDeck = new ReadOnlyDictionary<int, int>(mainDeckCards);
@@ -2249,9 +2248,17 @@ namespace DailyArena.DeckAdvisor
 		/// <param name="cardsById">A dictioanry mapping arena ids to Card objects.</param>
 		/// <returns>A list of Tuple&lt;int, int, int&gt; with Item1 = card to be replaced, Item2 = suggested replacement, Item3 = number of times to make this replacement</returns>
 		private List<Tuple<int, int, int>> GenerateReplacements(Archetype archetype, Dictionary<int, int> mainDeckToCollect, Dictionary<int, int> sideboardToCollect,
-			Dictionary<int, int> commandZoneToCollect, Dictionary<int, int> playerInventory, IDictionary<string, List<Card>> cardsByName, IDictionary<int, Card> cardsById)
+			Dictionary<int, int> commandZoneToCollect, Dictionary<int, int> playerInventory, IDictionary<string, List<Card>> cardsByName, IDictionary<int, Card> cardsById,
+			DeckFilters filters)
 		{
 			Logger.Debug("GenerateReplacements() Called for Archetype {archetypeName}", archetype.Name);
+
+			playerInventory = playerInventory.Where(
+				x => (!filters.HideCommon || filters.CommonCount > 0 || cardsById[x.Key].Rarity != CardRarity.Common) &&
+					(!filters.HideUncommon || filters.UncommonCount > 0 || cardsById[x.Key].Rarity != CardRarity.Uncommon) &&
+					(!filters.HideRare || filters.RareCount > 0 || cardsById[x.Key].Rarity != CardRarity.Rare) &&
+					(!filters.HideMythic || filters.MythicCount > 0 || cardsById[x.Key].Rarity != CardRarity.MythicRare)
+			).ToDictionary(x => x.Key, x => x.Value);
 
 			List<Tuple<int, int, int>> suggestedReplacements = new List<Tuple<int, int, int>>();
 			CardColors identity = null;
