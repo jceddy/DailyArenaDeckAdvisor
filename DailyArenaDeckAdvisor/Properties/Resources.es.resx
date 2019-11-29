@@ -337,6 +337,11 @@
     <value>Procesando colección desde el registro...</value>
     <comment>The "processing collection from log" string for the loading screen.</comment>
   </data>
+  <data name="Message_ClientVersion" xml:space="preserve">
+    <value>Su registro de Arena fue creado por una versión anterior del cliente.
+Actualice Arena y vaya a la pantalla de colección.</value>
+    <comment>Message shown when an older unsupported Arena version is detected.</comment>
+  </data>
   <data name="Message_CloseConfirmation" xml:space="preserve">
     <value>No se han aplicado filtros, ¿cerrar diálogo?</value>
     <comment>Confirmation message for Filters dialog close button.</comment>

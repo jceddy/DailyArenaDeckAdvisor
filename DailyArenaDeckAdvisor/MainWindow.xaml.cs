@@ -207,6 +207,11 @@ namespace DailyArena.DeckAdvisor
 		public BitmapScalingMode BitmapScalingMode { get; private set; }
 
 		/// <summary>
+		/// Minimum Arena client version supported by the application.
+		/// </summary>
+		private double _minimumClient = 1952.745934;
+
+		/// <summary>
 		/// Default constructor. Sets the logger and scaling mode, and does GUI initialization stuff.
 		/// </summary>
 		public MainWindow()
@@ -1048,7 +1053,21 @@ namespace DailyArena.DeckAdvisor
 							break;
 						}
 
-						if (line.Contains("PlayerInventory.GetPlayerCardsV3"))
+						if(line.Contains("clientVersion"))
+						{
+							Regex clientVersionPattern = new Regex(@"\\?""clientVersion\\?"": \\?""([0-9\.]+)\\?""");
+							Match match = clientVersionPattern.Match(line);
+							if(match.Groups.Count > 1)
+							{
+								double clientVersion = double.Parse(match.Groups[1].Value);
+								if(clientVersion < _minimumClient)
+								{
+									LoadingText.Value = Properties.Resources.Message_ClientVersion;
+									return;
+								}
+							}
+						}
+						else if (line.Contains("PlayerInventory.GetPlayerCardsV3"))
 						{
 							int jsonStart = line.IndexOf("{");
 							int jsonEnd = line.LastIndexOf("}");
@@ -1379,8 +1398,15 @@ namespace DailyArena.DeckAdvisor
 									continue;
 								}
 
+								var ignoreDeck = false;
 								for (int i = 0; i < mainDeck.Length; i += 2)
 								{
+									if(!cardsById.ContainsKey(mainDeck[i]))
+									{
+										Logger.Debug(@"Unknown Card found with ArenaId {arenaId}, skipping deck.", mainDeck[i]);
+										ignoreDeck = true;
+										break;
+									}
 									string cardName = cardsById[mainDeck[i]].Name;
 									int cardQuantity = mainDeck[i + 1];
 									if (mainDeckByName.ContainsKey(cardName))
@@ -1392,6 +1418,12 @@ namespace DailyArena.DeckAdvisor
 										mainDeckByName.Add(cardName, cardQuantity);
 									}
 								}
+
+								if(ignoreDeck)
+								{
+									continue;
+								}
+
 								for (int i = 0; i < sideboard.Length; i += 2)
 								{
 									string cardName = cardsById[sideboard[i]].Name;
@@ -1423,7 +1455,7 @@ namespace DailyArena.DeckAdvisor
 								{
 									// check whether there are any cards in the deck that aren't rotation-proof...if so, ignore this deck
 									Logger.Debug(@"Doing ""rotation-proof"" check...");
-									bool ignoreDeck = false;
+									ignoreDeck = false;
 									foreach (var card in mainDeckByName)
 									{
 										string cardName = card.Key;
@@ -1480,7 +1512,7 @@ namespace DailyArena.DeckAdvisor
 								{
 									// check whether there are any cards in the deck that aren't in standard...if so, ignore this deck
 									Logger.Debug(@"Doing Standard legality check...");
-									bool ignoreDeck = false;
+									ignoreDeck = false;
 									foreach (var card in mainDeckByName)
 									{
 										string cardName = card.Key;

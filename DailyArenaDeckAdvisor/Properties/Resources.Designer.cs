@@ -556,6 +556,16 @@ namespace DailyArena.DeckAdvisor.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Your Arena log was created by an old version of the client.
+        ///Please update Arena and browse to the Collection Screen..
+        /// </summary>
+        public static string Message_ClientVersion {
+            get {
+                return ResourceManager.GetString("Message_ClientVersion", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Filters have not been applied, close dialog?.
         /// </summary>
         public static string Message_CloseConfirmation {

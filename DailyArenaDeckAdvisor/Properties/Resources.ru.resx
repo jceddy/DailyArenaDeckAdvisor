@@ -337,6 +337,11 @@
     <value>Смотрим карты в вашей коллекции...</value>
     <comment>The "processing collection from log" string for the loading screen.</comment>
   </data>
+  <data name="Message_ClientVersion" xml:space="preserve">
+    <value>Ваш журнал Arena был создан старой версией клиента.
+Пожалуйста, обновите Arena и перейдите к Экрану Коллекции.</value>
+    <comment>Message shown when an older unsupported Arena version is detected.</comment>
+  </data>
   <data name="Message_CloseConfirmation" xml:space="preserve">
     <value>Фильтры не были применены, закрыть окно выбора фильтров?</value>
     <comment>Confirmation message for Filters dialog close button.</comment>

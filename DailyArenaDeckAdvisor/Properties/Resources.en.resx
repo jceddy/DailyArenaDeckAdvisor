@@ -337,6 +337,11 @@
     <value>Processing collection from log...</value>
     <comment>The "processing collection from log" string for the loading screen.</comment>
   </data>
+  <data name="Message_ClientVersion" xml:space="preserve">
+    <value>Your Arena log was created by an old version of the client.
+Please update Arena and browse to the Collection Screen.</value>
+    <comment>Message shown when an older unsupported Arena version is detected.</comment>
+  </data>
   <data name="Message_CloseConfirmation" xml:space="preserve">
     <value>Filters have not been applied, close dialog?</value>
     <comment>Confirmation message for Filters dialog close button.</comment>
