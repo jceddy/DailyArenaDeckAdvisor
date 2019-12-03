@@ -57,6 +57,8 @@ namespace DailyArena.DeckAdvisor.Common.Extensions
 			{
 				program.Logger.Debug("UICulture not set in configuration settings, Using Default UI Culture");
 			}
+
+			program.Logger.Debug("Current UI Culture: {CurrentUICulture}", Thread.CurrentThread.CurrentUICulture);
 		}
 
 		/// <summary>

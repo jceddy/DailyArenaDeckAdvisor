@@ -14,6 +14,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Configuration;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -1058,7 +1059,7 @@ namespace DailyArena.DeckAdvisor
 							Match match = clientVersionPattern.Match(line);
 							if(match.Groups.Count > 1)
 							{
-								double clientVersion = double.Parse(match.Groups[1].Value);
+								double clientVersion = double.Parse(match.Groups[1].Value, CultureInfo.InvariantCulture);
 								if(clientVersion < _minimumClient)
 								{
 									LoadingText.Value = Properties.Resources.Message_ClientVersion;
