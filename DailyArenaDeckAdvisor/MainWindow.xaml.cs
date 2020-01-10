@@ -1226,16 +1226,30 @@ namespace DailyArena.DeckAdvisor
 									}
 									for (int i = 0; i < commandZone.Length; i += 2)
 									{
-										string cardName = cardsById[commandZone[i]].Name;
-										int cardQuantity = commandZone[i + 1];
-										if (commandZoneByName.ContainsKey(cardName))
+										if (cardsById.ContainsKey(commandZone[i]))
 										{
-											commandZoneByName[cardName] += cardQuantity;
+											string cardName = cardsById[commandZone[i]].Name;
+											int cardQuantity = commandZone[i + 1];
+											if (commandZoneByName.ContainsKey(cardName))
+											{
+												commandZoneByName[cardName] += cardQuantity;
+											}
+											else
+											{
+												commandZoneByName.Add(cardName, cardQuantity);
+											}
 										}
 										else
 										{
-											commandZoneByName.Add(cardName, cardQuantity);
+											Logger.Debug(@"Unknown card found, ignoring player deck: {arenaId}", mainDeck[i]);
+											ignoreDeck = true;
+											break;
 										}
+									}
+
+									if (ignoreDeck)
+									{
+										continue;
 									}
 
 									if (RotationProof.Value)
