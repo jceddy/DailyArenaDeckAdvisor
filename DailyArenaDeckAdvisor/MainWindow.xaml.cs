@@ -734,6 +734,12 @@ namespace DailyArena.DeckAdvisor
 								ignoreDeck = true;
 								break;
 							}
+							else if(!cardsByName.ContainsKey(cardName))
+							{
+								Logger.Debug("Unknown card {cardName} detected, ignore this deck", cardName);
+								ignoreDeck = true;
+								break;
+							}
 							else if (cardsByName[cardName].Count(x => x.Set.StandardLegal) == 0)
 							{
 								Logger.Debug("{cardName} is not standard legal, ignore this deck", cardName);
