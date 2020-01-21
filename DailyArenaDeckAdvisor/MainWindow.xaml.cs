@@ -940,6 +940,24 @@ namespace DailyArena.DeckAdvisor
 						Dictionary<string, int> similarSideboard = new Dictionary<string, int>();
 						Dictionary<string, int> similarCommandZone = new Dictionary<string, int>();
 
+						bool ignoreDeck = false;
+						Logger.Debug("Validating alternate main deck card list");
+						foreach (dynamic card in similarDeck["deck"]["deck_list"])
+						{
+							string cardName = (string)card["name"];
+							int cardQuantity = (int)card["quantity"];
+
+							if (!cardsByName.ContainsKey(cardName))
+							{
+								ignoreDeck = true;
+								break;
+							}
+						}
+						if (ignoreDeck)
+						{
+							continue;
+						}
+
 						foreach (dynamic card in similarDeck["deck"]["deck_list"])
 						{
 							string cardName = (string)card["name"];
@@ -958,6 +976,7 @@ namespace DailyArena.DeckAdvisor
 
 							similarMainDeck.Add(cardName, cardQuantity);
 						}
+
 						foreach (dynamic card in similarDeck["deck"]["sideboard"])
 						{
 							string cardName = (string)card["name"];
