@@ -134,6 +134,7 @@
     </ApplicationDefinition>
     <Compile Include="MetaReport.cs" />
     <Compile Include="ContentTemplateSelector.cs" />
+    <Compile Include="OutlinedTextBlock.cs" />
     <Compile Include="Properties\Resources.es.Designer.cs">
       <DependentUpon>Resources.es.resx</DependentUpon>
       <AutoGen>True</AutoGen>
@@ -251,6 +252,9 @@
       <Project>{cf1ee6d1-3ed2-4b73-a8da-71fbbe22593e}</Project>
       <Name>DailyArena.DeckAdvisor.Common</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\vault.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

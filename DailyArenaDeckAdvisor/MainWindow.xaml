@@ -519,6 +519,18 @@
 					<Button Margin="3" Click="Settings_Click" ToolTip="{x:Static p:Resources.Tooltip_Settings}">
 						<Image Source="Resources/cog.png" Height="24" Width="24" RenderOptions.BitmapScalingMode="{Binding BitmapScalingMode}" />
 					</Button>
+					<Grid Height="28" MinWidth="28">
+						<Image Source="Resources/vault.png" VerticalAlignment="Center" Height="28" Width="28" RenderOptions.BitmapScalingMode="{Binding BitmapScalingMode}" />
+						<local:OutlinedTextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Fill="White" Stroke="Black" StrokeThickness="2" FontWeight="ExtraBold"
+							Text="{Binding VaultProgress.Value, StringFormat={}{0:0.0}%}">
+							<local:OutlinedTextBlock.ToolTip>
+								<StackPanel Orientation="Horizontal">
+									<TextBlock Text="{x:Static p:Resources.Tooltip_VaultProgress}" />
+									<TextBlock Text="{Binding VaultProgress.Value, StringFormat={}{0:0.0}%}" />
+								</StackPanel>
+							</local:OutlinedTextBlock.ToolTip>
+						</local:OutlinedTextBlock>
+					</Grid>
 				</StackPanel>
 
 				<StackPanel Grid.Row="0" Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right">

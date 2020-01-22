@@ -468,6 +468,10 @@ Haga clic para alternar a "Agnóstico de Alternación"</value>
     <value>Mostrar diálogo de filtros</value>
     <comment>The string for the Fillters tooltip.</comment>
   </data>
+  <data name="Tooltip_VaultProgress" xml:space="preserve">
+    <value>Progreso de la Cámara: </value>
+    <comment>String for the Vault Progress tooltip.</comment>
+  </data>
   <data name="Tooltip_Wiki" xml:space="preserve">
     <value>Ver el Wiki en Github</value>
     <comment>String for the Wiki tooltip on the settings dialog.</comment>

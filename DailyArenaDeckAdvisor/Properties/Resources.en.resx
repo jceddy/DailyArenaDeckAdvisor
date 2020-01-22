@@ -468,6 +468,10 @@ Click to toggle to "Rotation Agnostic"</value>
     <value>Show filters dialog</value>
     <comment>The string for the Fillters tooltip.</comment>
   </data>
+  <data name="Tooltip_VaultProgress" xml:space="preserve">
+    <value>Vault Progress: </value>
+    <comment>String for the Vault Progress tooltip.</comment>
+  </data>
   <data name="Tooltip_Wiki" xml:space="preserve">
     <value>View the Wiki on Github</value>
     <comment>String for the Wiki tooltip on the settings dialog.</comment>

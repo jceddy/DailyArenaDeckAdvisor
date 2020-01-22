@@ -468,6 +468,10 @@
     <value>Показать доступные фильтры</value>
     <comment>The string for the Fillters tooltip.</comment>
   </data>
+  <data name="Tooltip_VaultProgress" xml:space="preserve">
+    <value>Хранилище Прогресс: </value>
+    <comment>String for the Vault Progress tooltip.</comment>
+  </data>
   <data name="Tooltip_Wiki" xml:space="preserve">
     <value>Посмотреть Wiki на Github</value>
     <comment>String for the Wiki tooltip on the settings dialog.</comment>

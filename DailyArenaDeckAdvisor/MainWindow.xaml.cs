@@ -152,6 +152,11 @@ namespace DailyArena.DeckAdvisor
 		public string ApplicationUsageName { get { return "DailyArenaDeckAdvisor"; } }
 
 		/// <summary>
+		/// Gets or sets the user's vault progress.
+		/// </summary>
+		public Bindable<double> VaultProgress { get; private set; } = new Bindable<double>();
+
+		/// <summary>
 		/// Gets or sets the selected format being viewed.
 		/// </summary>
 		public Bindable<string> Format { get; private set; } = new Bindable<string>();
@@ -1164,6 +1169,7 @@ namespace DailyArena.DeckAdvisor
 								_wildcardsOwned[CardRarity.Uncommon] = json.payload.wcUncommon ?? 0;
 								_wildcardsOwned[CardRarity.Rare] = json.payload.wcRare ?? 0;
 								_wildcardsOwned[CardRarity.MythicRare] = json.payload.wcMythic ?? 0;
+								VaultProgress.Value = json.payload.vaultProgress;
 
 								LoadingValue.Value = Math.Max(LoadingValue.Value, 60);
 							}
@@ -1238,17 +1244,32 @@ namespace DailyArena.DeckAdvisor
 
 									for (int i = 0; i < sideboard.Length; i += 2)
 									{
-										string cardName = cardsById[sideboard[i]].Name;
-										int cardQuantity = sideboard[i + 1];
-										if (sideboardByName.ContainsKey(cardName))
+										if(cardsById.ContainsKey(sideboard[i]))
 										{
-											sideboardByName[cardName] += cardQuantity;
+											string cardName = cardsById[sideboard[i]].Name;
+											int cardQuantity = sideboard[i + 1];
+											if (sideboardByName.ContainsKey(cardName))
+											{
+												sideboardByName[cardName] += cardQuantity;
+											}
+											else
+											{
+												sideboardByName.Add(cardName, cardQuantity);
+											}
 										}
 										else
 										{
-											sideboardByName.Add(cardName, cardQuantity);
+											Logger.Debug(@"Unknown sideboard card found, ignoring player deck: {arenaId}", mainDeck[i]);
+											ignoreDeck = true;
+											break;
 										}
 									}
+
+									if (ignoreDeck)
+									{
+										continue;
+									}
+
 									for (int i = 0; i < commandZone.Length; i += 2)
 									{
 										if (cardsById.ContainsKey(commandZone[i]))

@@ -847,6 +847,15 @@ namespace DailyArena.DeckAdvisor.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Vault Progress: .
+        /// </summary>
+        public static string Tooltip_VaultProgress {
+            get {
+                return ResourceManager.GetString("Tooltip_VaultProgress", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to View the Wiki on Github.
         /// </summary>
         public static string Tooltip_Wiki {
