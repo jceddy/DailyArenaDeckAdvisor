@@ -904,6 +904,12 @@ namespace DailyArena.DeckAdvisor
 						int cardQuantity = (int)card["quantity"];
 
 						Logger.Debug("Processing commandZone card: {cardName}, {cardQuantity}", cardName, cardQuantity);
+						if(cardsByName.ContainsKey(cardName) && cardsByName[cardName][0].ColorIdentity == null)
+						{
+							Logger.Debug("Commander card has no color identity set, skipping deck");
+							badDeckDefinition = true;
+							break;
+						}
 						foreach (Card archetypeCard in cardsByName[cardName])
 						{
 							CardStats stats = _cardStats[archetypeCard];
@@ -921,6 +927,10 @@ namespace DailyArena.DeckAdvisor
 						{
 							commandZone.Add(cardName, cardQuantity);
 						}
+					}
+					if (badDeckDefinition)
+					{
+						continue;
 					}
 				}
 				var combinedCounts = mainDeck.Concat(sideboard).Concat(commandZone).GroupBy(x => x.Key).Select(x => new { Name = x.Key, Count = x.Sum(y => y.Value) });
@@ -2579,6 +2589,8 @@ namespace DailyArena.DeckAdvisor
 			string assemblyArchitecture = assemblyName.ProcessorArchitecture.ToString();
 
 			Title = Title + $" - ({assemblyVersion}, {assemblyArchitecture})";
+
+			Logger.Debug("Assembly Version: {0}, Assembly Architecture: {1}", assemblyVersion, assemblyArchitecture);
 
 			this.InitializeState();
 
