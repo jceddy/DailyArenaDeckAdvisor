@@ -2351,7 +2351,7 @@ namespace DailyArena.DeckAdvisor
 					try
 					{
 						var candidates = playerInventory.Select(x => new { Card = cardsById[x.Key], Quantity = x.Value }).
-							Where(x => x.Quantity > 0 && x.Card.Type == cardToReplace.Type && _colorsByLand[x.Card.Name] == _colorsByLand[cardToReplace.Name] && (identity == null || identity.Contains(x.Card.ColorIdentity))).
+							Where(x => x.Quantity > 0 && x.Card.Type == cardToReplace.Type && _colorsByLand.ContainsKey(x.Card.Name) && _colorsByLand[x.Card.Name] == _colorsByLand[cardToReplace.Name] && (identity == null || identity.Contains(x.Card.ColorIdentity))).
 							OrderByDescending(x => x.Card.Rank + CardStats.GetAssociationModifier(cardToReplace.Name, x.Card.Name, _cardStats));
 
 						foreach (var candidate in candidates)
