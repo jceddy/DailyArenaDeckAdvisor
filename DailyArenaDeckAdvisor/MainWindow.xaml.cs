@@ -2206,6 +2206,21 @@ namespace DailyArena.DeckAdvisor
 					}
 				}
 
+				bool badCommander = false;
+				foreach(string commanderName in playerDeck.CommandZone.Keys)
+				{
+					if(!cardsByName.ContainsKey(commanderName) || cardsByName[commanderName][0].ColorIdentity == null)
+					{
+						Logger.Debug("Missing Color Identity information for Commander: {commanderName} - skipping player deck {playerDeck}", commanderName, playerDeck.Name);
+						badCommander = true;
+						break;
+					}
+				}
+				if (badCommander)
+				{
+					continue;
+				}
+
 				Logger.Debug("Generating replacement suggestions for missing cards");
 				List<Tuple<int, int, int>> suggestedReplacements = GenerateReplacements(playerDeck, mainDeckToCollect, sideboardToCollect, commandZoneToCollect, playerInventory,
 					cardsByName, cardsById, filters);
