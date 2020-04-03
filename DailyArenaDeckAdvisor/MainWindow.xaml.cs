@@ -943,7 +943,16 @@ namespace DailyArena.DeckAdvisor
 					}
 				}
 				int win = archetype["win"] == null ? -1 : (int)archetype["win"];
-				int loss = archetype["loss"] == null ? -1 : (int)archetype["loss"];
+				int loss = -1;
+				try
+				{
+					loss = archetype["loss"] == null ? -1 : (int)archetype["loss"];
+				}
+				catch(FormatException e)
+				{
+					Logger.Debug(e, "Format Exception when parsing archetype loss field");
+					loss = -1;
+				}
 
 				List<Archetype> similarDecks = new List<Archetype>();
 				if(archetype["similar_decks"] != null)
