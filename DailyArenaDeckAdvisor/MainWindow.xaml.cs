@@ -910,6 +910,12 @@ namespace DailyArena.DeckAdvisor
 							badDeckDefinition = true;
 							break;
 						}
+						if(!cardsByName.ContainsKey(cardName))
+						{
+							Logger.Debug($"Card {cardName} not found, skipping deck");
+							badDeckDefinition = true;
+							break;
+						}
 						foreach (Card archetypeCard in cardsByName[cardName])
 						{
 							CardStats stats = _cardStats[archetypeCard];
