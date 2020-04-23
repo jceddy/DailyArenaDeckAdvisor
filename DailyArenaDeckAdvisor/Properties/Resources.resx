@@ -177,6 +177,10 @@
     <value>Commander</value>
     <comment>Commander header for Deck Details view.</comment>
   </data>
+  <data name="Deck_Companion" xml:space="preserve">
+    <value>Companion</value>
+    <comment>Companion header for Deck Details view.</comment>
+  </data>
   <data name="Deck_ExpectedCost" xml:space="preserve">
     <value>Expected Booster Cost</value>
     <comment>Expected Booster Cost header for Deck Details view.</comment>

@@ -177,6 +177,10 @@
     <value>Командир</value>
     <comment>Commander header for Deck Details view.</comment>
   </data>
+  <data name="Deck_Companion" xml:space="preserve">
+    <value>Компаньон</value>
+    <comment>Companion header for Deck Details view.</comment>
+  </data>
   <data name="Deck_ExpectedCost" xml:space="preserve">
     <value>Сколько примерно нужно вскрыть бустеров</value>
     <comment>Expected Booster Cost header for Deck Details view.</comment>

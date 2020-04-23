@@ -137,6 +137,11 @@ namespace DailyArena.DeckAdvisor
 		public ReadOnlyDictionary<string, int> CommandZone { get; private set; }
 
 		/// <summary>
+		/// Gets the name of the deck's selected companion card (null if there is none).
+		/// </summary>
+		public string Companion { get; private set; }
+
+		/// <summary>
 		/// The Arena Ids and quantities of cards still to be collected for the main deck list.
 		/// </summary>
 		private ReadOnlyDictionary<int, int> _mainDeckToCollect = null;
@@ -228,6 +233,11 @@ namespace DailyArena.DeckAdvisor
 		public Visibility CommanderVisibility { get; private set; }
 
 		/// <summary>
+		/// Whether companion info should be shown.
+		/// </summary>
+		public Visibility CompanionVisibility { get; private set; }
+
+		/// <summary>
 		/// The commander's color identity (for Brawl).
 		/// </summary>
 		private CardColors _commanderColorIdentity = null;
@@ -306,20 +316,22 @@ namespace DailyArena.DeckAdvisor
 		/// <param name="mainDeck">The names and quantities of cards in the the main deck list.</param>
 		/// <param name="sideboard">The names and quantities of cards in the sideboard.</param>
 		/// <param name="commandZone">The names and quanitities of cards in the command zone.</param>
+		/// <param name="companion">The sideboard card assigned as the companion.</param>
 		/// <param name="rotationProof">Whether we favor "rotation-proof" cards.</param>
 		/// <param name="win">The number of recorded wins for this archetype (if available).</param>
 		/// <param name="loss">The number of recorded losses for this archetype (if available).</param>
 		/// <param name="similarDecks">List of alternate deck configurations for this archetype.</param>
 		/// <param name="isPlayerDeck">Boolean indicating whether this is a deck that was imported from the player inventory.</param>
 		/// <param name="setNameTranslations">A dictionary containing set name translations for various languages.</param>
-		public Archetype(string name, Dictionary<string, int> mainDeck, Dictionary<string, int> sideboard, Dictionary<string, int> commandZone, bool rotationProof, int win = -1,
-			int loss = -1, List<Archetype> similarDecks = null, bool isPlayerDeck = false, Dictionary<string, Dictionary<string, string>> setNameTranslations = null)
+		public Archetype(string name, Dictionary<string, int> mainDeck, Dictionary<string, int> sideboard, Dictionary<string, int> commandZone, string companion, bool rotationProof,
+			int win = -1, int loss = -1, List<Archetype> similarDecks = null, bool isPlayerDeck = false, Dictionary<string, Dictionary<string, string>> setNameTranslations = null)
 		{
 			TabEnabled = true;
 			Name = name;
 			MainDeck = new ReadOnlyDictionary<string, int>(mainDeck);
 			Sideboard = new ReadOnlyDictionary<string, int>(sideboard);
 			CommandZone = new ReadOnlyDictionary<string, int>(commandZone);
+			Companion = companion;
 			RotationProof = rotationProof;
 			Win = win;
 			Loss = loss;
@@ -344,6 +356,15 @@ namespace DailyArena.DeckAdvisor
 			else
 			{
 				CommanderVisibility = Visibility.Collapsed;
+			}
+
+			if(companion == null)
+			{
+				CompanionVisibility = Visibility.Collapsed;
+			}
+			else
+			{
+				CompanionVisibility = Visibility.Visible;
 			}
 
 			if(similarDecks == null || similarDecks.Count == 0)
@@ -513,6 +534,7 @@ namespace DailyArena.DeckAdvisor
 						Concat(_sideboardToCollect.Select(x => new { cardsById[x.Key].Rarity, Count = _anyNumber.Contains(cardsById[x.Key].Name) ? Math.Min(x.Value, 4) - (_suggestedMainDeck.Where(y => y.Key == x.Key).Count() + _suggestedSideboard.Where(z => z.Key == x.Key).Count() + _suggestedCommandZone.Where(z => z.Key == x.Key).Count()) : x.Value })).
 						Concat(_commandZoneToCollect.Select(x => new { cardsById[x.Key].Rarity, Count = _anyNumber.Contains(cardsById[x.Key].Name) ? Math.Min(x.Value, 4) - (_suggestedMainDeck.Where(y => y.Key == x.Key).Count() + _suggestedSideboard.Where(z => z.Key == x.Key).Count() + _suggestedCommandZone.Where(z => z.Key == x.Key).Count()) : x.Value })).
 						GroupBy(x => x.Rarity).
+						Where(x => x.Key != CardRarity.Token).
 						Select(x => new Tuple<CardRarity, int, int>(x.Key, x.Sum(y => y.Count), _wildcardsOwned[x.Key])).
 						OrderByDescending(x => x.Item1).ToList();
 				}
@@ -831,6 +853,35 @@ namespace DailyArena.DeckAdvisor
 		}
 
 		/// <summary>
+		/// An object representing a view of the companion card, for Xaml binding.
+		/// </summary>
+		private List<CardView> _companionView;
+
+		/// <summary>
+		/// Gets an object representing a view of the companion card, for Xaml binding.
+		/// </summary>
+		public List<CardView> CompanionView
+		{
+			get
+			{
+				if(Companion != null && _companionView == null && _suggestedSideboard != null && _sideboardToCollect != null)
+				{
+					ReadOnlyDictionary<int, Card> cardsById = Card.CardsById;
+					Card companionCard = _suggestedSideboard.Select(x => cardsById[x.Key]).Where(y => y.Name == Companion).FirstOrDefault();
+					bool collected = true;
+					if(companionCard == null)
+					{
+						companionCard = _sideboardToCollect.Select(x => cardsById[x.Key]).Where(y => y.Name == Companion).FirstOrDefault();
+						collected = false;
+					}
+
+					_companionView = new List<CardView>() { new CardView() { Card = companionCard, Collected = collected, Stats = CardStats[companionCard], RotationProof = RotationProof } };
+				}
+				return _companionView;
+			}
+		}
+
+		/// <summary>
 		/// The string containing the deck in Arena import/export format.
 		/// </summary>
 		private string _exportList = null;
@@ -860,6 +911,10 @@ namespace DailyArena.DeckAdvisor
 					if(commandZone.Count() > 0)
 					{
 						exportList.AppendFormat("Commander{0}{1}{0}{0}", Environment.NewLine, string.Join(Environment.NewLine, commandZone));
+					}
+					if (CompanionView != null && CompanionView.Count > 0)
+					{
+						exportList.AppendFormat("Companion{0}{1}{0}{0}", Environment.NewLine, CompanionView[0].Card.FullName);
 					}
 					exportList.AppendFormat("Deck{0}{1}", Environment.NewLine, string.Join(Environment.NewLine, mainDeck));
 					if(sideboard.Count() > 0)
@@ -973,9 +1028,19 @@ namespace DailyArena.DeckAdvisor
 						Select(x => new { Card = cardsById[x.Key], Quantity = x.Sum(y => y.Value) }).
 						Select(x => $"{x.Quantity} {x.Card.Name} ({x.Card.Set.ArenaCode}) {x.Card.CollectorNumber}");
 
+					string companion = null;
+					if(CompanionView != null && CompanionView.Count > 0 && CompanionView[0].Collected)
+					{
+						companion = CompanionView[0].Card.FullName;
+					}
+
 					if (commandZone.Count() > 0)
 					{
 						exportList.AppendFormat("Commander{0}{1}{0}{0}", Environment.NewLine, string.Join(Environment.NewLine, commandZone));
+					}
+					if(companion != null)
+					{
+						exportList.AppendFormat("Companion{0}{1}{0}{0}", Environment.NewLine, companion);
 					}
 					exportList.AppendFormat("Deck{0}{1}", Environment.NewLine, string.Join(Environment.NewLine, mainDeck));
 					if (sideboard.Count() > 0)

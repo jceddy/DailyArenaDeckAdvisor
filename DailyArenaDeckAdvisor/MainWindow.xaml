@@ -175,6 +175,62 @@
 					</StackPanel>
 
 					<StackPanel Orientation="Vertical" Margin="3" Visibility="{Binding SideboardVisibility}">
+						<TextBlock FontWeight="Bold" HorizontalAlignment="Left" TextDecorations="Underline" Text="{x:Static p:Resources.Deck_Companion}"  Visibility="{Binding CompanionVisibility}" />
+						<ItemsControl ItemsSource="{Binding CompanionView}">
+							<ItemsControl.ItemsPanel>
+								<ItemsPanelTemplate>
+									<StackPanel Orientation="Vertical" />
+								</ItemsPanelTemplate>
+							</ItemsControl.ItemsPanel>
+							<ItemsControl.ItemTemplate>
+								<DataTemplate>
+									<StackPanel Orientation="Horizontal">
+										<TextBlock x:Name="CardName" FontWeight="Bold" Text="{Binding Card.PrintedName}" Foreground="Green" FontStyle="Italic" ToolTipService.ShowDuration="600000"
+												Tag="{Binding RelativeSource={RelativeSource AncestorType={x:Type Window}}}">
+											<TextBlock.ToolTip>
+												<ToolTip Background="Transparent" BorderThickness="0">
+													<Grid MaxHeight="340" MaxWidth="488">
+														<Border BorderBrush="Black" BorderThickness="1" Background="White"
+																HorizontalAlignment="Left" VerticalAlignment="Top">
+															<TextBlock Text="{Binding Card.FullName}" Margin="3" />
+														</Border>
+														<Image Source="{Binding Card.ImageUri, Converter={StaticResource NullImageConverter}}"
+															   Stretch="Uniform" StretchDirection="Both" RenderOptions.BitmapScalingMode="{Binding RelativeSource={RelativeSource AncestorType=ToolTip}, Path=PlacementTarget.Tag.DataContext.BitmapScalingMode}">
+														</Image>
+													</Grid>
+												</ToolTip>
+											</TextBlock.ToolTip>
+										</TextBlock>
+										<TextBlock Text=" " />
+										<TextBlock Text="{Binding Stats.MetaStatsView}" />
+										<TextBlock x:Name="RotationCallout" Text="!!" FontWeight="Bold" Foreground="DarkOrange" Visibility="Collapsed">
+											<TextBlock.ToolTip>
+												<StackPanel Orientation="Horizontal">
+													<TextBlock Text="This card will rotate out of Standard on " />
+													<TextBlock Text="{Binding Card.Set.Rotation, StringFormat=yyyy-MM-dd}" />
+													<TextBlock Text="." />
+												</StackPanel>
+											</TextBlock.ToolTip>
+										</TextBlock>
+									</StackPanel>
+									<DataTemplate.Triggers>
+										<DataTrigger Binding="{Binding Collected}" Value="False">
+											<Setter Property="Foreground" TargetName="CardName" Value="Red" />
+											<Setter Property="TextDecorations" TargetName="CardName" Value="Underline" />
+											<Setter Property="FontStyle" TargetName="CardName" Value="Normal" />
+										</DataTrigger>
+										<DataTrigger Binding="{Binding Card.RotationSafe}" Value="False">
+											<Setter Property="Visibility" TargetName="RotationCallout" Value="Visible" />
+										</DataTrigger>
+										<DataTrigger Binding="{Binding RotationProof}" Value="False">
+											<Setter Property="Visibility" TargetName="RotationCallout" Value="Collapsed" />
+										</DataTrigger>
+									</DataTemplate.Triggers>
+								</DataTemplate>
+							</ItemsControl.ItemTemplate>
+						</ItemsControl>
+						<TextBlock FontWeight="Bold" HorizontalAlignment="Left" Visibility="{Binding CompanionVisibility}" />
+
 						<TextBlock FontWeight="Bold" HorizontalAlignment="Left" TextDecorations="Underline" Text="{x:Static p:Resources.Deck_Sideboard}" />
 						<ItemsControl ItemsSource="{Binding SideboardView}">
 							<ItemsControl.ItemsPanel>

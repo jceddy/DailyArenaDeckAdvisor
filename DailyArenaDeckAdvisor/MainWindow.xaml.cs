@@ -619,6 +619,7 @@ namespace DailyArena.DeckAdvisor
 				string name = archetype["deck_name"];
 				Logger.Debug("Deck Name: {name}", name);
 				Dictionary<string, int> commandZone = new Dictionary<string, int>();
+				string companion = null;
 				Dictionary<string, int> mainDeck = new Dictionary<string, int>();
 				Dictionary<string, int> sideboard = new Dictionary<string, int>();
 				if(RotationProof.Value)
@@ -939,6 +940,23 @@ namespace DailyArena.DeckAdvisor
 						continue;
 					}
 				}
+				if(archetype["companion"] != null)
+				{
+					companion = (string)archetype["companion"];
+
+					Logger.Debug("Processing companion card: {cardName}", companion);
+					if (!cardsByName.ContainsKey(companion))
+					{
+						Logger.Debug($"Card {companion} not found, skipping deck");
+						continue;
+					}
+
+					if(!sideboard.ContainsKey(companion))
+					{
+						Logger.Debug($"Sideboard does not contain companion card, skipping deck");
+						continue;
+					}
+				}
 				var combinedCounts = mainDeck.Concat(sideboard).Concat(commandZone).GroupBy(x => x.Key).Select(x => new { Name = x.Key, Count = x.Sum(y => y.Value) });
 				foreach (var cardCount in combinedCounts)
 				{
@@ -969,6 +987,7 @@ namespace DailyArena.DeckAdvisor
 						Dictionary<string, int> similarMainDeck = new Dictionary<string, int>();
 						Dictionary<string, int> similarSideboard = new Dictionary<string, int>();
 						Dictionary<string, int> similarCommandZone = new Dictionary<string, int>();
+						string similarCompanion = null;
 
 						bool ignoreDeck = false;
 						Logger.Debug("Validating alternate main deck card list");
@@ -1060,14 +1079,31 @@ namespace DailyArena.DeckAdvisor
 								}
 							}
 						}
-						Archetype similarArchetype = new Archetype(name, similarMainDeck, similarSideboard, similarCommandZone, RotationProof.Value, win, loss, null,
-							setNameTranslations: _setNameTranslations);
+						if (similarDeck["deck"]["companion"] != null)
+						{
+							similarCompanion = (string)similarDeck["deck"]["companion"];
+
+							Logger.Debug("Processing companion card: {cardName}", similarCompanion);
+							if (!cardsByName.ContainsKey(similarCompanion))
+							{
+								Logger.Debug($"Card {similarCompanion} not found, skipping deck");
+								continue;
+							}
+
+							if (!similarSideboard.ContainsKey(similarCompanion))
+							{
+								Logger.Debug($"Sideboard does not contain companion card, skipping deck");
+								continue;
+							}
+						}
+						Archetype similarArchetype = new Archetype(name, similarMainDeck, similarSideboard, similarCommandZone, similarCompanion, RotationProof.Value, win, loss,
+							null, setNameTranslations: _setNameTranslations);
 						CardStats.UpdateDeckAssociations(similarArchetype);
 						similarDecks.Add(similarArchetype);
 					}
 				}
 
-				Archetype newArchetype = new Archetype(name, mainDeck, sideboard, commandZone, RotationProof.Value, win, loss, similarDecks,
+				Archetype newArchetype = new Archetype(name, mainDeck, sideboard, commandZone, companion, RotationProof.Value, win, loss, similarDecks,
 					setNameTranslations: _setNameTranslations);
 				CardStats.UpdateDeckAssociations(newArchetype);
 				_archetypes.Add(newArchetype);
@@ -1214,6 +1250,7 @@ namespace DailyArena.DeckAdvisor
 								{
 									string name = deck["name"];
 									int[] commandZone = deck["commandZoneGRPIds"] == null ? new int[0] : deck["commandZoneGRPIds"].ToObject<int[]>();
+									int companion = deck["companionGRPId"] == null ? 0 : (int)deck["companionGRPId"];
 									int[] mainDeck = deck["mainDeck"].ToObject<int[]>();
 									int[] sideboard = deck["sideboard"].ToObject<int[]>();
 									Guid id = Guid.Parse((string)deck["id"]);
@@ -1224,6 +1261,7 @@ namespace DailyArena.DeckAdvisor
 									Dictionary<string, int> mainDeckByName = new Dictionary<string, int>();
 									Dictionary<string, int> sideboardByName = new Dictionary<string, int>();
 									Dictionary<string, int> commandZoneByName = new Dictionary<string, int>();
+									string companionName = null;
 
 									if (Format == Properties.Resources.Item_Brawl && commandZone.Length == 0)
 									{
@@ -1321,6 +1359,24 @@ namespace DailyArena.DeckAdvisor
 									if (ignoreDeck)
 									{
 										continue;
+									}
+
+									if (companion != 0)
+									{
+										if (cardsById.ContainsKey(companion))
+										{
+											companionName = cardsById[companion].Name;
+											if (!sideboardByName.ContainsKey(companionName))
+											{
+												Logger.Debug(@"Sideboard doesn't contain companion, ignoring player deck");
+												continue;
+											}
+										}
+										else
+										{
+											Logger.Debug(@"Unknown card found, ignoring player deck: {arenaId}", companion);
+											continue;
+										}
 									}
 
 									if (RotationProof.Value)
@@ -1438,8 +1494,8 @@ namespace DailyArena.DeckAdvisor
 										}
 									}
 
-									_playerDecks.Add(id, new Archetype(name, mainDeckByName, sideboardByName, commandZoneByName, RotationProof.Value, isPlayerDeck: true,
-										setNameTranslations: _setNameTranslations));
+									_playerDecks.Add(id, new Archetype(name, mainDeckByName, sideboardByName, commandZoneByName, companionName, RotationProof.Value,
+										isPlayerDeck: true, setNameTranslations: _setNameTranslations));
 								}
 
 								LoadingValue.Value = Math.Max(LoadingValue.Value, 20);
@@ -1459,6 +1515,7 @@ namespace DailyArena.DeckAdvisor
 
 								string name = deck["name"];
 								int[] commandZone = deck["commandZoneGRPIds"] == null ? new int[0] : deck["commandZoneGRPIds"].ToObject<int[]>();
+								int companion = deck["companionGRPId"] == null ? 0 : (int)deck["companionGRPId"];
 								int[] mainDeck = deck["mainDeck"].ToObject<int[]>();
 								int[] sideboard = deck["sideboard"].ToObject<int[]>();
 								Guid id = Guid.Parse((string)deck["id"]);
@@ -1469,6 +1526,7 @@ namespace DailyArena.DeckAdvisor
 								Dictionary<string, int> mainDeckByName = new Dictionary<string, int>();
 								Dictionary<string, int> sideboardByName = new Dictionary<string, int>();
 								Dictionary<string, int> commandZoneByName = new Dictionary<string, int>();
+								string companionName = null;
 
 								if (Format == Properties.Resources.Item_Brawl && commandZone.Length == 0)
 								{
@@ -1533,6 +1591,24 @@ namespace DailyArena.DeckAdvisor
 									else
 									{
 										commandZoneByName.Add(cardName, cardQuantity);
+									}
+								}
+
+								if (companion != 0)
+								{
+									if (cardsById.ContainsKey(companion))
+									{
+										companionName = cardsById[companion].Name;
+										if (!sideboardByName.ContainsKey(companionName))
+										{
+											Logger.Debug(@"Sideboard doesn't contain companion, ignoring player deck");
+											continue;
+										}
+									}
+									else
+									{
+										Logger.Debug(@"Unknown card found, ignoring player deck: {arenaId}", companion);
+										continue;
 									}
 								}
 
@@ -1651,7 +1727,7 @@ namespace DailyArena.DeckAdvisor
 									}
 								}
 
-								_playerDecks.Add(id, new Archetype(name, mainDeckByName, sideboardByName, commandZoneByName, RotationProof.Value, isPlayerDeck: true,
+								_playerDecks.Add(id, new Archetype(name, mainDeckByName, sideboardByName, commandZoneByName, companionName, RotationProof.Value, isPlayerDeck: true,
 									setNameTranslations: _setNameTranslations));
 
 								LoadingValue.Value = Math.Max(LoadingValue.Value, 80);

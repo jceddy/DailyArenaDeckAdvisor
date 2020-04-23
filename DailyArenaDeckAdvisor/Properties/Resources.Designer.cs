@@ -196,6 +196,15 @@ namespace DailyArena.DeckAdvisor.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Companion.
+        /// </summary>
+        public static string Deck_Companion {
+            get {
+                return ResourceManager.GetString("Deck_Companion", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Expected Booster Cost.
         /// </summary>
         public static string Deck_ExpectedCost {

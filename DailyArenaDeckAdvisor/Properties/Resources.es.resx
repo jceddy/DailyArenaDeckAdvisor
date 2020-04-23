@@ -177,6 +177,10 @@
     <value>Comandante</value>
     <comment>Commander header for Deck Details view.</comment>
   </data>
+  <data name="Deck_Companion" xml:space="preserve">
+    <value>Compañero</value>
+    <comment>Companion header for Deck Details view.</comment>
+  </data>
   <data name="Deck_ExpectedCost" xml:space="preserve">
     <value>Costo Esperado en Paquetes</value>
     <comment>Expected Booster Cost header for Deck Details view.</comment>
