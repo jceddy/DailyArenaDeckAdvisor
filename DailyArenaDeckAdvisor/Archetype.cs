@@ -900,13 +900,13 @@ namespace DailyArena.DeckAdvisor
 					ReadOnlyDictionary<int, Card> cardsById = Card.CardsById;
 					var commandZone = SuggestedCommandZone.Concat(CommandZoneToCollect).GroupBy(x => x.Key).
 						Select(x => new { Card = cardsById[x.Key], Quantity = x.Sum(y => y.Value) }).
-						Select(x => $"{x.Quantity} {x.Card.Name} ({x.Card.Set.ArenaCode}) {x.Card.CollectorNumber}");
+						Select(x => $"{x.Quantity} {x.Card.Name}"/* ({x.Card.Set.ArenaCode}) {x.Card.CollectorNumber}"*/);
 					var mainDeck = SuggestedMainDeck.Concat(MainDeckToCollect).GroupBy(x => x.Key).
 						Select(x => new { Card = cardsById[x.Key], Quantity = x.Sum(y => y.Value) }).
-						Select(x => $"{x.Quantity} {x.Card.Name} ({x.Card.Set.ArenaCode}) {x.Card.CollectorNumber}");
+						Select(x => $"{x.Quantity} {x.Card.Name}"/* ({x.Card.Set.ArenaCode}) {x.Card.CollectorNumber}"*/);
 					var sideboard = SuggestedSideboard.Concat(SideboardToCollect).GroupBy(x => x.Key).
 						Select(x => new { Card = cardsById[x.Key], Quantity = x.Sum(y => y.Value) }).
-						Select(x => $"{x.Quantity} {x.Card.Name} ({x.Card.Set.ArenaCode}) {x.Card.CollectorNumber}");
+						Select(x => $"{x.Quantity} {x.Card.Name}"/* ({x.Card.Set.ArenaCode}) {x.Card.CollectorNumber}"*/);
 
 					if(commandZone.Count() > 0)
 					{
@@ -914,7 +914,7 @@ namespace DailyArena.DeckAdvisor
 					}
 					if (CompanionView != null && CompanionView.Count > 0)
 					{
-						exportList.AppendFormat("Companion{0}{1}{0}{0}", Environment.NewLine, CompanionView[0].Card.FullName);
+						exportList.AppendFormat("Companion{0}{1}{0}{0}", Environment.NewLine, CompanionView[0].Card.Name);
 					}
 					exportList.AppendFormat("Deck{0}{1}", Environment.NewLine, string.Join(Environment.NewLine, mainDeck));
 					if(sideboard.Count() > 0)
@@ -1020,18 +1020,18 @@ namespace DailyArena.DeckAdvisor
 
 					var mainDeck = SuggestedMainDeck.Concat(mainDeckReplacements).GroupBy(x => x.Key).
 						Select(x => new { Card = cardsById[x.Key], Quantity = x.Sum(y => y.Value) }).
-						Select(x => $"{x.Quantity} {x.Card.Name} ({x.Card.Set.ArenaCode}) {x.Card.CollectorNumber}");
+						Select(x => $"{x.Quantity} {x.Card.Name}"/* ({x.Card.Set.ArenaCode}) {x.Card.CollectorNumber}"*/);
 					var sideboard = SuggestedSideboard.Concat(sideboardReplacements).GroupBy(x => x.Key).
 						Select(x => new { Card = cardsById[x.Key], Quantity = x.Sum(y => y.Value) }).
-						Select(x => $"{x.Quantity} {x.Card.Name} ({x.Card.Set.ArenaCode}) {x.Card.CollectorNumber}");
+						Select(x => $"{x.Quantity} {x.Card.Name}"/* ({x.Card.Set.ArenaCode}) {x.Card.CollectorNumber}"*/);
 					var commandZone = SuggestedCommandZone.Concat(commandZoneReplacements).GroupBy(x => x.Key).
 						Select(x => new { Card = cardsById[x.Key], Quantity = x.Sum(y => y.Value) }).
-						Select(x => $"{x.Quantity} {x.Card.Name} ({x.Card.Set.ArenaCode}) {x.Card.CollectorNumber}");
+						Select(x => $"{x.Quantity} {x.Card.Name}"/* ({x.Card.Set.ArenaCode}) {x.Card.CollectorNumber}"*/);
 
 					string companion = null;
 					if(CompanionView != null && CompanionView.Count > 0 && CompanionView[0].Collected)
 					{
-						companion = CompanionView[0].Card.FullName;
+						companion = CompanionView[0].Card.Name;
 					}
 
 					if (commandZone.Count() > 0)

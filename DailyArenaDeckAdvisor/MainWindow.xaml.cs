@@ -788,6 +788,10 @@ namespace DailyArena.DeckAdvisor
 				foreach(dynamic card in archetype["deck_list"])
 				{
 					string cardName = ((string)card["name"]).Trim();
+					if(cardName == "Deck")
+					{
+						continue;
+					}
 					if(!cardsByName.ContainsKey(cardName))
 					{
 						cardName = Regex.Split(cardName, " // ")[0].Trim();
@@ -826,6 +830,10 @@ namespace DailyArena.DeckAdvisor
 				foreach (dynamic card in archetype["deck_list"])
 				{
 					string cardName = ((string)card["name"]).Trim();
+					if(cardName == "Deck")
+					{
+						continue;
+					}
 					int cardQuantity = (int)card["quantity"];
 
 					Logger.Debug("Processing main deck card: {cardName}, {cardQuantity}", cardName, cardQuantity);
@@ -877,6 +885,12 @@ namespace DailyArena.DeckAdvisor
 				{
 					string cardName = (string)card["name"];
 					int cardQuantity = (int)card["quantity"];
+
+					if(cardQuantity == 0)
+					{
+						Logger.Debug("Card {cardName} found in sideboard with a quantity of zero, skipping", cardName);
+						continue;
+					}
 
 					Logger.Debug("Processing sideboard card: {cardName}, {cardQuantity}", cardName, cardQuantity);
 					foreach (Card archetypeCard in cardsByName[cardName])
@@ -942,7 +956,7 @@ namespace DailyArena.DeckAdvisor
 				}
 				if(archetype["companion"] != null)
 				{
-					companion = (string)archetype["companion"];
+					companion = (string)archetype["companion"].name;
 
 					Logger.Debug("Processing companion card: {cardName}", companion);
 					if (!cardsByName.ContainsKey(companion))
@@ -1081,7 +1095,7 @@ namespace DailyArena.DeckAdvisor
 						}
 						if (similarDeck["deck"]["companion"] != null)
 						{
-							similarCompanion = (string)similarDeck["deck"]["companion"];
+							similarCompanion = (string)similarDeck["deck"]["companion"].name;
 
 							Logger.Debug("Processing companion card: {cardName}", similarCompanion);
 							if (!cardsByName.ContainsKey(similarCompanion))
@@ -1271,7 +1285,7 @@ namespace DailyArena.DeckAdvisor
 									{
 										continue;
 									}
-									else if ((Format == Properties.Resources.Item_ArenaStandard || Format == Properties.Resources.Item_Historic_Bo1) && (sideboard.Length > 0 || commandZone.Length > 0))
+									else if ((Format == Properties.Resources.Item_ArenaStandard || Format == Properties.Resources.Item_Historic_Bo1) && (sideboard.Length > 1 || commandZone.Length > 0))
 									{
 										continue;
 									}
@@ -1536,7 +1550,7 @@ namespace DailyArena.DeckAdvisor
 								{
 									continue;
 								}
-								else if ((Format == Properties.Resources.Item_ArenaStandard || Format == Properties.Resources.Item_Historic_Bo1) && (sideboard.Length > 0 || commandZone.Length > 0))
+								else if ((Format == Properties.Resources.Item_ArenaStandard || Format == Properties.Resources.Item_Historic_Bo1) && (sideboard.Length > 1 || commandZone.Length > 0))
 								{
 									continue;
 								}
