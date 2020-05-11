@@ -716,7 +716,13 @@ namespace DailyArena.DeckAdvisor
 
 						try
 						{
-							if (_standardBannings.Contains(cardName))
+							if (string.IsNullOrWhiteSpace(cardName))
+							{
+								Logger.Debug("Empty card name found, ignore this deck", cardName);
+								ignoreDeck = true;
+								break;
+							}
+							else if (_standardBannings.Contains(cardName))
 							{
 								Logger.Debug("{cardName} is banned in standard, ignore this deck", cardName);
 								ignoreDeck = true;
