@@ -914,7 +914,7 @@ namespace DailyArena.DeckAdvisor
 					}
 					if (CompanionView != null && CompanionView.Count > 0)
 					{
-						exportList.AppendFormat("Companion{0}{1}{0}{0}", Environment.NewLine, CompanionView[0].Card.Name);
+						exportList.AppendFormat("Companion{0}1 {1}{0}{0}", Environment.NewLine, CompanionView[0].Card.Name);
 					}
 					exportList.AppendFormat("Deck{0}{1}", Environment.NewLine, string.Join(Environment.NewLine, mainDeck));
 					if(sideboard.Count() > 0)
@@ -1040,7 +1040,7 @@ namespace DailyArena.DeckAdvisor
 					}
 					if(companion != null)
 					{
-						exportList.AppendFormat("Companion{0}{1}{0}{0}", Environment.NewLine, companion);
+						exportList.AppendFormat("Companion{0}1 {1}{0}{0}", Environment.NewLine, companion);
 					}
 					exportList.AppendFormat("Deck{0}{1}", Environment.NewLine, string.Join(Environment.NewLine, mainDeck));
 					if (sideboard.Count() > 0)
