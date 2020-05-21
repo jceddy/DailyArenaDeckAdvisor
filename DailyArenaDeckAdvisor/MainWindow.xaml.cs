@@ -1151,7 +1151,7 @@ namespace DailyArena.DeckAdvisor
 			var logFolder = GetLogFolderLocation();
 			bool playerInventoryFound = false;
 			bool playerCardsFound = false;
-			using (var fs = new FileStream(logFolder + "\\output_log.txt", FileMode.Open, FileAccess.Read, FileShare.ReadWrite | FileShare.Delete))
+			using (var fs = new FileStream(logFolder + "\\Player.log", FileMode.Open, FileAccess.Read, FileShare.ReadWrite | FileShare.Delete))
 			{
 				using (var reader = new StreamReader(fs))
 				{
