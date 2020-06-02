@@ -2793,14 +2793,14 @@ namespace DailyArena.DeckAdvisor
 			attachments.Add(new GithubAttachment(dadaLogAttachmentName, dadaLogContent));
 
 			var mtgaLogFolder = GetLogFolderLocation();
-			string mtgaLogContent = File.ReadAllText(mtgaLogFolder + "\\output_log.txt");
-			attachments.Add(new GithubAttachment("output_log.txt", mtgaLogContent));
+			string mtgaLogContent = File.ReadAllText(mtgaLogFolder + "\\Player.log");
+			attachments.Add(new GithubAttachment("Player.log", mtgaLogContent));
 
 			string nl = Environment.NewLine + Environment.NewLine;
 
 			GithubIssueResponse response = GithubUtilities.CreateNewIssue("daily-arena-deck-advisor", "jceddy", "DailyArenaDeckAdvisor",
 				string.Format("Unhandled Exception in {0} ({1} - Main Application)", task, method),
-				$"An unhandled exception was detected.{nl}Exception:{nl}{taskException.ToString()}{nl}%{dadaLogAttachmentName}%{nl}%output_log.txt%",
+				$"An unhandled exception was detected.{nl}Exception:{nl}{taskException.ToString()}{nl}%{dadaLogAttachmentName}%{nl}%Player.log%",
 				new string[] { "automatic" }, ((App)Application.Current).State.Fingerprint, attachments.ToArray(), out string serverResponse, out Exception exception);
 			if (serverResponse != null)
 			{
