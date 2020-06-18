@@ -1260,7 +1260,16 @@ namespace DailyArena.DeckAdvisor
 							int jsonStart = line.IndexOf("{");
 							int jsonEnd = line.LastIndexOf("}");
 							string jsonString = line.Substring(jsonStart, jsonEnd - jsonStart + 1);
-							dynamic json = JToken.Parse(jsonString);
+							dynamic json = null;
+							try
+							{
+								json = JToken.Parse(jsonString);
+							}
+							catch(JsonReaderException jsonEx)
+							{
+								Logger.Debug(jsonEx, "Exception when parsing deck list JSON: {line}", line);
+								continue;
+							}
 
 							if (json.payload != null)
 							{
