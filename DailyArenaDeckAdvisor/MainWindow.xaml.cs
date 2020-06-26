@@ -769,17 +769,39 @@ namespace DailyArena.DeckAdvisor
 
 							Logger.Debug("Checking sideboard card: {cardName}", cardName);
 
-							if(_standardBannings.Contains(cardName))
+							if (_standardBannings.Contains(cardName))
 							{
 								Logger.Debug("{cardName} is banned in standard, ignore this deck", cardName);
 								ignoreDeck = true;
 								break;
 							}
-							else if (cardsByName[cardName].Count(x => x.Set.StandardLegal) == 0)
+							else
 							{
-								Logger.Debug("{cardName} is not standard legal, ignore this deck", cardName);
-								ignoreDeck = true;
-								break;
+								List<Card> cardPrintings = null;
+								if (cardsByName.ContainsKey(cardName))
+								{
+									cardPrintings = cardsByName[cardName];
+								}
+								else
+								{
+									cardPrintings = cardsByName.Where(x => x.Key.Replace("-", " ") == cardName).Select(y => y.Value).FirstOrDefault();
+									if (cardPrintings == null)
+									{
+										ignoreDeck = true;
+										break;
+									}
+									else
+									{
+										cardName = cardPrintings[0].Name;
+									}
+								}
+
+								if (cardsByName[cardName].Count(x => x.Set.StandardLegal) == 0)
+								{
+									Logger.Debug("{cardName} is not standard legal, ignore this deck", cardName);
+									ignoreDeck = true;
+									break;
+								}
 							}
 						}
 					}
@@ -1052,7 +1074,25 @@ namespace DailyArena.DeckAdvisor
 							int cardQuantity = (int)card["quantity"];
 							Logger.Debug("Processing alternate sideboard card: {cardName}, {cardQuantity}", cardName, cardQuantity);
 
-							foreach (Card archetypeCard in cardsByName[cardName])
+							List<Card> cardPrintings = null;
+							if(cardsByName.ContainsKey(cardName))
+							{
+								cardPrintings = cardsByName[cardName];
+							}
+							else
+							{
+								cardPrintings = cardsByName.Where(x => x.Key.Replace("-", " ") == cardName).Select(y => y.Value).FirstOrDefault();
+								if(cardPrintings == null)
+								{
+									ignoreDeck = true;
+									break;
+								}
+								else
+								{
+									cardName = cardPrintings[0].Name;
+								}
+							}
+							foreach (Card archetypeCard in cardPrintings)
 							{
 								CardStats stats = _cardStats[archetypeCard];
 								if (!similarMainDeck.ContainsKey(cardName) && !similarSideboard.ContainsKey(cardName))
@@ -1071,6 +1111,12 @@ namespace DailyArena.DeckAdvisor
 								similarSideboard.Add(cardName, cardQuantity);
 							}
 						}
+
+						if (ignoreDeck)
+						{
+							continue;
+						}
+
 						if (similarDeck["deck"]["commandzone"] != null)
 						{
 							foreach (dynamic card in similarDeck["deck"]["commandzone"])
