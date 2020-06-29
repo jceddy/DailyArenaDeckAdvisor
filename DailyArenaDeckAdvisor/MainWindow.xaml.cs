@@ -684,7 +684,18 @@ namespace DailyArena.DeckAdvisor
 
 							Logger.Debug("Checking sideboard card: {cardName}", cardName);
 
-							if (cardsByName[cardName].Count(x => x.Set.RotationSafe) == 0)
+							var cardPrintings = cardsByName.Where(x => x.Key.Replace("-", " ") == cardName).Select(y => y.Value).FirstOrDefault();
+							if (cardPrintings == null)
+							{
+								ignoreDeck = true;
+								break;
+							}
+							else
+							{
+								cardName = cardPrintings[0].Name;
+							}
+
+							if (cardPrintings.Count(x => x.Set.RotationSafe) == 0)
 							{
 								Logger.Debug("{cardName} is rotating soon, ignore this deck", cardName);
 								ignoreDeck = true;
