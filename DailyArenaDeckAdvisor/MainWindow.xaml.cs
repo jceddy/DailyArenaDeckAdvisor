@@ -3093,6 +3093,11 @@ namespace DailyArena.DeckAdvisor
 		}
 
 		/// <summary>
+		/// Object used to ensure that two instances of filterTask don't run at the same time.
+		/// </summary>
+		private object _filterTaskLockObject = new object();
+
+		/// <summary>
 		/// Apply archetype filters.
 		/// </summary>
 		/// <param name="filters">Filters to apply.</param>
@@ -3101,17 +3106,20 @@ namespace DailyArena.DeckAdvisor
 			Logger.Debug("ApplyFilters() Called");
 
 			Task filterTask = new Task(() => {
-				FilterArchetypes(filters, true);
+				lock (_filterTaskLockObject)
+				{
+					FilterArchetypes(filters, true);
+				}
 			});
 			filterTask.ContinueWith(t =>
-			{
-				if (t.Exception != null)
 				{
-					Logger.Error(t.Exception, "Exception in {0} ({1} - {2})", "filterTask", "ApplyFilters", ApplicationName);
+					if (t.Exception != null)
+					{
+						Logger.Error(t.Exception, "Exception in {0} ({1} - {2})", "filterTask", "ApplyFilters", ApplicationName);
 
-					ReportException("filterTask", "ApplyFilters", t.Exception);
-				}
-			},
+						ReportException("filterTask", "ApplyFilters", t.Exception);
+					}
+				},
 				TaskContinuationOptions.OnlyOnFaulted
 			);
 			filterTask.Start();
