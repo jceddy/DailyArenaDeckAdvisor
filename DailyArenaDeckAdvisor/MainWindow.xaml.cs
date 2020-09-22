@@ -214,7 +214,7 @@ namespace DailyArena.DeckAdvisor
 		/// <summary>
 		/// Minimum Arena client version supported by the application.
 		/// </summary>
-		private double _minimumClient = 1952.745934;
+		private ClientVersion _minimumClient = new ClientVersion(1, 1200);
 
 		/// <summary>
 		/// Default constructor. Sets the logger and scaling mode, and does GUI initialization stuff.
@@ -399,6 +399,7 @@ namespace DailyArena.DeckAdvisor
 				}
 				else
 				{
+					_colorsByLand.Clear();
 					dynamic json = JToken.Parse(result.ToString());
 					foreach (dynamic lands in json)
 					{
@@ -1227,7 +1228,7 @@ namespace DailyArena.DeckAdvisor
 							Match match = clientVersionPattern.Match(line);
 							if(match.Groups.Count > 1)
 							{
-								double clientVersion = double.Parse(match.Groups[1].Value, CultureInfo.InvariantCulture);
+								ClientVersion clientVersion = new ClientVersion(match.Groups[1].Value);
 								if(clientVersion < _minimumClient)
 								{
 									LoadingText.Value = Properties.Resources.Message_ClientVersion;
