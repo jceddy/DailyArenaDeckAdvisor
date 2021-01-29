@@ -1,9 +1,9 @@
 ﻿<Project>
 	<PropertyGroup>
-		<Version>1.0.8.7</Version>
-		<AssemblyVersion>1.0.8.7</AssemblyVersion>
-		<FileVersion>1.0.8.7</FileVersion>
-		<Copyright>© 2019-2020 DailyArena</Copyright>
+		<Version>1.0.8.8</Version>
+		<AssemblyVersion>1.0.8.8</AssemblyVersion>
+		<FileVersion>1.0.8.8</FileVersion>
+		<Copyright>© 2019-2021 DailyArena</Copyright>
 		<Authors>Joseph Eddy</Authors>
 	</PropertyGroup>
 </Project>

@@ -14,7 +14,6 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Configuration;
 using System.Diagnostics;
-using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -122,7 +121,12 @@ namespace DailyArena.DeckAdvisor
 			{ "Island", "U" },
 			{ "Swamp", "B" },
 			{ "Mountain", "R" },
-			{ "Forest", "G" }
+			{ "Forest", "G" },
+			{ "Snow-Covered Plains", "W" },
+			{ "Snow-Covered Island", "U" },
+			{ "Snow-Covered Swamp", "B" },
+			{ "Snow-Covered Mountain", "R" },
+			{ "Snow-Covered Forest", "G" }
 		};
 
 		/// <summary>
