@@ -2548,7 +2548,7 @@ namespace DailyArena.DeckAdvisor
 					try
 					{
 						var candidates = playerInventory.Select(x => new { Card = cardsById[x.Key], Quantity = x.Value }).
-							Where(x => x.Quantity > 0 && x.Card.Type == cardToReplace.Type && _colorsByLand.ContainsKey(x.Card.Name) && _colorsByLand[x.Card.Name] == _colorsByLand[cardToReplace.Name] && (identity == null || identity.Contains(x.Card.ColorIdentity))).
+							Where(x => x.Quantity > 0 && x.Card.Type == cardToReplace.Type && _colorsByLand.ContainsKey(x.Card.Name) && _colorsByLand[x.Card.Name] == (_colorsByLand.ContainsKey(cardToReplace.Name) ? _colorsByLand[cardToReplace.Name] : (identity ?? CardColors.CardColorFromString(string.Empty))) && (identity == null || identity.Contains(x.Card.ColorIdentity))).
 							OrderByDescending(x => x.Card.Rank + CardStats.GetAssociationModifier(cardToReplace.Name, x.Card.Name, _cardStats));
 
 						foreach (var candidate in candidates)
@@ -2581,9 +2581,10 @@ namespace DailyArena.DeckAdvisor
 						Logger.Debug("Insufficient Candidates Found, suggesting basic land replacements");
 						Random r = new Random();
 						// randomizing colors here so we don't always favor colors in WUBRG order
-						string[] colors = (_colorsByLand[cardToReplace.Name] == null ?
+						CardColors tempColor = (_colorsByLand.ContainsKey(cardToReplace.Name) ? _colorsByLand[cardToReplace.Name] : identity);
+						string[] colors = (tempColor == null ?
 							new string[] { "W", "U", "B", "R", "G" }.Select(x => new { Sort = r.Next(), Value = x }) :
-							_colorsByLand[cardToReplace.Name].ColorString.Select(x => new { Sort = r.Next(), Value = x.ToString() })).
+							tempColor.ColorString.Select(x => new { Sort = r.Next(), Value = x.ToString() })).
 							OrderBy(y => y.Sort).Select(z => z.Value).ToArray();
 						Dictionary<string, int> _colorReplacements = new Dictionary<string, int>();
 						if (colors.Length > 0)
