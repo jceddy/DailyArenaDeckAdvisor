@@ -391,8 +391,8 @@ namespace DailyArena.DeckAdvisor
 
 			if(injectionSuccessful)
 			{
-				Logger.Debug("MTGA injection successful, sleeping for a second to give log dump time to execute.");
-				Thread.Sleep(1000);
+				Logger.Debug("MTGA injection successful, sleeping for ten seconds to give log dump time to execute.");
+				Thread.Sleep(10000);
 			}
 
 			return injectionSuccessful;

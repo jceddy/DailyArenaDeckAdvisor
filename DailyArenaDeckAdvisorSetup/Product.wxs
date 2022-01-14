@@ -25,8 +25,9 @@
 		<?define XceedMetroDllPath = "$(var.ProjectDir)..\DailyArenaDeckAdvisor\x64\Release\Xceed.Wpf.AvalonDock.Themes.Metro.dll" ?>
 		<?define XceedVS2010DllPath = "$(var.ProjectDir)..\DailyArenaDeckAdvisor\x64\Release\Xceed.Wpf.AvalonDock.Themes.VS2010.dll" ?>
 
-		<!-- Dll To Hook into MTGA -->
+		<!-- Dlls To Hook into MTGA -->
 		<?define DailyArenaDeckAdvisorGetDataDllSourcePath = "$(var.ProjectDir)..\DailyArenaDeckAdvisor\x64\Release\DailyArena.DeckAdvisor.GetData.dll" ?>
+		<?define SharpMonoInjectorDllSourcePath = "$(var.ProjectDir)..\DailyArenaDeckAdvisor\x64\Release\SharpMonoInjector.dll" ?>
 
 		<!-- DailyArena language resource files -->
 		<?define DailyArenaEnResourceDllPath = "$(var.ProjectDir)..\DailyArenaDeckAdvisor\x64\Release\en\DailyArenaDeckAdvisor.resources.dll" ?>
@@ -71,8 +72,9 @@
 		<?define XceedMetroDllPath = "$(var.ProjectDir)..\DailyArenaDeckAdvisor\x86\Release\Xceed.Wpf.AvalonDock.Themes.Metro.dll" ?>
 		<?define XceedVS2010DllPath = "$(var.ProjectDir)..\DailyArenaDeckAdvisor\x86\Release\Xceed.Wpf.AvalonDock.Themes.VS2010.dll" ?>
 
-		<!-- Dll To Hook into MTGA -->
+		<!-- Dlls To Hook into MTGA -->
 		<?define DailyArenaDeckAdvisorGetDataDllSourcePath = "$(var.ProjectDir)..\DailyArenaDeckAdvisor\x86\Release\DailyArena.DeckAdvisor.GetData.dll" ?>
+		<?define SharpMonoInjectorDllSourcePath = "$(var.ProjectDir)..\DailyArenaDeckAdvisor\x64\Release\SharpMonoInjector.dll" ?>
 
 		<!-- DailyArena language resource files -->
 		<?define DailyArenaEnResourceDllPath = "$(var.ProjectDir)..\DailyArenaDeckAdvisor\x86\Release\en\DailyArenaDeckAdvisor.resources.dll" ?>
@@ -225,6 +227,9 @@
 						<Component Id="DailyArena.DeckAdvisor.GetData.dll_comp" Guid="72a26d0a-c415-489f-af1c-c89d0984c0c5" Win64="$(var.Win64)">
 							<File Source="$(var.DailyArenaDeckAdvisorGetDataDllSourcePath)" Id="DailyArenaDeckAdvisorGetDataDll" KeyPath="yes" />
 						</Component>
+						<Component Id="SharpMonoInjector.dll_comp" Guid="e201d525-9478-446f-ba7f-ddb9c4aa26f3" Win64="$(var.Win64)">
+							<File Source="$(var.SharpMonoInjectorDllSourcePath)" Id="SharpMonoInjectorDll" KeyPath="yes" />
+						</Component>
 
 						<!-- language resource files -->
 						<Directory Id="deResourceFolder" Name="de">
@@ -360,8 +365,9 @@
 				<ComponentRef Id="Xceed.Wpf.AvalonDock.Themes.Metro.dll_comp" />
 				<ComponentRef Id="Xceed.Wpf.AvalonDock.Themes.VS2010.dll_comp" />
 
-				<!-- Dll To Hook into MTGA -->
+				<!-- Dlls To Hook into MTGA -->
 				<ComponentRef Id="DailyArena.DeckAdvisor.GetData.dll_comp" />
+				<ComponentRef Id="SharpMonoInjector.dll_comp" />
 
 				<!-- DailyArena language resource files -->
 				<ComponentRef Id="en_DailyArenaDeckAdvisor.resource.dll_comp" />
