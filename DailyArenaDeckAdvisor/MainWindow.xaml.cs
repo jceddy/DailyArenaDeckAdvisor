@@ -8,6 +8,7 @@ using DailyArena.DeckAdvisor.Common.Extensions;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Serilog;
+using SharpMonoInjector;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -238,6 +239,163 @@ namespace DailyArena.DeckAdvisor
 
 			InitializeComponent();
 			DataContext = this;
+		}
+
+		/// <summary>
+		/// Field to keep track of whether we have successfully hooked in to an MTGA instance.
+		/// </summary>
+		private bool _hookedIn = false;
+
+		/// <summary>
+		/// Field to keep track of whether we have successfully injected our assembly into MTGA.
+		/// </summary>
+		private bool _injectionDone = false;
+
+		/// <summary>
+		/// Field to track the PID of the MTGA process.
+		/// </summary>
+		private int _MTGAPID = 0;
+
+		/// <summary>
+		/// Field to track the address of the injected assembly.
+		/// </summary>
+		private IntPtr _injectedAssembly = IntPtr.Zero;
+
+		/// <summary>
+		/// Gets the directory containing the Assembly to inject into the MTGA instance.
+		/// </summary>
+		public static string AssemblyDirectory
+		{
+			get
+			{
+				string codeBase = Assembly.GetExecutingAssembly().CodeBase;
+				UriBuilder uri = new UriBuilder(codeBase);
+				string path = Uri.UnescapeDataString(uri.Path);
+				return Path.GetDirectoryName(path);
+			}
+		}
+
+		/// <summary>
+		/// Inject the GetData assembly into the currently running MTGA process.
+		/// </summary>
+		/// <param name="assemblyPath">The path to the assembly to inject.</param>
+		/// <param name="nmspc">The namespace to inject.</param>
+		/// <param name="className">The class of the method to call once the injection is complete.</param>
+		/// <param name="methodName">The method to call once the injection is complete.</param>
+		/// <returns>True if the assembly was successfully injected, false otherwise.</returns>
+		private bool Inject(string assemblyPath, string nmspc, string className, string methodName)
+		{
+			byte[] assembly;
+			Injector injector = new Injector(_MTGAPID);
+			try
+			{
+				assembly = File.ReadAllBytes(assemblyPath);
+			}
+			catch(Exception e)
+			{
+				Logger.Debug(e, "Faile to read {assemblyPath} into memory", assemblyPath);
+				return false;
+			}
+
+			using (injector)
+			{
+				if (_injectedAssembly != IntPtr.Zero)
+				{
+					try
+					{
+						injector.Eject(_injectedAssembly, nmspc, className, methodName);
+					}
+					catch (Exception e)
+					{
+						Logger.Debug(e, "Failed to Eject previously injected {assemblyPath}", assemblyPath);
+						return false;
+					}
+					finally
+					{
+						_injectedAssembly = IntPtr.Zero;
+					}
+				}
+
+				try
+				{
+					_injectedAssembly = injector.Inject(assembly, nmspc, className, methodName);
+				}
+				catch(InjectorException e)
+				{
+					Logger.Debug(e, "Failed to Inject {assemblyPath} [InjectorException]", assemblyPath);
+					return false;
+				}
+				catch(Exception e)
+				{
+					Logger.Debug(e, "Failed to Inject {assemblyPath} [Exception]", assemblyPath);
+					return false;
+				}
+
+				if (_injectedAssembly == IntPtr.Zero)
+				{
+					return false;
+				}
+				else
+				{
+					return true;
+				}
+			}
+		}
+
+		/// <summary>
+		/// Find the currently running MTGA process and inject our GetData assembly into it to dump user inventory data to the log.
+		/// </summary>
+		/// <returns>True if the MTGA process was found and the assembly injection was successful, false otherwise.</returns>
+		private bool HookIntoMTGA()
+		{
+			bool injectionSuccessful = false;
+			int tryCount = 0;
+
+			try
+			{
+				while(!_hookedIn)
+				{
+					Process[] processes = Process.GetProcessesByName("MTGA");
+					if(processes.Length > 0)
+					{
+						int pid = processes[0].Id;
+						if(_MTGAPID != pid)
+						{
+							_MTGAPID = pid;
+							_injectionDone = false;
+						}
+						if (!_injectionDone)
+						{
+							_injectionDone = true;
+							Thread.Sleep(3000);
+							injectionSuccessful = Inject($"{AssemblyDirectory}\\DailyArena.DeckAdvisor.GetData.dll", "DailyArena.DeckAdvisor.GetData", "Loader", "Load");
+						}
+						_hookedIn = true;
+					}
+					else
+					{
+						tryCount++;
+						if(tryCount > 10)
+						{
+							Logger.Debug("MTGA process not found, processing existing log.");
+							break;
+						}
+						Thread.Sleep(500);
+					}
+				}
+			}
+			catch(Exception e)
+			{
+				Logger.Debug(e, "Failed to hook into MTGA");
+			}
+
+			if(injectionSuccessful)
+			{
+				Logger.Debug("MTGA injection successful, sleeping for a second to give log dump time to execute.");
+				Thread.Sleep(1000);
+			}
+
+			return injectionSuccessful;
 		}
 
 		/// <summary>
@@ -517,6 +675,8 @@ namespace DailyArena.DeckAdvisor
 			DeckFilters filters = application.State.Filters;
 
 			Dispatcher.Invoke(() => { _tabObjects.Clear(); });
+
+			HookIntoMTGA();
 
 			LoadingValue.Value = 60;
 
@@ -1240,14 +1400,14 @@ namespace DailyArena.DeckAdvisor
 								}
 							}
 						}
-						else if (line.Contains("PlayerInventory.GetPlayerCardsV3"))
+						else if (line.Contains("**Collection**"))
 						{
 							int jsonStart = line.IndexOf("{");
 							int jsonEnd = line.LastIndexOf("}");
 							string jsonString = line.Substring(jsonStart, jsonEnd - jsonStart + 1);
 							dynamic json = JToken.Parse(jsonString);
 
-							if (json.payload != null)
+							if (json.Payload != null)
 							{
 								Logger.Debug(@"Processing player card inventory...");
 								playerCardsFound = true;
@@ -1255,7 +1415,7 @@ namespace DailyArena.DeckAdvisor
 								_basicLands.Clear();
 								_playerInventoryCounts.Clear();
 
-								foreach(dynamic info in json.payload)
+								foreach(dynamic info in json.Payload)
 								{
 									int id = int.Parse(info.Name);
 									int count = info.Value;
@@ -1297,27 +1457,27 @@ namespace DailyArena.DeckAdvisor
 								LoadingValue.Value = Math.Max(LoadingValue.Value, 40);
 							}
 						}
-						else if (line.Contains("PlayerInventory.GetPlayerInventory"))
+						else if (line.Contains("**InventoryContent**"))
 						{
 							int jsonStart = line.IndexOf("{");
 							int jsonEnd = line.LastIndexOf("}");
 							string jsonString = line.Substring(jsonStart, jsonEnd - jsonStart + 1);
 							dynamic json = JToken.Parse(jsonString);
 
-							if(json.payload != null)
+							if(json.Payload != null)
 							{
 								Logger.Debug(@"Processing player wildcard inventory...");
 								playerInventoryFound = true;
-								_wildcardsOwned[CardRarity.Common] = json.payload.wcCommon ?? 0;
-								_wildcardsOwned[CardRarity.Uncommon] = json.payload.wcUncommon ?? 0;
-								_wildcardsOwned[CardRarity.Rare] = json.payload.wcRare ?? 0;
-								_wildcardsOwned[CardRarity.MythicRare] = json.payload.wcMythic ?? 0;
-								VaultProgress.Value = json.payload.vaultProgress;
+								_wildcardsOwned[CardRarity.Common] = json.Payload.wcCommon ?? 0;
+								_wildcardsOwned[CardRarity.Uncommon] = json.Payload.wcUncommon ?? 0;
+								_wildcardsOwned[CardRarity.Rare] = json.Payload.wcRare ?? 0;
+								_wildcardsOwned[CardRarity.MythicRare] = json.Payload.wcMythic ?? 0;
+								VaultProgress.Value = json.Payload.vaultProgress;
 
 								LoadingValue.Value = Math.Max(LoadingValue.Value, 60);
 							}
 						}
-						else if (line.Contains("Deck.GetDeckListsV3") && !filters.HideFromCollection)
+						else if (line.Contains("**Decks**") && !filters.HideFromCollection)
 						{
 							int jsonStart = line.IndexOf("{");
 							int jsonEnd = line.LastIndexOf("}");
@@ -1333,18 +1493,56 @@ namespace DailyArena.DeckAdvisor
 								continue;
 							}
 
-							if (json.payload != null)
+							if (json.Payload != null)
 							{
 								Logger.Debug(@"Processing player deck list...");
 
-								foreach (dynamic deck in json.payload)
+								foreach (dynamic deck in json.Payload)
 								{
-									string name = deck["name"];
-									int[] commandZone = deck["commandZoneGRPIds"] == null ? new int[0] : deck["commandZoneGRPIds"].ToObject<int[]>();
-									int companion = deck["companionGRPId"] == null ? 0 : (int)deck["companionGRPId"];
-									int[] mainDeck = deck["mainDeck"].ToObject<int[]>();
-									int[] sideboard = deck["sideboard"].ToObject<int[]>();
-									Guid id = Guid.Parse((string)deck["id"]);
+									dynamic summary = deck["Summary"];
+									dynamic contents = deck["Contents"];
+									dynamic piles = contents["Piles"];
+
+									string name = summary["Name"];
+									int[] commandZone = null;
+									if(piles["CommandZone"] == null)
+									{
+										commandZone = new int[0];
+									}
+									else
+									{
+										List<int> commandZoneList = new List<int>();
+										foreach(dynamic commandZoneItem in piles["CommandZone"])
+										{
+											commandZoneList.Add((int)commandZoneItem["Id"]);
+											commandZoneList.Add((int)commandZoneItem["Quantity"]);
+										}
+										commandZone = commandZoneList.ToArray();
+									}
+									int companion = 0;// piles["Companions"] == null ? 0 : (int)piles["Companions"][0]["Id"];
+									if(piles["Companions"] != null)
+									{
+										foreach(dynamic companionItem in piles["Companions"])
+										{
+											companion = companionItem["Id"];
+											break;
+										}
+									}
+									List<int> mainDeckList = new List<int>();
+									foreach (dynamic mainDeckItem in piles["Main"])
+									{
+										mainDeckList.Add((int)mainDeckItem["Id"]);
+										mainDeckList.Add((int)mainDeckItem["Quantity"]);
+									}
+									int[] mainDeck = mainDeckList.ToArray();
+									List<int> sideboardList = new List<int>();
+									foreach (dynamic sideboardItem in piles["Sideboard"])
+									{
+										sideboardList.Add((int)sideboardItem["Id"]);
+										sideboardList.Add((int)sideboardItem["Quantity"]);
+									}
+									int[] sideboard = sideboardList.ToArray();
+									Guid id = Guid.Parse((string)summary["DeckId"]);
 									if (_playerDecks.ContainsKey(id))
 									{
 										_playerDecks.Remove(id);

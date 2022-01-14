@@ -25,6 +25,9 @@
 		<?define XceedMetroDllPath = "$(var.ProjectDir)..\DailyArenaDeckAdvisor\x64\Release\Xceed.Wpf.AvalonDock.Themes.Metro.dll" ?>
 		<?define XceedVS2010DllPath = "$(var.ProjectDir)..\DailyArenaDeckAdvisor\x64\Release\Xceed.Wpf.AvalonDock.Themes.VS2010.dll" ?>
 
+		<!-- Dll To Hook into MTGA -->
+		<?define DailyArenaDeckAdvisorGetDataDllSourcePath = "$(var.ProjectDir)..\DailyArenaDeckAdvisor\x64\Release\DailyArena.DeckAdvisor.GetData.dll" ?>
+
 		<!-- DailyArena language resource files -->
 		<?define DailyArenaEnResourceDllPath = "$(var.ProjectDir)..\DailyArenaDeckAdvisor\x64\Release\en\DailyArenaDeckAdvisor.resources.dll" ?>
 		<?define DailyArenaLauncherEnResourceDllPath = "$(var.ProjectDir)..\DailyArenaDeckAdvisorLauncher\x64\Release\en\DailyArenaDeckAdvisorLauncher.resources.dll" ?>
@@ -67,6 +70,9 @@
 		<?define XceedAeroDllPath = "$(var.ProjectDir)..\DailyArenaDeckAdvisor\x86\Release\Xceed.Wpf.AvalonDock.Themes.Aero.dll" ?>
 		<?define XceedMetroDllPath = "$(var.ProjectDir)..\DailyArenaDeckAdvisor\x86\Release\Xceed.Wpf.AvalonDock.Themes.Metro.dll" ?>
 		<?define XceedVS2010DllPath = "$(var.ProjectDir)..\DailyArenaDeckAdvisor\x86\Release\Xceed.Wpf.AvalonDock.Themes.VS2010.dll" ?>
+
+		<!-- Dll To Hook into MTGA -->
+		<?define DailyArenaDeckAdvisorGetDataDllSourcePath = "$(var.ProjectDir)..\DailyArenaDeckAdvisor\x86\Release\DailyArena.DeckAdvisor.GetData.dll" ?>
 
 		<!-- DailyArena language resource files -->
 		<?define DailyArenaEnResourceDllPath = "$(var.ProjectDir)..\DailyArenaDeckAdvisor\x86\Release\en\DailyArenaDeckAdvisor.resources.dll" ?>
@@ -216,6 +222,9 @@
 						<Component Id="Xceed.Wpf.AvalonDock.Themes.VS2010.dll_comp" Guid="d26fdde7-b4ce-4a13-bde3-08217fe701d4" Win64="$(var.Win64)">
 							<File Source="$(var.XceedVS2010DllPath)" Id="XceedVS2010Dll" KeyPath="yes" />
 						</Component>
+						<Component Id="DailyArena.DeckAdvisor.GetData.dll_comp" Guid="72a26d0a-c415-489f-af1c-c89d0984c0c5" Win64="$(var.Win64)">
+							<File Source="$(var.DailyArenaDeckAdvisorGetDataDllSourcePath)" Id="DailyArenaDeckAdvisorGetDataDll" KeyPath="yes" />
+						</Component>
 
 						<!-- language resource files -->
 						<Directory Id="deResourceFolder" Name="de">
@@ -350,7 +359,10 @@
 				<ComponentRef Id="Xceed.Wpf.AvalonDock.Themes.Aero.dll_comp" />
 				<ComponentRef Id="Xceed.Wpf.AvalonDock.Themes.Metro.dll_comp" />
 				<ComponentRef Id="Xceed.Wpf.AvalonDock.Themes.VS2010.dll_comp" />
-				
+
+				<!-- Dll To Hook into MTGA -->
+				<ComponentRef Id="DailyArena.DeckAdvisor.GetData.dll_comp" />
+
 				<!-- DailyArena language resource files -->
 				<ComponentRef Id="en_DailyArenaDeckAdvisor.resource.dll_comp" />
 				<ComponentRef Id="en_DailyArenaDeckAdvisorLauncher.resource.dll_comp" />
