@@ -181,6 +181,10 @@
     <Resource Include="DA_tiny.ico" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\DailyArenaDeckAdvisor.GetData\DailyArena.DeckAdvisor.GetData.csproj">
+      <Project>{ca4081dd-18da-41d1-b0db-8df9aaa6b13f}</Project>
+      <Name>DailyArena.DeckAdvisor.GetData</Name>
+    </ProjectReference>
     <ProjectReference Include="..\DailyArenaDeckAdvisorUpdater\DailyArenaDeckAdvisorUpdater.csproj">
       <Project>{986235b3-f7d9-4607-8cf8-7d8649fa1f23}</Project>
       <Name>DailyArenaDeckAdvisorUpdater</Name>
